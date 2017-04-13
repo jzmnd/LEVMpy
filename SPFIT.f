@@ -1,0 +1,158 @@
+C
+C       DO ALL SPECIFIED FITS      
+C       JRM 9/30/92
+C       MODIFIED JEREMY SMITH 3/31/2017
+C
+      SUBROUTINE SPFIT(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,PEX,
+     + NFREI,FV1)
+      IMPLICIT REAL*8 (A-H,O-Z)
+      CHARACTER*1 DATTYP,DFIT,PFIT,FUN,DATTYQ
+      INTEGER K,MAXFEV,NPRINT,NFEV,NFREI
+      REAL*8 FTOL,GTOL,XTOL,X,PEX,FV1
+      INCLUDE 'SIZE.INC'
+      DIMENSION X(*),YQQ(NPT2),PEX(*),FV1(*)
+      COMMON /CM1/ FREQ(NPTS),M,DATTYP
+      COMMON /CM2/ Y(NPT2),R(NPT2),FJ(NPT2),P(NTOT),DRSS,ROE,RKE,
+     + NS(NPAFR),NFREE(NTOT),NP,ICNT,MN,IRCH,IXI,DATTYQ
+      COMMON /CM3/ CELCAP,FUN,DFIT,PFIT
+      COMMON /CM11/ MQY,ISPR,ICX,NDF,FQQ
+      COMMON /CM16/ IOP,IORIG,NYC,J,IPRINT,LDFJAC,MODE,IFP,IRE,ISTP,JFP,
+     + NPH,INE
+      COMMON /CM34/ MD,IWT,IXW,INFP,IPL
+      COMMON /CM35/ JIT,IPF,NPRIN
+C
+      WRITE(*,*) '  ====== SPFIT ======'
+C
+      DO 983 JIT = 1,4
+C           DO MAIN FIT         
+          IF(JIT.EQ.1) THEN
+            ISTP = 2
+733         CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
+     + PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
+            IF(RKE.EQ.0.D0) THEN
+        SGMSQM = SGMAF*SGMAF
+        IF(ISPR.EQ.1) WRITE(3,745)
+        ENDIF   
+            IF(ROE.GT.0.D0.AND.RKE.EQ.0.D0) THEN
+                RKE = ROE*SGMAF
+                GOTO 733
+            ENDIF
+C       DO FWT ITERATION
+          ELSE IF(JIT.EQ.2) THEN
+             IF(IFP.NE.0) GOTO 333
+             GOTO 983
+C       DO RESIDUAL WEIGHTING ITERATION
+          ELSE IF(JIT.EQ.3.AND.ROE.EQ.0.D0) THEN
+             IF(IRE.GT.0) GOTO 333
+             GOTO 983
+C       DO OPTIMIZATION, COMPLEX FIT ONLY
+          ELSE IF(JIT.EQ.4) THEN
+            IF(IOP.GT.0) THEN
+            RKE = 0.D0
+        GOTO 876
+        ENDIF
+        GOTO 119
+          ENDIF
+          GOTO 983
+745     FORMAT(5X,'**************   END  MAIN  FIT   ***************'/)
+C
+C       OPTIMIZATION ITERATION (ONLY FOR DATTYP = C)
+876     CONTINUE   
+      IF(DATTYP.NE.'C') GOTO 119
+C     ******  NO OPTIMIZATION WHEN FPWT IS USED  ********
+      IF(IFP.GT.0.OR.IWT.EQ.1) THEN
+        GOTO 119
+      ENDIF
+           SDWRT = SDWR/SDWI
+           SDWRAT = SDWRT*SDWRT
+           TOLTST = DABS(1.D0 - SDWRT)
+           IF(IOCNT.EQ.IOP.OR.TOLTST.LT.1.D-2) THEN
+               ISTP = 2
+           ELSE
+               ISTP = 0 
+           ENDIF
+           SDFI = DSQRT(2.D0/(1.D0 + SDWRAT))
+           SDFR = SDWRT*SDFI
+           DO 880 IL = 1,M
+               R(IL) = SDFR*R(IL)
+               R(IL+M) = SDFI*R(IL+M)
+880        CONTINUE
+           CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
+     +     PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
+           IOCNT = IOCNT + 1
+           IF(ISTP.EQ.2) THEN
+               IF(ISPR.EQ.1) WRITE(3,748)
+               GOTO 119
+           ENDIF
+           GOTO 876
+C
+C     PROCEDURE FOR RESIDUAL OR FWT WEIGHTING ITERATION
+333   CONTINUE
+        NYC = 0
+       ISTP = 0
+        IXW = 0
+      IF(JIT.EQ.2) THEN
+        IXW = 1
+      IF(JFP.EQ.1) THEN
+        ISTP = 2
+        GOTO 628
+      ENDIF
+          SIGOLD = 5.D0
+          TOLI = 1.D-3
+          ITT = IFP
+          NRCH = 0
+      ENDIF
+      IF(JIT.EQ.3) THEN
+          TOLI = 1.D-2
+          ITT = IABS(IRE)
+          NRCH = 1
+      ENDIF
+384   IF(ISTP.EQ.2) THEN
+            IF(JIT.EQ.2.AND.JFP.EQ.0.AND.ISPR.EQ.1) WRITE(3,746)
+            IF(JIT.EQ.2.AND.JFP.EQ.1.AND.ISPR.EQ.1) WRITE(3,846)
+            IF(JIT.EQ.3.AND.ISPR.EQ.1) WRITE(3,747)            
+            GOTO 983
+      ENDIF
+      CALL MODEL(NTOT,P,FV1)
+      DO 340 I=J,K
+        YQQ(I) = DABS(FV1(I) - NRCH*Y(I))   
+340   CONTINUE
+846     FORMAT(1X,'*****  END *DIRECT* FWT ITERATION FIT   *****',/)
+746     FORMAT(1X,'*****  END *STAGED* FWT ITERATION  FIT   *****',/)
+747     FORMAT(3X,'*****  END  RWT  ITERATION  FIT   *****',/)
+748     FORMAT(3X,'*****  END  COMPLEX  FIT  OPTIMIZATION  *****',/)
+C
+      CALL RWTS(K,DATTYP,YQQ,FJ)
+      IF(NYC.GT.0) WRITE(3,346) NYC,SGMAF,SIGOLD
+346   FORMAT(2X,'*****  AFTER',I5,2X,'WEIGHTING ITERATIONS, SIGMA =',
+     +D20.10,/7X,'SIGMA OLD = ',D20.10,2X,'*****')
+      IF(JIT.EQ.2) THEN
+      IF(SGMAF.EQ.0.D0) GOTO 335
+          IF(DABS((SGMAF-SIGOLD)/SIGOLD).LT.TOLI) GOTO 335
+      ELSE
+          IF(DABS(1.D0-SGMAF).LT.TOLI) GOTO 335
+      ENDIF
+      IF(NYC.EQ.ITT) GOTO 336
+        SIGOLD=SGMAF
+        NYC=NYC+1
+        GO TO 628
+335   WRITE(3,347)
+347   FORMAT(2X,'*****  CONVERGENCE  *ACHIEVED*  IN WEIGHTING ITERATIO
+     +N  *****'/)
+      ISTP = 2
+      GO TO 628
+336   WRITE(3,348)
+348   FORMAT(1H0,2X,'*****  CONVERGENCE NOT ACHIEVED IN WEIGHTING ITER
+     +ATION  *****'/)
+      ISTP = 2
+      GO TO 628
+C
+628   CONTINUE
+      CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
+     +     PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
+        GOTO 384
+C     END OF WEIGHTING ITERATION PROCEDURE
+C
+983    CONTINUE
+119   RETURN
+      END

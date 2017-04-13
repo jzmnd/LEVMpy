@@ -1,0 +1,18 @@
+C
+C   THIS IS THE FUNCTION INTEGRATED TO FIND THE EDAE2 RESPONSE
+C     Exponential distribution of activation energies
+C
+      DOUBLE PRECISION FUNCTION DAEFN2(X)
+      IMPLICIT REAL*8(A-H,O-Z)
+      REAL*8 X
+      COMMON /CM5/ TOMEGA,PHICOM,IV
+C 
+      XPU = X*PHICOM
+      XP2 = X*(PHICOM + IV)
+      IF(DABS(XPU).GT.3.D2) XPU = DSIGN(3.D2,XPU)
+      IF(DABS(XP2).GT.3.D2) XP2 = DSIGN(3.D2,XP2)
+      IF(DABS(X).GT.3.D2) X = DSIGN(3.D2,X)
+      DAEFN2 = DEXP(-XPU)/(1.D0 + (TOMEGA*DEXP(-X))**2)
+     + + DEXP(-XP2)/(1.D0 + (TOMEGA*DEXP(X))**2)
+      RETURN
+      END

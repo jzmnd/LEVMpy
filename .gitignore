@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Compiled FORTRAN objects
+*.o
+
+# Shell scripts
+*.sh
+
+# Distribution / packaging / data
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+tests/
+not_required/
+LEVMWL/
+
+# DS Store
+.DS_Store
+
+# Other
+*.xlsx
+log.txt
+NEED_TO_WRAP.txt
+list_of_files.txt
+list_of_COMMON-all.txt
+list_of_COMMON.txt

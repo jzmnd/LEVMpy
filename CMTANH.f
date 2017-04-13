@@ -1,0 +1,17 @@
+      FUNCTION CMTANH(X)
+C           CMTANH(X) = X*TANH(X)
+      COMPLEX*16 CDTEMP,X,CMTANH,X2,CDI
+      DOUBLE PRECISION  DSIGN, ZR, DABS
+      ZR = DREAL(X)
+      IF (DABS(ZR) .GT. 1.3D2) GO TO 100
+      IF (CDABS(X) .GT. 4.D-3) GO TO 10
+      X2 = X**2
+      CMTANH = X2 - X2**2/3.D0 + 2.D0*X2**3/1.5D01
+      RETURN
+  10  CDTEMP = CDEXP(X)
+      CDI = 1.D0/CDTEMP        
+      CMTANH = X*((CDTEMP - CDI)/(CDTEMP + CDI))
+      RETURN
+  100 CMTANH = X*DCMPLX(DSIGN(1.D0,ZR),0.D0)
+      RETURN
+      END

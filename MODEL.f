@@ -1,0 +1,165 @@
+C     MODEL SUBROUTINE
+C     RUNS SELECTED CIRCUIT MODEL
+C     INPUTS:
+C       N  : input number of free parameters (IN)
+C       PX : all parameter list (IN)
+C       FQ : model function values (OUT)
+C
+C       MODIFIED JEREMY SMITH 3/31/2017
+C
+      SUBROUTINE MODEL(N, PX, FQ)
+      IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
+      INTEGER N
+      REAL*8 PX,FQ
+      COMPLEX*16 TRANS,ZRF,FOMEG
+      CHARACTER*1 AA,BB,CC,DD,EE,FF,GG,HH,II,JJ,KK,LM,MM,PP,YY,
+     + DATTYP,DFIT,PFIT,FUN,DATTYQ,OO,RR,SS,TT
+      DIMENSION NPA(NPAFR),PX(*),FQ(*)
+      COMMON /CM1/ FREQ(NPTS),MW,DATTYP
+      COMMON /CM2/ YV(NPT2),R(NPT2),FJ(NPT2),PR(NTOT),DRSS,ROE,RKE,
+     + NS(NPAFR),NFREE(NTOT),NDUM,ICNT,MN,IRCH,IXI,DATTYQ
+      COMMON /CM3/ CELCAP,FUN,DFIT,PFIT
+      COMMON /CM4/ FNORM
+      COMMON /CM10/ EPSG,IZR
+      DATA AA/'A'/,BB/'B'/,CC/'C'/,DD/'D'/,LM/'L'/,EE/'E'/,
+     +     FF/'F'/,GG/'G'/,HH/'H'/,II/'I'/,JJ/'J'/,KK/'K'/,MM/'M'/,
+     +     PP/'P'/,YY/'Y'/,OO/'O'/,RR/'R'/,SS/'S'/,TT/'T'/
+      TUPI = 6.283185307179586D0
+      TPDEG = TUPI/3.6D2
+      NK = 0
+C
+      DO 20 IW=1,N
+        IF(PX(IW).LT.0.D0.AND.NFREE(IW).EQ.1) GOTO 30
+        GOTO 20
+30      NK = NK + 1
+        NPA(NK) = IW
+20    CONTINUE
+      IF(NK.GT.0) GO TO 40
+      IF (FUN.EQ.AA) THEN
+        CALL ASUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.BB) THEN
+        CALL BSUB(MW,FREQ,PX,FQ)
+      ELSE IF (FUN.EQ.CC) THEN
+        CALL CSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.DD) THEN
+        CALL DSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.EE) THEN
+        CALL ESUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.FF) THEN
+        CALL FSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.GG) THEN
+        CALL GSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.HH) THEN
+        CALL HSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.II) THEN
+        CALL ISUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.JJ) THEN
+        CALL JSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.KK) THEN
+        CALL KSUB(MW,FREQ,PX,FQ,NFREE)
+      ELSEIF (FUN.EQ.OO) THEN
+        CALL OSUB(MW,FREQ,PX,FQ)
+      ELSEIF (FUN.EQ.RR) THEN
+        CALL RSUB(MW,FREQ,PX,FQ,NFREE)
+      ELSEIF (FUN.EQ.SS) THEN
+        CALL SSUB(MW,FREQ,PX,FQ,NFREE)
+C      ELSEIF (FUN.EQ.TT) THEN
+C         CALL TSUB(MW,FREQ,PX,FQ)
+      ELSE
+        WRITE(3,100) FUN
+  100   FORMAT('-*** PROGRAM TERMINATED: <',A1,'> IS INVALID MODEL')
+        RETURN
+C        STOP
+      ENDIF
+C
+C     POSSIBLY USE REFERENCE IMPEDANCE IN CALCULATIONS
+C     (requires complex fit with ZZRR input choices)
+C
+      IF(IZR.EQ.1.AND.PR(33).NE.0.D0) THEN
+        DO 150 IW = 1,MW
+          IM = IW + MW
+          FOMEG = DCMPLX(0.D0,FREQ(IW))
+          ZRF = PR(33)/(1.D0 + FOMEG*PR(33)*PR(34))
+          TRANS = DCMPLX(FQ(IW),FQ(IM))
+          TRANS = TRANS/(TRANS + ZRF)
+          FQ(IW) = DREAL(TRANS)
+          FQ(IM) = DIMAG(TRANS)
+150     CONTINUE
+      GOTO 666
+      ENDIF
+C
+C     TRANSFORM DATA FROM MODEL TO PROPER FORM
+C     FIRST TRANSFORM TO PROPER SYSTEM
+C
+C     Y FORMAT
+C
+      IF (DFIT.EQ.YY) THEN
+        DO 200 IW=1, MW
+          IM = IW + MW
+          TRANS = 1.D0/DCMPLX(FQ(IW), FQ(IM))
+          FQ(IW) = DREAL(TRANS)
+          FQ(IM) = DIMAG(TRANS)
+200     CONTINUE
+C
+C     M FORMAT
+C
+      ELSEIF (DFIT.EQ.MM) THEN
+        DO 250 IW=1, MW
+          IM = IW + MW
+          TRANS = DCMPLX(0.D0,FREQ(IW)*CELCAP)*DCMPLX(FQ(IW),FQ(IM))
+          FQ(IW) = DREAL(TRANS)
+          FQ(IM) = DIMAG(TRANS)
+  250   CONTINUE
+C
+C     E FORMAT
+C
+      ELSEIF (DFIT.EQ.EE) THEN
+        DO 300 IW=1, MW
+          IM = IW + MW
+        TRANS=1.D0/(DCMPLX(0.D0,FREQ(IW)*CELCAP)*DCMPLX(FQ(IW),FQ(IM)))
+          FQ(IW) = DREAL(TRANS)
+          FQ(IM) = DIMAG(TRANS)
+300     CONTINUE
+      ENDIF
+C
+C     CONVERT RECTANGULAR TO POLAR IF SPECIFIED
+C
+      IF((PFIT.EQ.PP).OR.(PFIT.EQ.DD).OR.(PFIT.EQ.LM)) THEN
+        DO 350 IW=1, MW
+          IM = IW + MW
+          FR = FQ(IW)
+          FI = FQ(IM)
+          FQ(IW) = DSQRT(FR*FR + FI*FI)
+          IF(PFIT.EQ.LM) FQ(IW) = DLOG(FQ(IW))
+          FQ(IM) = DATAN(FI/FR)
+          IF (PFIT.EQ.DD) FQ(IM) = FQ(IM)/TPDEG
+350     CONTINUE
+      ENDIF
+C
+C     IF DATTYP IS 'I', PUT IMAG. COMPUTATIONS IN FIRST PART OF VECTOR F        
+C
+      IF(DATTYP.EQ.'I') THEN
+        DO 400 IW=1,MW
+          FQ(IW) = FQ(IW+MW)
+400     CONTINUE
+      ENDIF
+C
+666   CONTINUE
+      RETURN
+C
+C   PENALTY FUNCTION PROCEDURE FOR UNWANTED(NFREE#2)NEGATIVE PARAMETERS
+C
+40    S = 1.D0
+      DO 50 IW=1,NK
+        ND = NPA(IW)
+        DQ = -PX(ND)
+        IF(DQ.GT.75.D0) DQ = 75.D0
+50    S = S + DEXP(DQ)
+      DQ = MW
+      DQ = DQ**.5D0
+      DQ = S*FNORM/DQ
+      DO 60 IW=1,MW
+60    FQ(IW) = YV(IW) + DQ*R(IW)
+      RETURN
+      END

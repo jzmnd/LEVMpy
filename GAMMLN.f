@@ -1,0 +1,26 @@
+C
+C     A function that returns the value of ln(Gamma(XX)) for XX > 0
+C
+      FUNCTION GAMMLN(XX)
+      IMPLICIT REAL*8(A-H,O-Z)
+      INTEGER J
+      REAL*8 XX
+      DIMENSION COF(6)
+      SAVE COF,STP
+C
+      DATA COF,STP/76.18009172947146D0,-86.50532032941677D0,
+     + 24.01409824083091D0,-1.231739572450155D0,.1208650973866179D-2,
+     + -.5395239384953D-5,2.5066282746310005D0/
+C 
+      X = XX
+      Y = X
+      TMP = X+5.5D0
+      TMP = (X+0.5D0)*DLOG(TMP)-TMP
+      SER = 1.000000000190015D0
+      DO 11 J=1,6
+        Y=Y+1.D0
+        SER = SER + COF(J)/Y
+11    CONTINUE
+      GAMMLN = TMP + LOG(STP*SER/X)
+      RETURN
+      END

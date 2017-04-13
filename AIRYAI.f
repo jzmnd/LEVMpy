@@ -1,0 +1,102 @@
+C     AIRY Ai FUNCTION SUBROUTINE
+C     For accurate KWW response function for BETA = 1/3
+C
+      SUBROUTINE AIRYAI(X,EPS,AI)
+      DOUBLE PRECISION X,EPS,AI,X3, 
+     +TK,FTERM,FSUM,FRATIO,GTERM,
+     +GSUM,GRATIO,ZETA,NSUM,DSUM,
+     +DDD,EE,EXPZETA,RSPIX,
+     +C1,C2,PI,
+     +DN(6),DD(7),EN(10),ED(11)
+C
+      INTEGER K
+      DATA C1 / 0.355028053887817D00 /, 
+     +    C2 / 0.258819403792807D00 /, 
+     +    PI / 3.14159265359D00 /, 
+     +    DN / 0.6223951529912393D00, 
+     +       18.406233696146327D00, 
+     +      90.62792720436782D00, 
+     +      136.22806191525729D00, 
+     +      72.26279462926934D00, 
+     +       11.691570161073225D00 /, 
+     +    DD / 1.0D00,22.093953355321673D00, 
+     +       98.14106331593061D00, 
+     +       140.86855055266716D00, 
+     +       73.07470903544198D00, 
+     +      11.691570165350335D00, 
+     +        4.249088927932299D-11 /, 
+     +    EN / 0.8256034744925347D00, 
+     +      2.883139497692721D00, 
+     +     2.1635619064914819D00, 
+     +      0.5401804200326157D00, 
+     +     0.6183717774780627D00, 
+     +     -0.03425732498078304D00, 
+     +     0.0493234227752643D00, 
+     +     -0.0026157454280489184D00, 
+     +     0.0008066890401987603D00, 
+     +      0.3380663415058702D-4/, 
+     +    ED / 1.0D00,1.9602145386554288D00, 
+     +      2.4213535313953605D00, 
+     +     0.4230947450530819D00, 
+     +      0.6299743421502649D00, 
+     +    -0.03868261937469959D00, 
+     +      0.0495486788287488D00, 
+     +    -0.0026760752382712361D00, 
+     +      0.00080443640770155D00, 
+     +     0.3380498458461015D-4, 
+     +      1.2773999631503219D-11 /
+C 
+      IF (DABS(X).LE.2.0D00) THEN 
+C     USE POWER SERIES
+        X3 = X*X*X
+        TK = 0.0D00
+        FTERM = 1.0D00
+        FSUM = 1.0D00
+        FRATIO = 10.0D00
+        GTERM = 1.0D00
+        GSUM = 1.0D00
+        GRATIO = 10.0D00
+        DO WHILE ((FRATIO.GT.EPS).OR.(GRATIO.GT.EPS))
+          TK = TK+3.0D00
+C       FOR  F  SERIES 
+          FTERM = FTERM*X3/(TK*(TK-1.0D00))
+          FSUM = FSUM+FTERM
+          FRATIO = DABS(FTERM/FSUM)
+C       FOR  G  SERIES
+          GTERM = GTERM*X3/(TK*(TK+1.0D00)) 
+          GSUM = GSUM+GTERM
+          GRATIO = DABS(GTERM/GSUM)
+        END DO
+        FSUM = FSUM*C1
+        GSUM = GSUM*C2*X
+C     VALUES FOR  |X| <= 2 
+        AI = FSUM - GSUM
+        RETURN 
+      END IF
+C
+      IF ( X.GT.2.0D00 ) THEN
+C     USE RATIONAL APPROXIMATIONS TO D AND E  
+        ZETA = 2.0D00*(X**1.5D00)/3.0D00
+C     D APPROXIMATION 
+        NSUM = 0.0D00  
+        DSUM = DD(7)
+        DO K = 6, 1, -1
+          NSUM = NSUM*ZETA+DN(K)
+          DSUM = DSUM*ZETA+DD(K)
+        END DO
+        DDD = NSUM/DSUM
+C     E APPROXIMATION 
+        NSUM = 0.0D00 
+        DSUM = ED(11)
+        DO K = 10, 1, -1
+          NSUM = NSUM*ZETA+EN(K)
+          DSUM = DSUM*ZETA+ED(K)
+        END DO
+        EE = NSUM/DSUM
+        EXPZETA = EXP(ZETA)
+        RSPIX = 1.0D00/SQRT(PI*SQRT(X))
+C     VALUES FOR  X > 2
+        AI = RSPIX/(2.0D00*EXPZETA)*DDD
+        RETURN  
+      END IF
+      END

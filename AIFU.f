@@ -1,0 +1,34 @@
+C     AIRY FUNCTION
+C     For accurate KWW response function for BETA = 1/3
+C
+      DOUBLE PRECISION FUNCTION AIFU(YY)
+      IMPLICIT REAL*8(A-H,O-Z)
+      REAL*8 YY
+      COMMON /CM5/ TOMEGA,PHICOM,IV
+      COMMON /CM12/ CELCAP,ATEMP,WF,MAXFEV,ICF,MDE,JCDX
+      DATA BETA /0.3333333333333333D0/, EPS /1.D-10/
+C
+C   AIRY FUNCTION.  HERE YY IS LN(TAU)
+C       
+       XX = DEXP(YY)              !this is tau/tauo
+      XXI = XX**IV
+       XA = BETA*XX
+      XA3 = XA**BETA
+      IF(XA3.GT.1.5D1) XA3 = 1.5D1
+C
+C   CALCULATE DRT = AID
+      CALL AIRYAI(XA3,EPS,AI)
+      AID = XA3*AI
+      IF(MDE.LT.0) AID = XX*AID
+C
+C   TRANSIENT RESPONSE
+      IF(ABS(MDE).EQ.8) THEN
+        AIFU = AID*DEXP(-TOMEGA/XX)
+      ELSE
+C
+C   FREQUENCY RESPONSE
+      AIFU = XXI*AID/(1.D0 + (TOMEGA*XX)**2)
+C
+      ENDIF
+      RETURN
+      END

@@ -1,0 +1,347 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module LEVMpy ! in 
+    interface  ! in :LEVMpy
+        real*8 :: p8
+        real*8 :: p18
+        real*8 :: gam
+        real*8 :: sn1
+        real*8 :: cs1
+        real*8 :: pii
+        real*8 :: cdn
+        real*8 :: qpi
+        integer :: mdex
+        real*8 dimension(50) :: rxsd
+        integer :: icount
+        character*1 :: dattyc
+        real*8 :: tomega
+        real*8 :: phicom
+        integer :: iv
+        real*8 :: fnorm
+        real*8 :: celcap
+        character*1 :: fun
+        character*1 :: dfit
+        character*1 :: pfit
+        real*8 dimension(4002) :: y
+        real*8 dimension(4002) :: r
+        real*8 dimension(4002) :: fj
+        real*8 dimension(50) :: p
+        real*8 :: drss
+        real*8 :: roe
+        real*8 :: rke
+        integer dimension(50) :: ns
+        integer dimension(50) :: nfree
+        integer :: n
+        integer :: icnt
+        integer :: mn
+        integer :: irch
+        integer :: ixi
+        character*1 :: dattyq
+        real*8 dimension(2001) :: freq
+        integer :: m
+        character*1 :: dattyp
+        real*8 :: rx
+        real*8 :: tx
+        real*8 :: ux
+        real*8 :: phi
+        real*8 :: xxm1
+        real*8 :: xx1
+        real*8 :: xx2
+        real*8 :: xx3
+        real*8 :: rn
+        real*8 :: ain
+        integer :: icav
+        integer :: nelem
+        integer :: nch
+        real*8 :: clcap
+        real*8 :: atemp
+        real*8 :: wf
+        integer :: maxfev
+        integer :: icf
+        integer :: mde
+        integer :: jcdx
+        integer :: mqy
+        integer :: ispr
+        integer :: icx
+        integer :: ndf
+        real*8 :: fqq
+        real*8 :: epsg
+        integer :: izr
+        integer :: iop
+        integer :: iorig
+        integer :: nyc
+        integer :: jy
+        integer :: iprint
+        integer :: ldfjac
+        integer :: mode
+        integer :: ifp
+        integer :: ire
+        integer :: istp
+        integer :: jfp
+        integer :: nph
+        integer :: ine
+        real*8 :: p39
+        real*8 dimension(4002,50) :: fjacc
+        real*8 dimension(4002) :: ytt
+        real*8 :: sdwc
+        real*8 :: sdrc
+        real*8 dimension(50) :: diag
+        integer :: ipar
+        integer :: iopr
+        integer :: jit
+        integer :: ipf
+        integer :: nprint
+        integer :: mda
+        integer :: iwt
+        integer :: ixw
+        integer :: infp
+        integer :: ipl
+        real*8 dimension(4002) :: shw
+        integer :: isw
+        real*8 :: px1
+        real*8 :: px41
+        real*8 :: px45
+        common /cm39/ p8,p18
+        common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
+        common /cm20/ rxsd
+        common /cm47/ icount
+        common /cm78/ dattyc
+        common /cm5/ tomega,phicom,iv
+        common /cm4/ fnorm
+        common /cm3/ celcap,fun,dfit,pfit
+        common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,n,icnt,mn,irch,ixi,dattyq
+        common /cm1/ freq,m,dattyp
+        common /cm13/ rx,tx,ux,phi,xxm1,xx1,xx2,xx3,rn,ain,icav,nelem,nch
+        common /cm12/ clcap,atemp,wf,maxfev,icf,mde,jcdx
+        common /cm11/ mqy,ispr,icx,ndf,fqq
+        common /cm10/ epsg,izr
+        common /cm16/ iop,iorig,nyc,jy,iprint,ldfjac,mode,ifp,ire,istp,jfp,nph,ine
+        common /cm73/ p39
+        common /cm14/ fjacc
+        common /cm79/ ytt
+        common /cm18/ sdwc,sdrc,diag,ipar,iopr
+        common /cm35/ jit,ipf,nprint
+        common /cm34/ mda,iwt,ixw,infp,ipl
+        common /cm36/ shw,isw
+        common /cm55/ px1,px41,px45
+        function aifu(yy) ! in :LEVMpy:AIFU.f
+            real*8 intent(in) :: yy
+            real*8 :: celcap
+            real*8 :: atemp
+            real*8 :: wf
+            integer :: maxfev
+            integer :: icf
+            integer :: mde
+            integer :: jcdx
+            real*8 :: tomega
+            real*8 :: phicom
+            integer :: iv
+            double precision intent(out) :: aifu
+            common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
+            common /cm5/ tomega,phicom,iv
+        end function aifu
+        function distel(r,t,u,phi,nelem,omega) ! in :LEVMpy:DISTEL.f
+            real*8 intent(in) :: r
+            real*8 intent(in) :: t
+            real*8 intent(in) :: u
+            real*8 intent(in) :: phi
+            integer intent(in) :: nelem
+            real*8 intent(in) :: omega
+            real*8 :: rz
+            real*8 :: tx
+            real*8 :: uu
+            real*8 :: phix
+            real*8 :: xxm1
+            real*8 :: xx1
+            real*8 :: xx2
+            real*8 :: xx3
+            real*8 :: rn
+            real*8 :: ain
+            integer :: icav
+            integer :: nelemn
+            integer :: nch
+            real*8 :: celcap
+            real*8 :: atemp
+            real*8 :: wf
+            integer :: maxfev
+            integer :: icf
+            integer :: mde
+            integer :: jcdx
+            real*8 :: tcmega
+            real*8 :: xigdae
+            integer :: ichg
+            integer :: iwt
+            real*8 :: p8
+            real*8 :: p18
+            real*8 :: tomega
+            real*8 :: phicom
+            integer :: iv
+            real*8 :: px1
+            real*8 :: px41
+            real*8 :: px45
+            complex*16 intent(out) :: distel
+            common /cm13/ rz,tx,uu,phix,xxm1,xx1,xx2,xx3,rn,ain,icav,nelemn,nch
+            common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
+            common /cm9/ tcmega,xigdae,ichg,iwt
+            common /cm39/ p8,p18
+            common /cm5/ tomega,phicom,iv
+            common /cm55/ px1,px41,px45
+        end function distel
+        function gammln(xx) ! in :LEVMpy:GAMMLN.f
+            real*8 intent(in) :: xx
+            real*8 intent(out) :: gammln
+        end function gammln
+        subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpy:GEDAE.f
+            integer :: ii
+            integer :: m
+            real*8 dimension(*) :: freq
+            real*8 dimension(8) :: qx
+            real*8 dimension(*) :: f
+            integer :: jcd
+            integer :: nch
+            integer :: inh
+            real*8 :: rx
+            real*8 :: tx
+            real*8 :: ux
+            real*8 :: phiz
+            real*8 :: xxm1
+            real*8 :: xx1
+            real*8 :: xx2
+            real*8 :: xx3
+            real*8 :: rnx
+            real*8 :: ain
+            integer :: icav
+            integer :: nelem
+            integer :: ncha
+            real*8 :: celcap
+            real*8 :: atemp
+            real*8 :: wf
+            integer :: maxfev
+            integer :: icf
+            integer :: mde
+            integer :: jcdx
+            real*8 :: px1
+            real*8 :: px41
+            real*8 :: px45
+            real*8 :: tomega
+            real*8 :: phix
+            integer :: ichg
+            integer :: iwt
+            real*8 :: gamx
+            real*8 :: sn1
+            real*8 :: cs1
+            real*8, optional :: pii=0.3183098861838d0
+            real*8 :: cdn
+            real*8 :: qpi
+            integer :: mdex
+            common /cm13/ rx,tx,ux,phiz,xxm1,xx1,xx2,xx3,rnx,ain,icav,nelem,ncha
+            common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
+            common /cm55/ px1,px41,px45
+            common /cm9/ tomega,phix,ichg,iwt
+            common /cm29/ gamx,sn1,cs1,pii,cdn,qpi,mdex
+        end subroutine gedae
+        subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy:MAINCLC.f
+            integer :: k
+            real*8 :: ftol
+            real*8 :: gtol
+            real*8 :: xtol
+            real*8 dimension(*) :: x
+            integer :: maxfev
+            integer :: nprint
+            integer :: nfev
+            real*8 dimension(*) :: pex
+            integer :: nfrei
+            real*8 dimension(*) :: fv1
+            integer :: mqy
+            integer :: ispr
+            integer :: icx
+            integer :: ndf
+            real*8 :: fqq
+            integer :: iop
+            integer :: iorig
+            integer :: nyc
+            integer :: j
+            integer :: iprint
+            integer :: ldfjac
+            integer :: mode
+            integer :: ifp
+            integer :: ire
+            integer :: istp
+            integer :: jfp
+            integer :: nph
+            integer :: ine
+            integer :: md
+            integer :: iwt
+            integer :: ixw
+            integer :: infp
+            integer :: ipl
+            real*8 :: celcap
+            character*1 :: fun
+            character*1 :: dfit
+            character*1 :: pfit
+            real*8 dimension(4002) :: y
+            real*8 dimension(4002) :: r
+            real*8 dimension(4002) :: fj
+            real*8 dimension(50) :: p
+            real*8 :: drss
+            real*8 :: roe
+            real*8 :: rke
+            integer dimension(50) :: ns
+            integer dimension(50) :: nfree
+            integer :: np
+            integer :: icnt
+            integer :: mn
+            integer :: irch
+            integer :: ixi
+            character*1 :: dattyq
+            real*8 dimension(2001) :: freq
+            integer :: m
+            character*1 :: dattyp
+            common /cm11/ mqy,ispr,icx,ndf,fqq
+            common /cm16/ iop,iorig,nyc,j,iprint,ldfjac,mode,ifp,ire,istp,jfp,nph,ine
+            common /cm34/ md,iwt,ixw,infp,ipl
+            common /cm3/ celcap,fun,dfit,pfit
+            common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
+            common /cm1/ freq,m,dattyp
+        end subroutine mainclc
+        subroutine model(n,px,fq) ! in :LEVMpy:MODEL.f
+            integer :: n
+            real*8 dimension(*) :: px
+            real*8 dimension(*) :: fq
+            real*8 :: epsg
+            integer :: izr
+            real*8 :: fnorm
+            real*8 :: celcap
+            character*1 :: fun
+            character*1 :: dfit
+            character*1 :: pfit
+            real*8 dimension(4002) :: yv
+            real*8 dimension(4002) :: r
+            real*8 dimension(4002) :: fj
+            real*8 dimension(50) :: pr
+            real*8 :: drss
+            real*8 :: roe
+            real*8 :: rke
+            integer dimension(50) :: ns
+            integer dimension(50) :: nfree
+            integer :: ndum
+            integer :: icnt
+            integer :: mn
+            integer :: irch
+            integer :: ixi
+            character*1 :: dattyq
+            real*8 dimension(2001) :: freq
+            integer :: mw
+            character*1 :: dattyp
+            common /cm10/ epsg,izr
+            common /cm4/ fnorm
+            common /cm3/ celcap,fun,dfit,pfit
+            common /cm2/ yv,r,fj,pr,drss,roe,rke,ns,nfree,ndum,icnt,mn,irch,ixi,dattyq
+            common /cm1/ freq,mw,dattyp
+        end subroutine model
+    end interface 
+end python module LEVMpy
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

@@ -1,0 +1,179 @@
+C
+C       LEVM PROGRAM: SUBROUTINES -- LV2: LEV2B.FOR
+C
+C       MODIFIED JEREMY SMITH 3/31/2017
+C
+      SUBROUTINE FCN(M,NFREI,X,FVEC,FJAC,LDFJAC,IFLAG)
+      IMPLICIT REAL*8 (A-H,O-Z)
+      INTEGER M,NFREI,LDFJAC,IFLAG
+      REAL*8 X,FVEC,FJAC
+      CHARACTER*1 DATTYP
+      INCLUDE 'SIZE.INC'
+      DIMENSION X(*),FVEC(M),FJAC(LDFJAC,NFREI),FNN(NPT2)
+      DIMENSION FN(NPT2),FNP(NPT2),FJN(NPT2),FJP(NPT2),FJCW(NPT2,NPAFR)
+      COMMON /CM2/ Y(NPT2),R(NPT2),FJ(NPT2),P(NTOT),DRSS,ROE,RKE,
+     + NS(NPAFR),NFREE(NTOT),N,ICNT,MN,IRCH,IXI,DATTYP
+      COMMON /CM11/ MQY,ISPR,ICX,NDF,FQQ
+      COMMON /CM14/ FJACC(NPT2,NPAFR)
+      COMMON /CM34/ MD,IWT,IXW,INFP,IPL
+      COMMON /CM35/ JIT,IPF,NPRIN
+      COMMON /CM47/ ICOUNT
+      COMMON /CM16/ IOP,IORIG,NYC,J,IPRINT,LDFJYC,MODE,IFP,IRE,ISTP,JFP,
+     + NPH,INE
+C
+C     M IS KY HERE (TWICE # OF FREQS); MD IS ORIG. NO. OF FREQS.
+      ICNT = ICNT + 1
+      WRITE(*,*) ICNT,JIT
+      ICOUNT = ICNT
+      IMTX = 0
+C
+      IF(ICNT.EQ.1) THEN
+        AKY = 1.D0/FLOAT(M)
+        AKF = 1.D0/FLOAT(M-NFREI)
+        RKK = RKE
+      ENDIF
+C
+C     MD IS #  OF FREQ; FOR COMPLEX FIT, M AND LDFJAC = 2*MD
+C     NFREI IS # OF FREE PARAMETERS
+C
+      DO 50 I=1,NFREI
+          P(NS(I))=X(I)
+      IF(IXI.EQ.1) THEN
+        DPP = DABS(P(32))
+        IF(P(32).GT.4.D0) THEN
+          IFLAG = -16
+          GOTO 666
+        ENDIF
+        IF(P(32).LT.-4.D0) THEN
+          IFLAG = -15
+          GOTO 666
+        ENDIF
+      ENDIF
+50    CONTINUE
+C
+      IF (IFLAG-1) 100, 110, 120
+C
+C     IFLAG = 0 CAUSES PARAMETER ESTIMATES AND NORM TO BE OUTPUT
+C
+100   CONTINUE
+        FNORM = ENORM(M,FVEC)
+        WRITE(3,102)
+        WRITE(*,102)
+102   FORMAT('- PARAMETER ESTIMATES')
+        WRITE(3,103) ( P(NS(I)), I = 1, NFREI)
+        WRITE(*,103) ( P(NS(I)), I = 1, NFREI)
+103   FORMAT (2X,6(1PD13.4))
+        WRITE(3,105) FNORM
+        IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+          WRITE(*,105) FNORM
+        ENDIF
+105   FORMAT('- L2 NORM',5X,1PD22.12)
+      RETURN
+C
+C     IFLAG = 1 GIVES THE FUNCTION EVALUATION
+C
+110   CONTINUE
+        MN = 0
+        IF(RKE.EQ.0) MN = M
+        CALL MODEL(NPAFR,P,FN)
+C
+C    If IFP >= 0, JFP = 1; otherwise 0.  If IRCH >= 0, IWT = 0;
+C   otherwise 1.  IXI = 1 if XI is free; otherwise 0.
+C
+      IF(IRCH.EQ.0.OR.JIT.GT.3) GOTO 116
+      IF((IWT+IXI).EQ.0.AND.ICNT.EQ.1.AND.JIT.EQ.1) THEN
+          CALL RWTS(M,DATTYP,Y,FJ)
+          GOTO 116
+      ENDIF
+      IF(JIT.EQ.2.AND.JFP.EQ.0) GOTO 116
+      IF(IWT.EQ.0.AND.IXI.EQ.1.AND.JIT.EQ.1) THEN
+          CALL RWTS(M,DATTYP,Y,FJ)
+      ELSEIF(IWT.EQ.1.OR.IXI.EQ.1.OR.JIT.EQ.2) THEN
+          CALL RWTS(M,DATTYP,FN,FJ)
+      ENDIF
+116   CONTINUE
+C
+      DO 115 I = 1, M
+        IF(DABS(FN(I)).GT.1.D72.AND.IMTX.GT.0) THEN
+          IMTX = IMTX + 1
+        ELSE
+          IF(DABS(FN(I)).GT.1.D72.AND.IMTX.GE.1) GOTO 767
+        ENDIF
+C
+        IF(IRCH.NE.0.AND.JIT.NE.4) THEN
+          R(I) = FJ(I)
+        ELSEIF(IRCH.EQ.0) THEN
+          FJ(I) = R(I)
+        ENDIF
+C
+        FVC = (Y(I) - FN(I))/R(I)
+        FVA = DABS(FVC)
+        IF(RKE.EQ.0.D0) THEN
+          FVEC(I) = FVC
+        ELSE
+          IF(RKE.GT.FVA) THEN
+            MN = MN + 1
+            FVEC(I) = FVC
+          ELSE
+            FVEC(I) = DSIGN(1.D0,FVC)*RKE
+          ENDIF
+        ENDIF
+115   CONTINUE
+666   RETURN
+C
+C     IFLAG = 2 GIVES THE JACOBIAN WITH RESPECT TO THE FREE PARAMETERS
+C
+120   CONTINUE
+C
+      DO 150 JJ = 1, NFREI
+        IF(X(JJ).NE.0.D0) THEN  
+          DXJ = DRSS*X(JJ)
+        ELSE
+          DXJ = DRSS
+        ENDIF   
+        DXJ2 = DXJ*2.D0
+        P(NS(JJ))=X(JJ)+DXJ
+        CALL MODEL(NPAFR,P,FNP)
+C
+        IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNP,FJP)
+C
+        P(NS(JJ))=X(JJ)-DXJ
+        CALL MODEL(NPAFR,P,FNN)
+        IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNN,FJN)
+C
+        P(NS(JJ))=X(JJ)
+        DO 145 I = 1, M
+          IF(IXW.EQ.1) THEN
+            FWDR = (FJN(I) - FJP(I))/(FJ(I)*DXJ2)
+            FJCW(I,JJ) = FWDR*FVEC(I)
+          ELSE
+            FJCW(I,JJ) = 0.D0   
+          ENDIF
+C
+        FJAC(I,JJ) = FJCW(I,JJ) + (FNN(I) - FNP(I))/(FJ(I)*DXJ2)
+        FJACC(I,JJ) = FJAC(I,JJ)
+C
+145   CONTINUE
+C
+C     CALCULATE GRADIENT
+C
+      IF(P(34).LT.0.D0) THEN
+        SNG = 0.D0
+        SNP = 0.D0
+          IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+            IF(JJ.EQ.1) WRITE(*,105) ENORM(M,FVEC)
+          ENDIF
+          DO 342 I = 1,M
+            SNG = SNG + FVEC(I)*FJAC(I,JJ)
+            SNP = SNP + FVEC(I)*FJCW(I,JJ)
+342       CONTINUE
+        PSNG = P(NS(JJ))*SNG
+        IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+          WRITE(*,341) ICNT,NS(JJ),P(NS(JJ)),SNG,PSNG,SNP
+        ENDIF
+      ENDIF
+341   FORMAT(2X,I7,3X,I3,5(1PD14.3))
+C
+150   CONTINUE
+767   RETURN
+      END

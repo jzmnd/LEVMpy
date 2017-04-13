@@ -1,5 +1,5 @@
 C
-C     Levenberg–Marquardt algorithm from MINPACK
+C     LEVENBERG–MARQUARDT ALGORITHM FROM MINPACK
 C
 C       The purpose of LMDER is to minimize the sum of the squares of
 C       M nonlinear functions in N variables by a modification of
@@ -135,6 +135,8 @@ C            the first n elements of the vector (q transpose)*fvec.
 C
 C       WA1, WA2, and WA3 are work arrays of length n.
 C       WA4 is a work array of length m.
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE LMDER(FUNC,M,N,X,FVEC,FJAC,LDFJAC,FTOL,XTOL,GTOL,
      + MAXFEV,DIAG,MODE,FACTOR,NPRINT,INFO,NFEV,NJEV,

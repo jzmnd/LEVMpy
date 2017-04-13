@@ -1,9 +1,3 @@
-C                 LEVM SUBROUTINE OSUB:  LV6.FOR
-C           J. Ross Macdonald
-C   6/15/02; 8/4/02; 3/29/04
-C   ADDED PX41 = P(41) IN /CM55/   3/14/97
-C   ADDED PX45 = P(45) IN /CM55/   3/19/97
-C   corrected c3,r3  4/3/99; corrected loop problems (H. Wintle) 7/01
       SUBROUTINE OSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
       INTEGER M
@@ -22,6 +16,11 @@ C   corrected c3,r3  4/3/99; corrected loop problems (H. Wintle) 7/01
 C
 C   ****************** O CIRCUIT: Runs as an external subroutine
 C
+C           J. Ross Macdonald
+C   6/15/02; 8/4/02; 3/29/04
+C   ADDED PX41 = P(41) IN /CM55/   3/14/97
+C   ADDED PX45 = P(45) IN /CM55/   3/19/97
+C   corrected c3,r3  4/3/99; corrected loop problems (H. Wintle) 7/01
 C
 C   SPECIAL FOR CALLING OTHER PROGRAMS AND DOING SEPARATE OR COMBINED
 C   CONDUCTIVE AND DIELECTRIC SYSTEM DISPERSIVE (CSD,DSD) RESPONSE FITS.

@@ -1,6 +1,8 @@
 C
-C   This is the function integrated to find general exponential response
-C     SEE NELEM=34
+C   THIS IS THE FUNCTION INTEGRATED TO FIND GENERAL EXPONENTIAL RESPONSE
+C       See NELEM=34
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       DOUBLE PRECISION FUNCTION GDAEFN2(X)
       IMPLICIT REAL*8(A-H,O-Z)

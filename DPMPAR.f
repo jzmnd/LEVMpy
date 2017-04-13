@@ -17,6 +17,8 @@ C         dpmpar(2) = b**(emin - 1), the smallest magnitude,
 C
 C         dpmpar(3) = b**emax*(1 - b**(-t)), the largest magnitude.
 C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
+C
       DOUBLE PRECISION FUNCTION DPMPAR(I)
       INTEGER I
       INTEGER MCHEPS(4), MINMAG(4), MAXMAG(4)

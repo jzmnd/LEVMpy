@@ -1,10 +1,12 @@
 C
-C     Extended midpoint rule subroutine
+C     EXTENDED MIDPOINT RULE SUBROUTINE
 C       FUNC: function to be integrated
 C       A: starting point
 C       B: final point
 C       S: area
 C       N: iteration number
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE MIDPNT(FUNC,A,B,S,N)
       IMPLICIT REAL*8 (A-H,O-Z)

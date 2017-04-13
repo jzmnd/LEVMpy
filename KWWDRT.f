@@ -1,3 +1,6 @@
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
+C
       SUBROUTINE KWWDRT(TAU,PHI,SUM,ATEMP)
       IMPLICIT REAL*8 (A-H,O-Z)
       EXTERNAL GAMMLN
@@ -52,7 +55,8 @@ C
       ALP = 0.D0
       IX = 0
 C
-C   **********************************************************
+C   *********************************************
+C
       DO KJ = 1,NEPS
         PHK = PHI*KJ
         SK = DSIN(PPI*PHK)

@@ -1,6 +1,7 @@
 C
-C       MAIN LEAST SQUARES FIT CALCULATIONS
-C       MODIFIED JEREMY SMITH 3/31/2017
+C     MAIN LEAST SQUARES FIT CALCULATIONS
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,PEX,
      + NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
@@ -88,29 +89,29 @@ C
         ENDIF   
       IC=INFO+1
       GO TO(751,752,753,754,755,756,757,758,755),IC
-751   WRITE(3,761)
-      WRITE(4,761)
+751   WRITE(*,761)
+C      WRITE(4,761)
       RETURN
-752   WRITE(3,762)
-      WRITE(4,762)
+752   WRITE(*,762)
+C      WRITE(4,762)
       GO TO 759
-753   WRITE(3,763)
-      WRITE(4,763)
+753   WRITE(*,763)
+C      WRITE(4,763)
       GO TO 759
-754   WRITE(3,764)
-      WRITE(4,764)
+754   WRITE(*,764)
+C      WRITE(4,764)
       GO TO 759
-755   WRITE(3,765)
-      WRITE(4,765)
+755   WRITE(*,765)
+C      WRITE(4,765)
       GO TO 759
-756   WRITE(3,766)
-      WRITE(4,766)
+756   WRITE(*,766)
+C      WRITE(4,766)
       GO TO 759
-757   WRITE(3,767)
-      WRITE(4,767)
+757   WRITE(*,767)
+C      WRITE(4,767)
       GO TO 759
-758   WRITE(3,768)
-      WRITE(4,768)
+758   WRITE(*,768)
+C      WRITE(4,768)
 759   CONTINUE
 761   FORMAT(/10X,'IMPROPER INPUT PARAMETERS'/)
 762   FORMAT(/5X,'ALGORITHM TERMINATES HAVING ESTIMATED THAT THE RELATIV
@@ -132,9 +133,9 @@ C
 768   FORMAT(/5X,'TERMINATION: XTOL IS TOO SMALL. NO FURTHER IMPROVEMENT
      + IN THE FREE'/5X,'PARAMETERS IS POSSIBLE.'/)
         IF(IPRINT.GT.0) THEN
-           WRITE(3,750) FNORM, NFEV, NJEV
+C           WRITE(3,750) FNORM, NFEV, NJEV
            WRITE(*,750) FNORM, NFEV, NJEV
-           WRITE(4,750) FNORM,NFEV,NJEV
+C           WRITE(4,750) FNORM,NFEV,NJEV
         ENDIF
 750   FORMAT(15X,'FINAL L2 NORM OF THE RESIDUALS  ',D15.7 /15X,'NUM
      +BER OF FUNCTION EVALUATIONS  ',I10 /15X,'NUMBER OF JACOBIAN EVAL
@@ -146,12 +147,14 @@ C
 760   CONTINUE
       IF((IPRINT.EQ.2.AND.ISTP.EQ.2).OR.(IPRINT.EQ.3.AND.
      +ISTP.GT.0)) THEN
-                     WRITE(3,315)
-                DO 770 IW = 1, N
-          IF(NFREE(IW).NE.0) THEN
-                     WRITE(3,310) IW,P(IW)
-          ENDIF
-770           CONTINUE
+            WRITE(*,315)
+C            WRITE(3,315)
+            DO 770 IW = 1, N
+              IF(NFREE(IW).NE.0) THEN
+                  WRITE(*,310) IW,P(IW)
+C                  WRITE(3,310) IW,P(IW)
+              ENDIF
+770         CONTINUE
         ENDIF
 310     FORMAT(' ',12X,'P(',I2,') = ',1PD20.13)
 315     FORMAT(15X,'FINAL PARAMETER ESTIMATES')
@@ -161,31 +164,31 @@ C
                    AN1 = -1.D0/FLOAT(KJN)
             PUW = P(31)*P(31)
             PXI = 2.D0*P(32)
-      IF(IXW.EQ.1) THEN
-           IF(IWT.EQ.0) THEN
+        IF(IXW.EQ.1) THEN
+          IF(IWT.EQ.0) THEN
             YDDS = 1.D0
             DO 487 I = J,K
                 FTD = PUW + DABS(Y(I))**PXI
                 YDDS = YDDS*(FTD**AN1)
 487         CONTINUE
             YPXS = YDDS
-      ELSEIF(IWT.EQ.1) THEN
+        ELSEIF(IWT.EQ.1) THEN
             CALL MODEL(NTOT,P,FV1)
             YDMS = 1.D0
             DO 488 I = J,K
-               IF(FV1(I).EQ.0.D0) THEN
+              IF(FV1(I).EQ.0.D0) THEN
                 FTD = PUW
-               ELSE
+              ELSE
                 FTD = PUW + DABS(FV1(I))**PXI
-               ENDIF
-               IF(FTD.EQ.0.D0) THEN
+              ENDIF
+              IF(FTD.EQ.0.D0) THEN
                 YDMS = 0.D0
-               ELSE
+              ELSE
                 YDMS = YDMS*(FTD**AN1)
-               ENDIF
+              ENDIF
 488         CONTINUE
             YPXS = YDMS + SML
-       ENDIF
+        ENDIF
       ELSE
         YPXS = 1.D0
       ENDIF
@@ -242,9 +245,10 @@ C     CALCULATE AKAI FIT QUALITY FACTOR, FQQ, WHICH BECOMES FQF
       SGMAF = DSQRT(SGMASQ)
 C
       IF(ISTP.GT.0) THEN
-             IF(RKE.NE.0.D0) WRITE(3,2103) RKE,MN
-             WRITE(3,853) SUMSQ, SGMASQ, SGMAF, FQQ, NDF
-             WRITE(4,853) SUMSQ, SGMASQ, SGMAF, FQQ, NDF
+             IF(RKE.NE.0.D0) WRITE(*,2103) RKE,MN
+              WRITE(*,853) SUMSQ, SGMASQ, SGMAF, FQQ, NDF
+C             WRITE(3,853) SUMSQ, SGMASQ, SGMAF, FQQ, NDF
+C             WRITE(4,853) SUMSQ, SGMASQ, SGMAF, FQQ, NDF
       ENDIF
 2103  FORMAT(/' OBJECTIVE FUNCTION, S, INVOLVES LS/AB SWITCH VALUE, RKE=
      +',D10.3, ' AND MN =',I4)
@@ -259,11 +263,12 @@ C
      +ED',3X,'UNCERTANTIES',4X,'RESIDUALS',4X,'RESID./MODEL')
 C
       IF(ISTP.GT.0.AND.IPRINT.GT.1) THEN
-          WRITE(3,673) DFIT,DFIT,DFIT,DFIT
-673      FORMAT(/4X,'I',6X,'OMEGA',9X,A1,'(IW)',6X,'SIGMA(',A1,
+        WRITE(*,673) DFIT,DFIT,DFIT,DFIT
+C        WRITE(3,673) DFIT,DFIT,DFIT,DFIT
+673     FORMAT(/4X,'I',6X,'OMEGA',9X,A1,'(IW)',6X,'SIGMA(',A1,
      +'(IW))',4X,A1,'(IW+M)',3X,'SIGMA(',A1,'(IW+M))')
           DO 672 IW=1,M
-672       WRITE(3,674)IW,FREQ(IW),Y(IW),R(IW),Y(IW+M),R(IW+M)
+672       WRITE(*,674)IW,FREQ(IW),Y(IW),R(IW),Y(IW+M),R(IW+M)
 674        FORMAT(I5,5(1PD14.5))
 C
       END IF
@@ -277,9 +282,11 @@ C
       YPX = DSQRT(YPXS)
       IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
         IF(IPAR.LE.0) THEN
-            WRITE(4,8561)
+            WRITE(*,8561)
+C            WRITE(4,8561)
         ELSE
-            WRITE(4,856)
+            WRITE(*,8561)
+C            WRITE(4,856)
         ENDIF
       ENDIF 
         V2S = 0.D0
@@ -292,7 +299,7 @@ C
         V5W = 0.D0
         V6R = 0.D0
         V6W = 0.D0
-      OPEN(7,FILE='AUXPNTL1')
+C      OPEN(7,FILE='AUXPNTL1')
       DO 859 IW=1,M
       IF(IOPR.EQ.1) THEN
         FREQX = TPII*FREQ(IW) 
@@ -318,13 +325,13 @@ C
       ENDIF
           V5R = V5R + V5
           V5W = V5W + V5*V5
-          IF(IPRINT.GE.2.AND.ISTP.GT.0) WRITE(3,857) IW,Y(IW),FV1(IW),
+          IF(IPRINT.GE.2.AND.ISTP.GT.0) WRITE(*,857) IW,Y(IW),FV1(IW),
      +R(IW),V1,V2
           IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
-        WRITE(4,857) IW,Y(IW),FV1(IW),R(IW),V1,V7
+        WRITE(*,857) IW,Y(IW),FV1(IW),R(IW),V1,V7
         IF(DATTYP.EQ.'R') THEN
             V7L = DLOG10(DABS(V7)+SML) + MODE
-            WRITE(7,865)IW,FREQXX,V1,V5,V7,V7L
+            WRITE(*,865)IW,FREQXX,V1,V5,V7,V7L
         ENDIF
       ENDIF
 10000   CONTINUE
@@ -343,16 +350,16 @@ C
       ENDIF
           V6R = V6R + V6
           V6W = V6W + V6*V6
-         IF(IPRINT.GE.2.AND.ISTP.GT.0) WRITE(3,857)IW,Y(IW+M),FV1(IW+M),
+        IF(IPRINT.GE.2.AND.ISTP.GT.0) WRITE(*,857)IW,Y(IW+M),FV1(IW+M),
      +R(IW+M),V3,V4
-         IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
-        WRITE(4,857)IW,Y(IW+M),FV1(IW+M),R(IW+M),V3,V8
-            WRITE(7,865)IW,FREQXX,V1,V3,V7,V8
+        IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
+          WRITE(*,857)IW,Y(IW+M),FV1(IW+M),R(IW+M),V3,V8
+          WRITE(*,865)IW,FREQXX,V1,V3,V7,V8
       ENDIF
 860   CONTINUE
 859   CONTINUE
 865      FORMAT(1X,I5,1PE14.5,4(1PE13.4))
-      CLOSE(7)
+c      CLOSE(7)
 C
       IF(DATTYP.EQ.'I') THEN
         KX = M
@@ -397,12 +404,12 @@ C
 C
       IF(ISTP.GT.0) THEN 
           WRITE(*,107)
-          WRITE(3,107)
-          WRITE(3,109) AVARR,SDWR,SDWI,SDWC,AVARI,NYC
+C          WRITE(3,107)
+C          WRITE(3,109) AVARR,SDWR,SDWI,SDWC,AVARI,NYC
           WRITE(*,109) AVARR,SDWR,SDWI,SDWC,AVARI,NYC
           WRITE(*,108)
-          WRITE(3,108)
-          WRITE(3,105) AVRR,SDRR,SDRI,SDRC,SSE,IOCNT
+C          WRITE(3,108)
+C          WRITE(3,105) AVRR,SDRR,SDRI,SDRC,SSE,IOCNT
           WRITE(*,105) AVRR,SDRR,SDRI,SDRC,SSE,IOCNT
           IF(NFREI.GE.M) WRITE(*,812)
       ENDIF

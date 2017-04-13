@@ -1,8 +1,10 @@
 C
-C     Calculates Euclidean Norm from MINPACK
+C     CALCULATES EUCLIDEAN NORM FROM MINPACK
 C
-C     N: a positive integer input variable
-C     X: an input array of length n
+C       N: a positive integer input variable
+C       X: an input array of length n
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       DOUBLE PRECISION FUNCTION ENORM(N,X)
       INTEGER N,I

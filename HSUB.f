@@ -458,20 +458,20 @@ C       WRITE(*,*) DNUM,TEMP,ENO,AKRAT,EEPS
 C       WRITE(*,*) IKX,IBC,MAXFEV,TAUD,R1
 C           PAUSE 124
       IF(IKX.GT.0) GOTO 663
-      WRITE(4,51)
+      WRITE(*,51)
 C   PAUSE 125
-      WRITE(4,49) EEPS,EKG,TAUD,R1
+      WRITE(*,49) EEPS,EKG,TAUD,R1
 C   PAUSE 126
-      WRITE(4,52)  
-      WRITE(4,49) BLAM,EKR,TAUGR,C1
-      WRITE(4,53) 
-      WRITE(4,49) DM,ADL,ELL,AN0
+      WRITE(*,52)  
+      WRITE(*,49) BLAM,EKR,TAUGR,C1
+      WRITE(*,53) 
+      WRITE(*,49) DM,ADL,ELL,AN0
 C   PAUSE 127
-      WRITE(4,54) 
-      WRITE(4,49) ALAM,PIM,AK2,ENO
-      WRITE(4,56)
-      WRITE(4,49) EMUN,EMUP,DN,DP
-      WRITE(4,55)
+      WRITE(*,54) 
+      WRITE(*,49) ALAM,PIM,AK2,ENO
+      WRITE(*,56)
+      WRITE(*,49) EMUN,EMUP,DN,DP
+      WRITE(*,55)
       
 C        IF(PIM.GE.1.D38.OR.PIM.LE.1.D-38) THEN
       SQRT2 = DSQRT(2.D0)
@@ -481,14 +481,14 @@ C           AM1= ELL/(2.D0*ADL1)
       RCM1 = RCM/SQRT2        
 C          ENDIF
 C
-      WRITE(4,49) AK1,CLCAP,XI,EDS
+      WRITE(*,49) AK1,CLCAP,XI,EDS
 C       WRITE(*,*) AK1,CLCAP,AKRAT,XI,EDS,P(24)
 C       PAUSE 777
 C
-      WRITE(4,61) 
-      WRITE(4,49) REZ,REE,RCM,AMRAT
-      WRITE(4,60) 
-      WRITE(4,49) PIM,ADL1,RCM1,TEMP
+      WRITE(*,61) 
+      WRITE(*,49) REZ,REE,RCM,AMRAT
+      WRITE(*,60) 
+      WRITE(*,49) PIM,ADL1,RCM1,TEMP
 C       ELSE
 C       ENDIF                                                     
 C       PAUSE 128

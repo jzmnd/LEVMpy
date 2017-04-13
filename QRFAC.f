@@ -1,5 +1,5 @@
 C
-C     Levenberg–Marquardt algorithm from MINPACK
+C     LEVENBERG–MARQUARDT ALGORITHM FROM MINPACK
 C
 C       M: a positive integer input variable set to the number
 C          of rows of a.
@@ -39,6 +39,8 @@ C         if this information is not needed, then acnorm can coincide
 C         with rdiag.
 C
 C       WA is a work array of length n.
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE QRFAC(M,N,A,LDA,PIVOT,IPVT,LIPVT,SIGMA,ACNORM,WA)
       INTEGER M,N,LDA,LIPVT

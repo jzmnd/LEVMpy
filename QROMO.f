@@ -1,9 +1,11 @@
 C
-C     Romberg integration method using midpoint rule on open integration
+C     ROMBERG INTEGRATION METHOD USING MIDPOINT RULE ON OPEN INTEGRATION
 C       FUNC: function to be integrated
 C       A: starting point
 C       B final point
 C       SS: value of integrand
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE QROMO(FUNC,A,B,SS)
       IMPLICIT REAL*8 (A-H,O-Z)
@@ -19,11 +21,11 @@ C
         CALL MIDPNT(FUNC,A,B,S(J),J)
         IF (J.GE.K) THEN
           CALL POLINT(H(J-KM),S(J-KM),K,0.D0,SS,DSS)
-        SERR = EPSG*ABS(SS)
-        IF(J.GT.10) WRITE(*,150) J,EPSG,DSS,SERR
+          SERR = EPSG*ABS(SS)
+          IF(J.GT.10) WRITE(*,150) J,EPSG,DSS,SERR
 C
 150   FORMAT(I4,1P,(3D14.5))
-        IF (ABS(DSS).LE.SERR) RETURN
+          IF (ABS(DSS).LE.SERR) RETURN
         ENDIF
         S(J+1)=S(J)
         H(J+1)=H(J)/9.D0

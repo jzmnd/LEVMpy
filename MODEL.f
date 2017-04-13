@@ -1,11 +1,12 @@
+C
 C     MODEL SUBROUTINE
-C     RUNS SELECTED CIRCUIT MODEL
-C     INPUTS:
+C     Runs selected circuit model
+C
 C       N  : input number of free parameters (IN)
 C       PX : all parameter list (IN)
 C       FQ : model function values (OUT)
 C
-C       MODIFIED JEREMY SMITH 3/31/2017
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE MODEL(N, PX, FQ)
       IMPLICIT REAL*8(A-H,O-Z)
@@ -67,8 +68,8 @@ C
 C      ELSEIF (FUN.EQ.TT) THEN
 C         CALL TSUB(MW,FREQ,PX,FQ)
       ELSE
-        WRITE(3,100) FUN
-  100   FORMAT('-*** PROGRAM TERMINATED: <',A1,'> IS INVALID MODEL')
+        WRITE(*,100) FUN
+  100   FORMAT('*** PROGRAM TERMINATED: <',A1,'> IS INVALID MODEL')
         RETURN
 C        STOP
       ENDIF

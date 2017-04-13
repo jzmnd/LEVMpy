@@ -1,7 +1,9 @@
 C
-C     Calls either GSER or GCF
+C     CALLS EITHER GSER OR GCF
 C       If X < A+1 then call GSER
 C       If X >= A+1 then call GCF
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       FUNCTION GAMMQ(A,X)
       DOUBLE PRECISION A,GAMMQ,X

@@ -1,9 +1,11 @@
 C
-C     Romberg integration method using trapezium rule
+C     ROMBERG INTEGRATION METHOD USING TRAPEZIUM RULE
 C       FUNC: function to be integrated
 C       A: starting point
 C       B final point
 C       VINT: value of integrand
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE QROMB(FUNC,A,B,VINT)
       IMPLICIT REAL*8 (A-H,O-Z)

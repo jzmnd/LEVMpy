@@ -1,5 +1,7 @@
 C
-C     A function that returns the value of ln(Gamma(XX)) for XX > 0
+C     A FUNCTION THAT RETURNS THE VALUE OF LN(GAMMA(XX)) FOR XX > 0
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       FUNCTION GAMMLN(XX)
       IMPLICIT REAL*8(A-H,O-Z)

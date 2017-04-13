@@ -117,10 +117,11 @@ C
         ENDIF
         ZT = ZT + L*IOMEGA + RL
         IF(I.EQ.M) THEN
-            OPEN(69,FILE='LNL')
-            WRITE(69,879) 1,I,YC,YA,ZT
-            WRITE(69,*) I,OMEGA,ZT
-            CLOSE(69)
+C            OPEN(69,FILE='LNL')
+C            WRITE(69,879) 1,I,YC,YA,ZT
+            WRITE(*,879) 1,I,YC,YA,ZT
+C            WRITE(69,*) I,OMEGA,ZT
+C            CLOSE(69)
         ENDIF
 879     FORMAT(1X,2I3,1P,(4E5.1))
         F(I) = DREAL(ZT)

@@ -1,16 +1,9 @@
-C                  LEVM  CNLS PROGRAM 
-C           LV5.FOR
-C                J.R. Macdonald, 3/22/95; etc.
-C         12/7/96;10/23/97;5/10/98,2/12/01,10/16/09, 11/16/10
-C          LEVM PROGRAMS SUBROUTINES AND FUNCTIONS - LEVOLB.FOR
-C                          DCE'S
+C     DISTRIBUTED ELEMENTS MULTIFUNCTION
 C
-C          DISTRIBUTED ELEMENTS MULTIFUNCTION
-C
-C   THIS FUNCTION RETURNS IMPEDANCE VALUES FROM ANY OF A VARIETY OF
-C   DISTRIBUTED ELEMENTS, AND MAY BE USED IN CIRCUIT MODELS AS IF
-C   IT WERE ANY OF THE ELEMENTS.  THE PARTICULAR ELEMENT IS SELECTED
-C   BY THE 'NELEM' PARAMETER.  CURRENT ASSIGNMENTS ARE AS FOLLOWS:
+C   This function returns impedance values from any of a variety of
+C   distributed elements, and may be used in circuit models as if
+C   it were any of the elements. The particular element is selected
+C   by the 'NELEM' parameter. Current assignments are as follows:
 C
 C       1 : R-C PARALLEL CIRCUIT
 C           Z = R / (1 + i*OMEGA*R*T)
@@ -103,7 +96,9 @@ C
 C      37: CALCULATE KWW DRT FOR ARBITRARY BETA. USE IRCH=0, OR >0 FOR
 C          FIT
 C
-C      38: NOT USED  
+C      38: NOT USED
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       FUNCTION DISTEL(R,T,U,PHI,NELEM,OMEGA)
       IMPLICIT REAL*8(A-H,O-Z)

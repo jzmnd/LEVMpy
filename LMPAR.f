@@ -1,5 +1,5 @@
 C
-C     Levenberg–Marquardt algorithm from MINPACK
+C     LEVENBERG–MARQUARDT ALGORITHM FROM MINPACK
 C
 C       N: a positive integer input variable set to the order of r.
 C
@@ -37,6 +37,8 @@ C       SDIAG: is an output array of length n which contains the
 C              diagonal elements of the upper triangular matrix s.
 C
 C       WA1 and WA2 are work arrays of length n.
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE LMPAR(N,R,LDR,IPVT,DIAG,QTB,DELTA,PAR,X,SIGMA,WA1,WA2)
       INTEGER N,LDR

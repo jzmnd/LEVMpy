@@ -1,5 +1,5 @@
 C
-C     Polynomial Interpolation or extrapolation subroutine
+C     POLYNOMIAL INTERPOLATION OR EXTRAPOLATION SUBROUTINE
 C     The unique polynomial interpolation for N points of degree N-1
 C       XA: array of x values
 C       YA: array of y values
@@ -7,6 +7,8 @@ C       N: length of arrays
 C       X: value of x to interpolate to
 C       Y: interpolated y value at x
 C       DY: error estimate in Y
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE POLINT(XA,YA,N,X,Y,DY)
       IMPLICIT REAL*8 (A-H,O-Z)

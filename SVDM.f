@@ -1,5 +1,10 @@
 C
-C       MODIFIED JEREMY SMITH 3/31/2017
+C     DECOMPOSITION OF MATRIX
+C
+C       ND: twice number of frequencies
+C       MP: number of free parameters
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE SVDM(ND,MP,SGMASQ,X,PEX,NS,IORIG,ISTP)
       IMPLICIT REAL*8 (A-H,O-Z)
@@ -12,7 +17,6 @@ C
       COMMON /CM14/ V(NPT2,NPAFR)
       COMMON /CM20/ RXSD(NPAFR)
 C
-C     ND IS TWICE # OF FREQS; MP IS # OF FREE PARAMETERS
       DO 14 I=1,MP
         DO 13 J=1,I
           SUM=0.D0
@@ -36,24 +40,24 @@ C     ND IS TWICE # OF FREQS; MP IS # OF FREE PARAMETERS
 C
       IF(ISTP.GT.0) THEN  
 C        OUTPUT PARAMETER NUMBERS AND ESTIMATED VALUES
-         WRITE(3,16)
+C         WRITE(3,16)
          WRITE(*,16)
       IF(ISD.EQ.1) THEN
-        WRITE(3,*) '!!!!!**  SINGULAR MATRIX - BEWARE  **!!!!!'
+        WRITE(*,*) '!!!!!**  SINGULAR MATRIX - BEWARE  **!!!!!'
         WRITE(*,*)
       ENDIF
          WRITE(*,41)
-         WRITE(3,41)  
+C         WRITE(3,41)  
 41       FORMAT(3X,'ORIGINAL PARAMETER NUMBERS',/,
      +3X,'PARAMETER ESTIMATES',/,3X,'ESTIMATED STD DEV OF PARAMETERS'
      +,/,3X,'ESTIMATED RELATIVE STD DEV OF PARAMETERS')
       IF(IORIG.GT.0) THEN
         WRITE(*,48)
-        WRITE(3,48)
+C        WRITE(3,48)
       ENDIF
 48    FORMAT(3X,'RELATIVE ERRORS OF PARAMETERS')
         WRITE(*,16)
-        WRITE(3,16)
+C        WRITE(3,16)
 C
         PDAV = 0.D0
         PDRMS = 0.D0
@@ -99,53 +103,53 @@ C
         ENDIF
       IF(IXS.LE.MP) THEN
         WRITE(*,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
-        WRITE(3,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
+C        WRITE(3,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
         WRITE(*,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
-        WRITE(3,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
+C        WRITE(3,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
         WRITE(*,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
-        WRITE(3,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
+C        WRITE(3,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
         WRITE(*,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
-        WRITE(3,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
+C        WRITE(3,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
         IF(IORIG.GT.0) THEN
           WRITE(*,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
-          WRITE(3,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
+C          WRITE(3,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
         ENDIF
-        WRITE(3,16)
+C        WRITE(3,16)
       ENDIF
 C
 762   CONTINUE
 C
       IF(MQY.GT.0) THEN
         WRITE(*,39) PDAV,PDRMS
-        WRITE(3,39) PDAV,PDRMS
+C        WRITE(3,39) PDAV,PDRMS
 39    FORMAT(6X,'PDAV=',2X,1P,1D12.4,6X,'PDRMS=',2X,1P,1D12.4)
 C
-      WRITE(*,173) NDF,FQQ 
+        WRITE(*,173) NDF,FQQ 
 173   FORMAT(7X,'NDF=',I4,7X,'FQF=',1P,1D15.6) 
 C     temporarily changed 1.d3 to 1.d40  8/17/94 !!!!!!!!!!!!!
-      IF(PDAV.GT.1.D40) THEN
-        WRITE(*,749)
+        IF(PDAV.GT.1.D40) THEN
+          WRITE(*,749)
 749   FORMAT(/2X,'****  NOTE LARGE VALUE OF ONE OR MORE RELATIVE
      + STANDARD DEVIATIONS ****'/,
      + 14X,'SIGN OF WRONG OR POOR INITIAL CHOICE OF A FREE PARAMETER,'/,
      + 21X,'ALSO LACK OF CONVERGENCE AND/OR SINGULAR MATRIX'//)
 C     CALL NOTESUB
-      ENDIF
+        ENDIF
 C
-      IF(IORIG.GT.0) THEN
-        PSABS = PSABS/MQY
-        PSRMS = DSQRT(PSRMS/MQY)
-        WRITE(*,43) PSABS,PSRMS
-        WRITE(3,43) PSABS,PSRMS
+        IF(IORIG.GT.0) THEN
+          PSABS = PSABS/MQY
+          PSRMS = DSQRT(PSRMS/MQY)
+          WRITE(*,43) PSABS,PSRMS
+C          WRITE(3,43) PSABS,PSRMS
 43    FORMAT(6X,'PRSDAV=',1P,1D12.4,6X,'PRSDRMS=',1P,1D12.4)
-          ENDIF
+        ENDIF
       ENDIF
 16    FORMAT(/)
 C
 C            OUTPUT VARIANCE-COVARIANCE MATRIX: CINV
 C            OUTPUT PARAMETER CORRELATION MATRIX: CORR
       IF(ICX.EQ.1) WRITE(*,42)
-      WRITE(3,42)  
+      WRITE(*,42)  
 42    FORMAT(/3X,'ESTIMATED PARAMETER CORRELATION MATRIX')
 C
       IBAD = 0
@@ -159,16 +163,16 @@ C
         ENDIF
 C
         DO 17 I = IXS,IXL
-           DO 18 J = 1,I
-        CORP = CINV(I,I)*CINV(J,J)
-        IF(CORP.LE.0.D0) THEN
-            CORP = 1.D0
-            IBAD = IBAD + 1
-        ENDIF
+          DO 18 J = 1,I
+            CORP = CINV(I,I)*CINV(J,J)
+            IF(CORP.LE.0.D0) THEN
+                CORP = 1.D0
+                IBAD = IBAD + 1
+            ENDIF
             CORR(I,J) = CINV(I,J)/DSQRT(CORP)
-18          CONTINUE
+18        CONTINUE
           IF(ICX.EQ.1) WRITE(*,'(2X,6D12.4)') (CORR(I,J),J=1,I)
-          WRITE(3,'(2X,6D12.4)') (CORR(I,J),J=1,I)
+          WRITE(*,'(2X,6D12.4)') (CORR(I,J),J=1,I)
 17      CONTINUE
 769   FORMAT(/2X,'  #!!!!  BAD CORRELATION MATRIX  !!!!#'
      + /5X,'PROBABLY AT LEAST ONE FREE PARAMETER IS NOT USED IN 

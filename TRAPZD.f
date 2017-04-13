@@ -1,10 +1,12 @@
 C
-C     Trapezoidal method subroutine
+C     TRAPEZOIDAL METHOD SUBROUTINE
 C       FUNC: function to be integrated
 C       A: starting point
 C       B: final point
 C       S: area
 C       N: iteration number
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE TRAPZD(FUNC,A,B,S,N)
       IMPLICIT REAL*8 (A-H,O-Z)

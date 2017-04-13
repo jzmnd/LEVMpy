@@ -1,6 +1,8 @@
 C     AIRY FUNCTION
 C     For accurate KWW response function for BETA = 1/3
 C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
+C
       DOUBLE PRECISION FUNCTION AIFU(YY)
       IMPLICIT REAL*8(A-H,O-Z)
       REAL*8 YY

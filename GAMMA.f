@@ -1,3 +1,6 @@
+C
+C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
+C
       SUBROUTINE GAMMA(ZZ,G1,HH)
       IMPLICIT REAL*8 (A-H,O-Z)
       REAL*8 ZZ,G1,HH
@@ -13,7 +16,6 @@ C           HERE G1(Z) IS GAMMA(1 + Z); HH = GAMMA(Z)
       ELSE
         G1 = 1.D0
         HH = 666
-C        PAUSE 66
       ENDIF
 C
       RETURN

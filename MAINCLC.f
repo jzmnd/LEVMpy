@@ -1,6 +1,19 @@
 C
 C       LEVM PROGRAM: MAIN CALCULATIONS -- LEV2A.FOR: LV1.FOR
-C       CHANGES FOR STAGED WEIGHTING: FREE/FIXED ITER;  FFI
+C        CHANGES FOR STAGED WEIGHTING: FREE/FIXED ITER; FFI
+C        CALLS SPFIT
+C
+C              K:
+C           FTOL:
+C           GTOL:
+C           XTOL: 
+C              X: array
+C         MAXFEV: maximum number of 
+C         NPRINT:
+C           NFEV:
+C            PEX: parameter list (IN)
+C          NFREI: numbe of free parameters (IN)
+C            FV1: output values array (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -26,7 +39,8 @@ C
       IOCNT = 0
       RKE = 0.D0
 C
-      WRITE(*,*) '======= MAINCLC ======='
+      WRITE(*,10)
+10    FORMAT(2X,'==========  RUNNING MAIN CALCULATION  =========='/)
 C
 C     HERE K (OLD KY) IS MD OR 2*MD
 C     SET UP FOR POSSIBLE STAGED WEIGHTING WHEN XI FREE

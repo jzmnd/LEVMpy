@@ -1,6 +1,7 @@
 C
 C       DO ALL SPECIFIED FITS      
 C         JRM 9/30/92
+C         CALLS FITCALC, MODEL, RWTS
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -21,8 +22,6 @@ C
      + NPH,INE
       COMMON /CM34/ MD,IWT,IXW,INFP,IPL
       COMMON /CM35/ JIT,IPF,NPRIN
-C
-      WRITE(*,*) '  ====== SPFIT ======'
 C
       DO 983 JIT = 1,4
 C           DO MAIN FIT         
@@ -55,7 +54,7 @@ C       DO OPTIMIZATION, COMPLEX FIT ONLY
         GOTO 119
           ENDIF
           GOTO 983
-745     FORMAT(5X,'**************   END  MAIN  FIT   ***************'/)
+745     FORMAT(2X,'**************   END  MAIN  FIT   ***************'/)
 C
 C       OPTIMIZATION ITERATION (ONLY FOR DATTYP = C)
 876     CONTINUE   

@@ -1,5 +1,17 @@
 C
 C   CALCULATE GENERALIZED EDAE, HN, OR CD RESPONSE
+C      Generalized exponential distribution of relaxation times model (GED)
+C      Cole-Davidson (CD) model
+C      Havriliak-Negami (HN) model
+C
+C       II: ith element of array (IN)
+C        M: number of data points (IN)
+C     FREQ: frequency array (IN)
+C       QX: model parameters, subset of 8 (IN)
+C        F: output array (IN,OUT)
+C      JCD: 0 or 1: conductive-system vs dielectric-system dispersion (IN)
+C      NCH: 0 to 6: selects model, see O-circuit (IN)
+C      INH: 0 or 1: 1 if NCH1 and NCH2 are > 0  (IN)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -8,7 +20,7 @@ C
       EXTERNAL GDAEFN1,CDFG,HNFG
       INTEGER II,M,JCD,NCH,INH
       REAL*8 FREQ,QX,F
-      DIMENSION QX(8),F(*),FREQ(*),VV(5),PHI(2),GAM(2),UU(2)
+      DIMENSION QX(8),F(2*M),FREQ(M),VV(5),PHI(2),GAM(2),UU(2)
       COMPLEX*16 ZI0C,TCOMEGA
 C      COMMON TO PASS DATA TO DAEFN FUNCTION
       COMMON /CM9/ TOMEGA,PHIX,ICHG,IWT

@@ -143,14 +143,14 @@ python module LEVMpy ! in
             real*8 intent(out) :: gammln
         end function gammln
         subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpy:GEDAE.f
-            integer :: ii
-            integer :: m
-            real*8 dimension(*) :: freq
-            real*8 dimension(8) :: qx
-            real*8 dimension(*) :: f
-            integer :: jcd
-            integer :: nch
-            integer :: inh
+            integer intent(in) :: ii
+            integer intent(in) :: m
+            real*8 dimension(m),depend(m),intent(in) :: freq
+            real*8 dimension(8),intent(in) :: qx
+            real*8 dimension(2 * m),depend(m),intent(in,out) :: f
+            integer intent(in) :: jcd
+            integer intent(in) :: nch
+            integer intent(in) :: inh
         end subroutine gedae
         subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy:MAINCLC.f
             integer :: k
@@ -163,12 +163,12 @@ python module LEVMpy ! in
             integer :: nfev
             real*8 dimension(*) :: pex
             integer :: nfrei
-            real*8 dimension(*) :: fv1
+            real*8 dimension(*),intent(in,out) :: fv1
         end subroutine mainclc
         subroutine model(n,px,fq) ! in :LEVMpy:MODEL.f
-            integer :: n
-            real*8 dimension(*) :: px
-            real*8 dimension(*) :: fq
+            integer intent(in) :: n
+            real*8 dimension(n),depend(n),intent(in) :: px
+            real*8 dimension(*),intent(in,out) :: fq
         end subroutine model
     end interface 
 end python module LEVMpy

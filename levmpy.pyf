@@ -671,10 +671,10 @@ python module LEVMpy ! in
     end function gdrt
     subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpy
         integer :: ii
-        integer :: m
-        real*8 dimension(*) :: freq
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        real*8 dimension(m) :: freq
         real*8 dimension(8) :: qx
-        real*8 dimension(*) :: f
+        real*8 dimension(2 * m),depend(m) :: f
         integer :: jcd
         integer :: nch
         integer :: inh
@@ -967,9 +967,9 @@ python module LEVMpy ! in
         integer :: n
     end subroutine midpnt
     subroutine model(n,px,fq) ! in :LEVMpy
-        integer :: n
-        real*8 dimension(*) :: px
-        real*8 dimension(*) :: fq
+        integer, optional,check(len(px)>=n),depend(px) :: n=len(px)
+        real*8 dimension(n) :: px
+        real*8 dimension(2 * mw) :: fq
         real*8 :: epsg
         integer :: izr
         real*8 :: fnorm
@@ -993,7 +993,7 @@ python module LEVMpy ! in
         integer :: ixi
         character*1 :: dattyq
         real*8 dimension(2001) :: freq
-        integer :: mw
+        integer, optional,check((len(fq))/(2)>=mw),depend(fq) :: mw=(len(fq))/(2)
         character*1 :: dattyp
         common /cm10/ epsg,izr
         common /cm4/ fnorm

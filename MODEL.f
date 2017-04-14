@@ -2,9 +2,9 @@ C
 C     MODEL SUBROUTINE
 C     Runs selected circuit model
 C
-C       N  : input number of free parameters (IN)
+C       N  : input number of parameters (IN)
 C       PX : all parameter list (IN)
-C       FQ : model function values (OUT)
+C       FQ : model function values (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -16,7 +16,7 @@ C
       COMPLEX*16 TRANS,ZRF,FOMEG
       CHARACTER*1 AA,BB,CC,DD,EE,FF,GG,HH,II,JJ,KK,LM,MM,PP,YY,
      + DATTYP,DFIT,PFIT,FUN,DATTYQ,OO,RR,SS,TT
-      DIMENSION NPA(NPAFR),PX(*),FQ(*)
+      DIMENSION NPA(NPAFR),PX(N),FQ(*)
       COMMON /CM1/ FREQ(NPTS),MW,DATTYP
       COMMON /CM2/ YV(NPT2),R(NPT2),FJ(NPT2),PR(NTOT),DRSS,ROE,RKE,
      + NS(NPAFR),NFREE(NTOT),NDUM,ICNT,MN,IRCH,IXI,DATTYQ
@@ -31,11 +31,13 @@ C
       NK = 0
 C
       DO 20 IW=1,N
+C     CHECKS FOR NEGATIVE FREE PARAMETERS
         IF(PX(IW).LT.0.D0.AND.NFREE(IW).EQ.1) GOTO 30
         GOTO 20
 30      NK = NK + 1
         NPA(NK) = IW
 20    CONTINUE
+C
       IF(NK.GT.0) GO TO 40
       IF (FUN.EQ.AA) THEN
         CALL ASUB(MW,FREQ,PX,FQ)

@@ -98,6 +98,19 @@ C          FIT
 C
 C      38: NOT USED
 C
+C
+C       INPUT
+C           R: Free parameter, usually a resistance
+C           T: Free parameter, usually a time constant/relaxation time
+C              Sometimes a fit model may use TT not = T, when MODE=2
+C           U: Free parameter, NOT the same as U=P(31)
+C         PHI: Free parameter, typically an exponent
+C       NELEM: Fixed parameter, selects DE to be used (see above)
+C       OMEGA: Fixed parameter, represents frequency of AC signal
+C              Sometimes time or temperature
+C     RETURNS
+C      DISTEL: Impedance of DE, COMPLEX*16
+C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       FUNCTION DISTEL(R,T,U,PHI,NELEM,OMEGA)
@@ -829,7 +842,8 @@ C
       ELSEIF(U.EQ.2.D0) THEN
         CD = R
         IF(CD.EQ.0) THEN
-          WRITE(*,*) 'WRONG INPUT'
+          WRITE(*,40)
+40        FORMAT(5X,'WRONG INPUT')
         ENDIF
         QD = TD/CD
         PD = TD*PHI
@@ -954,7 +968,6 @@ C   POWER LAW ELEMENT #3
 C       Y = RDE*[(I OMEGA)**TDE] +  UDE*DCMPLX(0.D0,OMEGA**PDE]
 C
 2200  COMEG = DCMPLX(0.D0,OMEGA)
-C   WRITE(*,*) 9999,NELEM,R,T,U,PHI,COMEG
       YC =  R*(COMEG**T) + U*DCMPLX(0.D0,OMEGA**PHI)
       DISTEL = 1.D0/YC
       GO TO 5000
@@ -1585,7 +1598,8 @@ C
                 CALL QROMB(GDRT,BOT,TOP,ZN)
             VV(IJ) = ZN
         IF(ZN.EQ.0.D0) THEN
-          WRITE(*,*) '   U TOO LARGE !!!! '
+          WRITE(*,61)
+61        FORMAT(3X,'U IS TOO LARGE !!!!')
           DISTEL = (0.D0,0.D0)
           RETURN
 C          STOP
@@ -1612,8 +1626,9 @@ C
       IWT = 0
       TOMEGA = 0.D0
       IF(BOT.GT.TOP) THEN
-        WRITE(*,*) '      ****  INTEGRATION LIMITS:  U = BOT > TOP! '
-        WRITE(*,*) '      ####  TRY, E.G., U = .99*TOP,  WITH U FIXED'
+        WRITE(*,71)
+71    FORMAT(6X,'****  INTEGRATION LIMITS:  U = BOT > TOP! '/6X,
+     +'####  TRY, E.G., U = .99*TOP,  WITH U FIXED'/)
         DISTEL = (0.D0,0.D0)
         RETURN
 C      STOP

@@ -6,8 +6,8 @@ C           CMTANH(X) = X*TANH(X)
       COMPLEX*16 CDTEMP,X,CMTANH,X2,CDI
       DOUBLE PRECISION  DSIGN, ZR, DABS
       ZR = DREAL(X)
-      IF (DABS(ZR) .GT. 1.3D2) GO TO 100
-      IF (CDABS(X) .GT. 4.D-3) GO TO 10
+      IF (DABS(ZR) .GT. 1.3D2) GOTO 100
+      IF (CDABS(X) .GT. 4.D-3) GOTO 10
       X2 = X**2
       CMTANH = X2 - X2**2/3.D0 + 2.D0*X2**3/1.5D01
       RETURN

@@ -450,7 +450,7 @@ C
       REE = DREAL(EBC)
       REZ = DREAL(ZBC)
       RCC = DCMPLX(AM,0.D0)
-      RCM = CDCOTH(RCC)
+      RCM = DREAL(CDCOTH(RCC))
 C       AMRAT = (EPS(0)/(EEPS)/(MCTNH(M)    !
       AMRAT = (REE/EEPS)/RCM 
 C

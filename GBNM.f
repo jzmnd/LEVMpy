@@ -68,8 +68,7 @@ C       ADD BACK G0N IF PHI.NE.8.D0
         ADD = P0
       ENDIF
       YM = P0/(CFWI*AMM) + ADD
-C
-      EPS = YM*CFWI
+C      EPS = YM*CFWI
       ZM = (1.D0 - RINN)*(P0/YM) + RINN
 C
       RETURN

@@ -39,8 +39,8 @@ C
       IF(ICNT.LE.1) THEN
         IP40A = INT(DABS(P(40)) + 0.01D0)
         IP38A = INT(DABS(P(38)) + 0.01D0)
-        IP38 = SIGN(1.D0,P(38))*IP38A
-        P39 = P(39)
+         IP38 = NINT(SIGN(1.D0,P(38)))*IP38A
+          P39 = P(39)
 C
         IF(ATEMP.LT.0.D0.AND.P(40).LT.0.D0) THEN
             CELC = CELCAP

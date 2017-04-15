@@ -1,6 +1,11 @@
 C
 C     APPLIES RESIDUAL WEIGHTING
 C
+C           KY : number of functions (2*M for complex) (IN)
+C       DATTYP : data type C, R or I (IN)
+C           YQ : data input (IN)
+C           FT : weights on function (IN,OUT)
+C
 C       MODIFIED JEREMY SMITH 3/31/2017
 C
       SUBROUTINE RWTS(KY,DATTYP,YQ,FT)

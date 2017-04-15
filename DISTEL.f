@@ -99,17 +99,16 @@ C
 C      38: NOT USED
 C
 C
-C       INPUT
-C           R: Free parameter, usually a resistance
-C           T: Free parameter, usually a time constant/relaxation time
-C              Sometimes a fit model may use TT not = T, when MODE=2
-C           U: Free parameter, NOT the same as U=P(31)
-C         PHI: Free parameter, typically an exponent
-C       NELEM: Fixed parameter, selects DE to be used (see above)
-C       OMEGA: Fixed parameter, represents frequency of AC signal
-C              Sometimes time or temperature
-C     RETURNS
-C      DISTEL: Impedance of DE, COMPLEX*16
+C           R : Free parameter, usually a resistance (IN)
+C           T : Free parameter, usually a time constant/relaxation time
+C               Sometimes a fit model may use TT not = T, when MODE=2 (IN)
+C           U : Free parameter, NOT the same as U=P(31) (IN)
+C         PHI : Free parameter, typically an exponent (IN)
+C       NELEM : Fixed parameter, selects DE to be used (see above) (IN)
+C       OMEGA : Fixed parameter, represents frequency of AC signal
+C               Sometimes time or temperature (IN)
+C
+C      DISTEL : Impedance of DE, COMPLEX*16 (OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -120,7 +119,7 @@ C
       INTEGER NELEM
       LOGICAL TC,RCC,CC,RRC
       COMPLEX*16 CTEMP,EXPSAV,DISTEL,XX,XTX,CMTANH,YC,YP,YCP,
-     + COMEG,YP0,YP1,CDCOTH,XS,XP,TS
+     + COMEG,YP0,YP1,CDCOTH,XP,TS
       DIMENSION GSP(43),XXJ(43),VV(5)
       DIMENSION XLL(43),XLH(43)
 C     COMMON TO PASS ADDITIONAL DATA TO DAE INTEGRATION FUNCTIONS
@@ -138,6 +137,7 @@ C
      + SML/1.D-10/,PII/0.318309886D0/
 C
 C
+      CTEMP = DCMPLX(0.D0,0.D0)
       MDEX = MDE
       NELEMN = NELEM
       PHIX = PHI
@@ -331,7 +331,7 @@ C
 C
       IF(JM.EQ.0) THEN
         IF(P18.EQ.4.D0.OR.P18.EQ.8.D0) PX = 3
-        AA= P8
+        AA = P8
         AM = 1.D0 - AA
       ENDIF
 C      
@@ -701,7 +701,7 @@ C
         TA = -TT
         TMP = DABS(ATEMP)
         XS = AKINV*R/TMP
-        RR = CDEXP(XS)              ! XS IS A COMPLEX!!! AG.
+        RR = DEXP(XS)
         ZT = TA*EVI     
         TAUO = TA*RR        
         R0 = ZT*(RR - 1.D0)/XS
@@ -747,7 +747,7 @@ C     IMAGINARY:
       PHICOM = PHIN + 1.D0
       CALL QROMB(DAEFN,0.D0,UU,Z2)
 C
-      DISTEL = RINF + RX * RP * DCMPLX( DBLE(Z1), -TOMEGA*DBLE(Z2))
+      DISTEL = RINF + RX * RP * DCMPLX(DBLE(Z1), -TOMEGA*DBLE(Z2))
       GOTO 5000
 C
 C-------------------------------------------------------------------
@@ -1015,7 +1015,7 @@ C
 C   POWER LAW ELEMENT #7  SCPE FOR ELECTRODE EFFECTS.  Z LEVEL (SERIES)
 C
 2600  COMEG = DCMPLX(0.D0,OMEGA)
-      DISTEL = 1.D0/((CELCAP*U)*(COMEG**(PHI)))!Z LEVEL FOR CSD
+      DISTEL = 1.D0/((CELCAP*U)*(COMEG**(PHI)))   !Z LEVEL FOR CSD
 C
       GO TO 5000
 C

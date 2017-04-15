@@ -2,7 +2,7 @@ C
 C     MODEL SUBROUTINE
 C     Runs selected circuit model
 C
-C       N  : input number of parameters (IN)
+C        N : number of parameters (IN)
 C       PX : all parameter list (IN)
 C       FQ : model function values (IN,OUT)
 C

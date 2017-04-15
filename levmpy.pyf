@@ -470,7 +470,7 @@ python module LEVMpy ! in
         integer :: maxfev
         integer :: nprint
         integer :: nfev
-        real*8 dimension(*) :: pex
+        real*8 dimension(50) :: pex
         integer :: nfrei
         real*8 :: sdwr
         real*8 :: sdwi
@@ -895,17 +895,17 @@ python module LEVMpy ! in
         integer :: isd
     end subroutine ludcmp
     subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy
-        integer :: k
+        integer, optional,check(len(x)>=k),depend(x) :: k=len(x)
         real*8 :: ftol
         real*8 :: gtol
         real*8 :: xtol
-        real*8 dimension(*) :: x
+        real*8 dimension(k) :: x
         integer :: maxfev
         integer :: nprint
         integer :: nfev
-        real*8 dimension(*) :: pex
+        real*8 dimension(50) :: pex
         integer :: nfrei
-        real*8 dimension(*) :: fv1
+        real*8 dimension(k),depend(k) :: fv1
         integer :: mqy
         integer :: ispr
         integer :: icx
@@ -969,7 +969,7 @@ python module LEVMpy ! in
     subroutine model(n,px,fq) ! in :LEVMpy
         integer, optional,check(len(px)>=n),depend(px) :: n=len(px)
         real*8 dimension(n) :: px
-        real*8 dimension(2 * mw) :: fq
+        real*8 dimension(*) :: fq
         real*8 :: epsg
         integer :: izr
         real*8 :: fnorm
@@ -993,7 +993,7 @@ python module LEVMpy ! in
         integer :: ixi
         character*1 :: dattyq
         real*8 dimension(2001) :: freq
-        integer, optional,check((len(fq))/(2)>=mw),depend(fq) :: mw=(len(fq))/(2)
+        integer :: mw
         character*1 :: dattyp
         common /cm10/ epsg,izr
         common /cm4/ fnorm

@@ -4,14 +4,14 @@ C      Generalized exponential distribution of relaxation times model (GED)
 C      Cole-Davidson (CD) model
 C      Havriliak-Negami (HN) model
 C
-C       II: ith element of array (IN)
-C        M: number of data points (IN)
-C     FREQ: frequency array (IN)
-C       QX: model parameters, subset of 8 (IN)
-C        F: output array (IN,OUT)
-C      JCD: 0 or 1: conductive-system vs dielectric-system dispersion (IN)
-C      NCH: 0 to 6: selects model, see O-circuit (IN)
-C      INH: 0 or 1: 1 if NCH1 and NCH2 are > 0  (IN)
+C       II : ith element of array (IN)
+C        M : number of data points (IN)
+C     FREQ : frequency array (IN)
+C       QX : model parameters, subset of 8 (IN)
+C        F : output array (IN,OUT)
+C      JCD : 0 or 1: conductive-system vs dielectric-system dispersion (IN)
+C      NCH : 0 to 6: selects model, see O-circuit (IN)
+C      INH : 0 or 1: 1 if NCH1 and NCH2 are > 0  (IN)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C

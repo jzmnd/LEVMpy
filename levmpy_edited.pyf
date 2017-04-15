@@ -153,17 +153,17 @@ python module LEVMpy ! in
             integer intent(in) :: inh
         end subroutine gedae
         subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy:MAINCLC.f
-            integer :: k
+            integer intent(in) :: k
             real*8 intent(in) :: ftol
             real*8 intent(in) :: gtol
             real*8 intent(in) :: xtol
-            real*8 dimension(*) :: x
-            integer :: maxfev
-            integer :: nprint
-            integer :: nfev
-            real*8 dimension(*) :: pex
-            integer :: nfrei
-            real*8 dimension(*),intent(in,out) :: fv1
+            real*8 dimension(k),depend(k),intent(in,out) :: x
+            integer intent(in) :: maxfev
+            integer intent(in) :: nprint
+            integer intent(in,out) :: nfev
+            real*8 dimension(50),intent(in) :: pex
+            integer intent(in) :: nfrei
+            real*8 dimension(k),depend(k),intent(in,out) :: fv1
         end subroutine mainclc
         subroutine model(n,px,fq) ! in :LEVMpy:MODEL.f
             integer intent(in) :: n

@@ -3,16 +3,26 @@ C       LEVM PROGRAM: MAIN CALCULATIONS -- LEV2A.FOR: LV1.FOR
 C        CHANGES FOR STAGED WEIGHTING: FREE/FIXED ITER; FFI
 C        CALLS SPFIT
 C
-C              K:
-C           FTOL:
-C           GTOL:
-C           XTOL: 
-C              X: array
-C         MAXFEV: maximum number of 
-C         NPRINT:
-C           NFEV:
+C              K: number of functions (2*M for complex) (IN)
+C
+C           FTOL: termination occurs when both the actual and predicted
+C                 relative reductions in the sum of squares are at most
+C                 ftol (IN)
+C           GTOL: termination occurs when the cosine of the angle between
+C                 fvec and any column of the jacobian is at most gtol in
+C                 absolute value (IN)
+C           XTOL: termination occurs when the relative error between two
+C                 consecutive iterates is at most xtol (IN)
+C
+C              X: array containing an initial estimate of the solution
+C                 vector (IN,OUT)
+C
+C         MAXFEV: termination occurs when the number of calls to fcn with
+C                 iflag = 1 has reached maxfev (IN)
+C         NPRINT: enables controlled printing of iterates (IN)
+C           NFEV: number of calls output (IN,OUT)
 C            PEX: parameter list (IN)
-C          NFREI: numbe of free parameters (IN)
+C          NFREI: number of free parameters (IN)
 C            FV1: output values array (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
@@ -24,7 +34,7 @@ C
       INTEGER K,MAXFEV,NPRINT,NFEV,NFREI
       REAL*8 FTOL,GTOL,XTOL,X,PEX,FV1
       INCLUDE  'SIZE.INC'
-      DIMENSION X(*),PEX(*),FV1(*),NFREO(40),
+      DIMENSION X(K),PEX(NTOT),FV1(K),NFREO(40),
      + NFREF(40),NFREW(40)
       COMMON /CM1/ FREQ(NPTS),M,DATTYP
       COMMON /CM2/ Y(NPT2),R(NPT2),FJ(NPT2),P(NTOT),DRSS,ROE,RKE,

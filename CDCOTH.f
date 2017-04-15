@@ -12,7 +12,7 @@ C         ACTUALLY X * COTH(X)
       RETURN
    10 CONTINUE
       CDTEMP = CDEXP(X)
-      CDI = 1.D0/CDTEMP        
+      CDI = 1.D0/CDTEMP
       CDCOTH = X*(CDTEMP + CDI)/(CDTEMP - CDI)
       RETURN
   100 CDCOTH = X*DCMPLX(DSIGN(1.D0,ZR),0.D0)

@@ -1,8 +1,14 @@
 C
 C     DECOMPOSITION OF MATRIX
 C
-C       ND: twice number of frequencies
-C       MP: number of free parameters
+C           ND : number of functions (2*M for complex) (IN)
+C           MP : number of free parameters (IN)
+C       SGMASQ : 
+C            X : solution vector (IN)
+C          PEX : parameter list (IN)
+C           NS : 
+C        IORIG : 
+C         ISTP : 
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -27,13 +33,13 @@ C
           CVM(J,I)=SUM
 13      CONTINUE
 14    CONTINUE
-       DO 121 I = 1,MP
-         DO 111 J = 1,MP
+        DO 121 I = 1,MP
+          DO 111 J = 1,MP
             CINV(I,J) = 0.D0
-111      CONTINUE
+111     CONTINUE
           CINV(I,I) = 1.D0
 121     CONTINUE
-       CALL LUDCMP(CVM,MP,NPAFR,INDX,D,ISD)
+        CALL LUDCMP(CVM,MP,NPAFR,INDX,D,ISD)
         DO 131 J = 1,MP
           CALL LUBKSB(CVM,MP,NPAFR,INDX,CINV(1,J))
 131     CONTINUE
@@ -41,22 +47,22 @@ C
       IF(ISTP.GT.0) THEN  
 C        OUTPUT PARAMETER NUMBERS AND ESTIMATED VALUES
 C         WRITE(3,16)
-         WRITE(*,16)
-      IF(ISD.EQ.1) THEN
-        WRITE(*,*) '!!!!!**  SINGULAR MATRIX - BEWARE  **!!!!!'
-        WRITE(*,*)
-      ENDIF
-         WRITE(*,41)
+        WRITE(*,16)
+        IF(ISD.EQ.1) THEN
+          WRITE(*,*) '!!!!!**  SINGULAR MATRIX - BEWARE  **!!!!!'
+          WRITE(*,*)
+        ENDIF
+        WRITE(*,41)
 C         WRITE(3,41)  
-41       FORMAT(3X,'ORIGINAL PARAMETER NUMBERS',/,
+41      FORMAT(3X,'ORIGINAL PARAMETER NUMBERS',/,
      +3X,'PARAMETER ESTIMATES',/,3X,'ESTIMATED STD DEV OF PARAMETERS'
      +,/,3X,'ESTIMATED RELATIVE STD DEV OF PARAMETERS')
-      IF(IORIG.GT.0) THEN
-        WRITE(*,48)
+        IF(IORIG.GT.0) THEN
+          WRITE(*,48)
 C        WRITE(3,48)
       ENDIF
 48    FORMAT(3X,'RELATIVE ERRORS OF PARAMETERS')
-        WRITE(*,16)
+      WRITE(*,16)
 C        WRITE(3,16)
 C
         PDAV = 0.D0
@@ -65,28 +71,28 @@ C
         PSRMS = 0.D0
 C
       DO 31 JJ =1,MP
-      IF(CINV(JJ,JJ).LE.0.D0) CINV(JJ,JJ) = DABS(CINV(JJ,JJ))
-        XSD(JJ) = DSQRT(CINV(JJ,JJ)*SGMASQ)
-      IF(X(JJ).NE.0.D0) THEN
-        RXSD(JJ) = DABS(XSD(JJ)/X(JJ))
-      ELSE
-        RXSD(JJ) = XSD(JJ)
-      ENDIF
-      IF(JJ.LE.MQY) THEN
-        PDAV = PDAV + RXSD(JJ)
-        PDRMS = PDRMS + RXSD(JJ)**2
-      ENDIF
-      IF(IORIG.GT.0) THEN
-        IF(PEX(NS(JJ)).NE.0.D0) THEN    
-          PRELE(JJ) = (X(JJ) - PEX(NS(JJ)))/PEX(NS(JJ))
+        IF(CINV(JJ,JJ).LE.0.D0) CINV(JJ,JJ) = DABS(CINV(JJ,JJ))
+          XSD(JJ) = DSQRT(CINV(JJ,JJ)*SGMASQ)
+        IF(X(JJ).NE.0.D0) THEN
+          RXSD(JJ) = DABS(XSD(JJ)/X(JJ))
         ELSE
-          PRELE(JJ) = 0
+          RXSD(JJ) = XSD(JJ)
         ENDIF
         IF(JJ.LE.MQY) THEN
-          PSABS = PSABS + DABS(PRELE(JJ))
-          PSRMS = PSRMS + PRELE(JJ)**2
+          PDAV = PDAV + RXSD(JJ)
+          PDRMS = PDRMS + RXSD(JJ)**2
         ENDIF
-      ENDIF
+        IF(IORIG.GT.0) THEN
+          IF(PEX(NS(JJ)).NE.0.D0) THEN    
+            PRELE(JJ) = (X(JJ) - PEX(NS(JJ)))/PEX(NS(JJ))
+          ELSE
+            PRELE(JJ) = 0
+          ENDIF
+          IF(JJ.LE.MQY) THEN
+            PSABS = PSABS + DABS(PRELE(JJ))
+            PSRMS = PSRMS + PRELE(JJ)**2
+          ENDIF
+        ENDIF
 31    CONTINUE
         PDAV = PDAV/MQY
         PDRMS = DSQRT(PDRMS/MQY)
@@ -101,21 +107,21 @@ C
         ELSE
             IXL = JQP
         ENDIF
-      IF(IXS.LE.MP) THEN
-        WRITE(*,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
+        IF(IXS.LE.MP) THEN
+          WRITE(*,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
 C        WRITE(3,'(2X,I7,6I12)') (NS(I),I=IXS,IXL)
-        WRITE(*,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
+          WRITE(*,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
 C        WRITE(3,'(2X,1P,6D12.4)') (X(I),I=IXS,IXL)
-        WRITE(*,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
+          WRITE(*,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
 C        WRITE(3,'(2X,1P,6D12.4)') (XSD(I),I=IXS,IXL)
-        WRITE(*,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
+          WRITE(*,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
 C        WRITE(3,'(2X,1P,6D12.4)') (RXSD(I),I=IXS,IXL)
-        IF(IORIG.GT.0) THEN
-          WRITE(*,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
+          IF(IORIG.GT.0) THEN
+            WRITE(*,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
 C          WRITE(3,'(2X,1P,6D12.4)') (PRELE(I),I=IXS,IXL)
-        ENDIF
+          ENDIF
 C        WRITE(3,16)
-      ENDIF
+        ENDIF
 C
 762   CONTINUE
 C
@@ -131,8 +137,8 @@ C     temporarily changed 1.d3 to 1.d40  8/17/94 !!!!!!!!!!!!!
           WRITE(*,749)
 749   FORMAT(/2X,'****  NOTE LARGE VALUE OF ONE OR MORE RELATIVE
      + STANDARD DEVIATIONS ****'/,
-     + 14X,'SIGN OF WRONG OR POOR INITIAL CHOICE OF A FREE PARAMETER,'/,
-     + 21X,'ALSO LACK OF CONVERGENCE AND/OR SINGULAR MATRIX'//)
+     + 14X,'SIGN OF WRONG OR POOR INITIAL CHOICE OF A FREE PARAMETER,'
+     + /,21X,'ALSO LACK OF CONVERGENCE AND/OR SINGULAR MATRIX'//)
 C     CALL NOTESUB
         ENDIF
 C
@@ -148,6 +154,7 @@ C          WRITE(3,43) PSABS,PSRMS
 C
 C            OUTPUT VARIANCE-COVARIANCE MATRIX: CINV
 C            OUTPUT PARAMETER CORRELATION MATRIX: CORR
+C
       IF(ICX.EQ.1) WRITE(*,42)
       WRITE(*,42)  
 42    FORMAT(/3X,'ESTIMATED PARAMETER CORRELATION MATRIX')
@@ -181,7 +188,7 @@ C
 C
 763   CONTINUE
         IF(IBAD.GE.1) THEN
-            WRITE(*,769)
+          WRITE(*,769)
         ENDIF
       ENDIF
       RETURN

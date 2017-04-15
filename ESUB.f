@@ -1,7 +1,8 @@
       SUBROUTINE ESUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(*),L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 ZA,ZB,ZC,ZD,ZT,IOMEGA
       COMMON /CM47/ ICNT    
       LOGICAL RD30,CP0,DE50,DE40
@@ -12,10 +13,10 @@ C   THIS SUBROUTINE CALCULATES THE IMPEDANCE OF A SET OF NESTED
 C   DISTRIBUTED ELEMENT CIRCUITS.  FOR MORE DETAILED INFO,
 C   CONSULT THE CIRCUIT MODEL DOCUMENTATION.
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -53,7 +54,7 @@ C
       R2 = P(27)
       R3 = P(28)
       CP = P(29)
-      L = P(30)
+       L = P(30)
 C
 C   SET VARIABLES FOR ZERO CHECKING
 C

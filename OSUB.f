@@ -1,8 +1,9 @@
       SUBROUTINE OSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      REAL*8 FREQ,P,F
-      DIMENSION P(*),F(*),FREQ(*),QD(8),QC(8)
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M)
+      DIMENSION QD(8),QC(8)
       EXTERNAL DISTEL
       COMPLEX*16 ZT,YT,YZ,YE,DISTEL,IOMEGA,ZR,ZNL,ZS,ZT16,EEM,EEF,ZEL,
      + YEL,YS,YES,ZES
@@ -143,10 +144,10 @@ C   GENERALLY FOR HN/CD, WE EXPECT U1 TO FALL IN THE RANGE 5 < U < 25,
 C   BUT A LIMITED DATA RANGE OFTEN PRECLUDES THE POSSIBILITY OF FINDING
 C   ITS MOST APPROPRIATE VALUE BY TAKING IT FREE TO VARY IN THE FITTING.     
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C

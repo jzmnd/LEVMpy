@@ -1,7 +1,8 @@
       SUBROUTINE CSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(*),L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 YC,ZA,ZB,ZC,ZT,ZD,IOMEGA
       COMMON /CM47/ ICNT    
       LOGICAL NDE20,C20,RC30,RC50,RP0,RP1
@@ -11,10 +12,10 @@ C
 C   THIS CIRCUIT HAS TWO AUGMENTED DISTRIBUTED ELEMENTS AND ONE
 C   REGULAR DISTRIBUTED ELEMENT.
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -52,17 +53,17 @@ C
       C5 = P(27)
       RP = P(28)
       CP = P(29)
-      L = P(30)
+       L = P(30)
 C
 C   SET VARIABLES FOR ZERO-CHECKING
 C
       IF(ICNT.LE.1) THEN  
          C20 = (C2.EQ.0)
-           RC30 = ((R3.EQ.0.D0).AND.(C3.GT.0.D0))
-           RC50 = ((R5.EQ.0.D0).AND.(C5.GT.0.D0))
-            RP0 = ((RP.EQ.0.D0).AND.(CP.NE.0.D0))
-            RP1 = (RP.EQ.0)
-          NDE20 = (NDE2.EQ.0)
+        RC30 = ((R3.EQ.0.D0).AND.(C3.GT.0.D0))
+        RC50 = ((R5.EQ.0.D0).AND.(C5.GT.0.D0))
+         RP0 = ((RP.EQ.0.D0).AND.(CP.NE.0.D0))
+         RP1 = (RP.EQ.0)
+        NDE20 = (NDE2.EQ.0)
       ENDIF
 C
 C   LOOP OVER ALL FREQUENCIES

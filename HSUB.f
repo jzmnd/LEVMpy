@@ -1,7 +1,8 @@
       SUBROUTINE HSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(*)
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M)
       COMPLEX*16 QSN,ZBC,HI,FI,ZA,ZB,ZC,ZT,YC,DISTEL,COMEGA,ZA3,
      +  THSQ(2),PSI,AX,BX,RAD,RADS,IOMEGA,AMT(2),GAM(2),CDCOTH,A11,
      +  TT(2),THP(2),ANUM,EG(2),DNM,PTHI,THDI,YMN0,YMN1,A22,ZBCSR,
@@ -20,10 +21,10 @@ C   THIS SUBROUTINE CALCULATES THE IMPEDANCE OF A SET OF NESTED
 C   R-C/DISTRIBUTED ELEMENT CIRCUITS.  P11 - P29 ARE INPUTS ASSOCIATED
 C   WITH THE BLOCKING/CONDUCTIVE DCE MODEL
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -39,15 +40,15 @@ C
       PDE3 = P(9)
       NDE3 = IDINT(P(10))
 C
-      RA = P(17)
+       RA = P(17)
       IRA = 1
-      CA = P(18)
-      R2 = P(21)
-      C2 = P(22)
-      R3 = P(23)
-      C3 = P(24)
-      RP = P(28)
-      CP = P(29)
+       CA = P(18)
+       R2 = P(21)
+       C2 = P(22)
+       R3 = P(23)
+       C3 = P(24)
+       RP = P(28)
+       CP = P(29)
 C
 C       SET VARIABLES FOR ZERO CHECKING
 C
@@ -296,7 +297,7 @@ C
         IOMEGA = DCMPLX(0.D0,OMEGA)
 C
 C   NO BCD ELEMENT IF ICH=0
-C        IF(ICH.EQ.0) GO TO 38
+C        IF(ICH.EQ.0) GOTO 38
 C
         COOMEGA = IOMEGA*TAUD
 C   PAUSE 396
@@ -521,8 +522,8 @@ C   PAUSE 40
 C
 C   CALCULATE FIRST NESTED CIRCUIT
 C
-      IF(P(40).LT.4) THEN                                           !PNP P25=5  P40=4
-C       GO TO 936
+      IF(P(40).LT.4) THEN                       !PNP P25=5  P40=4
+C       GOTO 936
 C   ELSE     
       IF (RD30) THEN
         IF (C30) THEN

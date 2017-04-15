@@ -50,7 +50,7 @@ C       P0WER LAW (PROPORTIONAL) WEIGHTING
             RT(I) = DABS(YQ(I))
             FT(I) = RT(I)**XT2
 670     CONTINUE
-        GO TO 675
+        GOTO 675
 C
 300   CONTINUE
 C       MODULUS PL WEIGHTING

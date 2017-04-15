@@ -3,27 +3,27 @@ C       LEVM PROGRAM: MAIN CALCULATIONS -- LEV2A.FOR: LV1.FOR
 C        CHANGES FOR STAGED WEIGHTING: FREE/FIXED ITER; FFI
 C        CALLS SPFIT
 C
-C              K: number of functions (2*M for complex) (IN)
+C              K : number of functions (2*M for complex) (IN)
 C
-C           FTOL: termination occurs when both the actual and predicted
-C                 relative reductions in the sum of squares are at most
-C                 ftol (IN)
-C           GTOL: termination occurs when the cosine of the angle between
-C                 fvec and any column of the jacobian is at most gtol in
-C                 absolute value (IN)
-C           XTOL: termination occurs when the relative error between two
-C                 consecutive iterates is at most xtol (IN)
+C           FTOL : termination occurs when both the actual and predicted
+C                  relative reductions in the sum of squares are at most
+C                  ftol (IN)
+C           GTOL : termination occurs when the cosine of the angle
+C                  between fvec and any column of the jacobian is at
+C                  most gtol in absolute value (IN)
+C           XTOL : termination occurs when the relative error between
+C                  two consecutive iterates is at most xtol (IN)
 C
-C              X: array containing an initial estimate of the solution
-C                 vector (IN,OUT)
+C              X : array containing an initial estimate of the solution
+C                  vector (IN,OUT)
 C
-C         MAXFEV: termination occurs when the number of calls to fcn with
-C                 iflag = 1 has reached maxfev (IN)
-C         NPRINT: enables controlled printing of iterates (IN)
-C           NFEV: number of calls output (IN,OUT)
-C            PEX: parameter list (IN)
-C          NFREI: number of free parameters (IN)
-C            FV1: output values array (IN,OUT)
+C         MAXFEV : termination occurs when the number of calls to fcn
+C                  with iflag = 1 has reached maxfev (IN)
+C         NPRINT : enables controlled printing of iterates (IN)
+C           NFEV : number of calls output (IN,OUT)
+C            PEX : parameter list (IN)
+C          NFREI : number of free parameters (IN)
+C            FV1 : output values array (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
@@ -95,7 +95,7 @@ C     ABOVE LINES EFFECTIVELY SET IRCH = -2
               ELSE
                   NFREE(I) = NFREF(I)
               ENDIF
-              IF (NFREE(I).EQ.0) GO TO 128
+              IF (NFREE(I).EQ.0) GOTO 128
               LLL = LLL + 1
               NS(LLL) = I
                X(LLL) = P(I)

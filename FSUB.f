@@ -1,9 +1,9 @@
       SUBROUTINE FSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(*),L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 Z(6),Y(6),ZA,ZB,ZD,ZT,YT,ZC1,ZC2,ZC5,IOMEGA,YC
-C      DIMENSION Z(6),Y(6)
       COMMON /CM47/ ICNT    
       LOGICAL RC60,RC70,RC90,C10,C20,C40,C50,RP0,RP1
 C
@@ -14,10 +14,10 @@ C   THIS SUBROUTINE CALCULATES THE IMPEDANCE OF A SET OF
 C   PARALLEL SERIES ELEMENTS.  FOR MORE DETAILED INFO,
 C   CONSULT THE CIRCUIT MODEL DOCUMENTATION.
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -55,7 +55,7 @@ C
       C9 = P(27)
       RP = P(28)
       CP = P(29)
-      L = P(30)
+       L = P(30)
 C
 C   SET VARIABLES FOR ZERO CHECKING
 C

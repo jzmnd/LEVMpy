@@ -1,18 +1,19 @@
       SUBROUTINE ISUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
       DIMENSION AA(2,2),PP(2),QQ(2),TRSY(2)
-      DOUBLE PRECISION P(*),F(*),FREQ(*)
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M)
 C
 C     THIS SUBROUTINE IS FOR NLS FITTING TO Y = F(T) OR F(OMEGA)
 C           WHERE Y IS REAL INPUT AND T (TIME)  IS OMEGA INPUT
 C                IT CALCULATES EDAE TRANSIENT RESPONSE
 C                     RUN ONLY WITH DATTYP=R CHOICE
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C

@@ -1,28 +1,29 @@
       SUBROUTINE SSUB(M,FREQ,P,F,NFREE)
       IMPLICIT REAL*8(A-H,O-Z)
-      INTEGER M, NFREE
-      DOUBLE PRECISION P(*),F(*),FREQ(*),LE
+      INCLUDE 'SIZE.INC'
+      INTEGER M,NFREE
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),LE
       COMPLEX*16 ZT,Z1,YDL,ZE,YSD,IOMEGA
 C
 C   **********************     S CIRCUIT:
 C
 C   CALCULATES IMPEDANCE OF ELECTROCHEMICAL SUPERCAPACITOR.
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
-C     NFREE: free parameter array (IN)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
+C     NFREE : free parameter array (IN)
 C
 C   SET PARAMETER VALUES
 C
-      RB = P(1)
-      RE = P(2)
-      RF = P(3)
-      CF = P(4)
+       RB = P(1)
+       RE = P(2)
+       RF = P(3)
+       CF = P(4)
       RSD = P(5)
       CDL = P(6)
-      LE =  P(7)
+       LE = P(7)
 C
 C   LOOP OVER ALL FREQUENCIES
 C

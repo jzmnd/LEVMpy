@@ -1,13 +1,13 @@
       SUBROUTINE KSUB(M,FREQ,P,F,NFREE)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M,NFREE
-      REAL*8 FREQ,P,F
-      DOUBLE PRECISION L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 ZT,ZD,YC,IOMEGA,YCC(20),ZX
       COMMON /CM12/ CELCAP,ATEMP,WF,MAXFEV,ICF,MDE,JCDX
       COMMON /CM47/ ICNT
       COMMON /CM73/ P39
-      DIMENSION P(*),F(*),FREQ(*),NFREE(*),XTAU(20) 
+      DIMENSION XTAU(20),NFREE(NTOT)
 C
 C               **********************     K CIRCUIT:
 C
@@ -19,11 +19,11 @@ C
 C   P(30) < 0:  P(30) IS A POSITIVE SERIES RESISTANCE, NOT AN INDUCTANCE
 C   ATEMP < 0 AND P(40) < 0, DRT PARAMETERS ARE DIEL. CONSTS, NOT CAPS
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
-C     NFREE: free parameter array (IN)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
+C     NFREE : free parameter array (IN)
 C
 C   SET PARAMETER VALUES
 C
@@ -34,7 +34,7 @@ C
       NDE1 = IDINT(P(27)+0.01D0)
       GP = P(28)
       CP = P(29)
-      L =  DABS(P(30))
+       L = DABS(P(30))
 C
       IF(ICNT.LE.1) THEN
         IP40A = INT(DABS(P(40)) + 0.01D0)

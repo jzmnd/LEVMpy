@@ -1,13 +1,13 @@
       SUBROUTINE RSUB(M,FREQ,P,F,NFREE)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M,NFREE
-      REAL*8 FREQ,P,F
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M)
       COMPLEX*16 ZT,YCC(20),IOMEGA,YC,ZX
       COMMON /CM12/ CELCAP,ATEMP,WF,MAXFEV,ICF,MDE,JCDX
       COMMON /CM47/ ICNT
       COMMON /CM73/ P39
-C
-      DIMENSION P(*),F(*),FREQ(*),XTAU(20),NFREE(*) 
+      DIMENSION XTAU(20),NFREE(NTOT)
 C
 C   **********************     R CIRCUIT:
 C
@@ -24,11 +24,11 @@ C           <-9 AND >-19 : P(30) IS A CAPACITANCE C IN SERIES
 C   P(39):  IF > 0, IT IS USED IN SETTING TAU MINIMUM VALUE;
 C       SEE CHOICE BELOW
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
-C     NFREE: free parameter array (IN)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
+C     NFREE : free parameter array (IN)
 C
 C   SET PARAMETER VALUES
 C

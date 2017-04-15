@@ -1,7 +1,8 @@
       SUBROUTINE ASUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(M),L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 ZT,ZD,Z5,YC,IOMEGA
       COMMON /CM47/ ICNT    
       LOGICAL RC10,RC20,RC30,RC40,R40,RP0,RP1
@@ -11,10 +12,10 @@ C
 C   CALCULATES IMPEDANCE OF 6 SUBCIRCUITS IN SERIES AND
 C   IN PARALLEL WITH RP AND CP AND IN SERIES WITH L.
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C

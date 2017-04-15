@@ -1,8 +1,9 @@
       SUBROUTINE DSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
       EXTERNAL DAEFN,GDAEFN
-      DOUBLE PRECISION P(*),F(*),FREQ(*),L
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
       COMPLEX*16 ZA,ZB,ZC,ZD,ZT,ZDAE,IOMEGA,YC
 C              COMMON TO PASS DATA TO DAEFN FUNCTION
       COMMON /CM5/ TOMEGA,PHICOM,IV
@@ -18,10 +19,10 @@ C   R-C/DISTRIBUTED ELEMENT CIRCUITS AND INCLUDES A POSSIBLE DAE.
 C   FOR MORE DETAILED INFO, CONSULT THE CIRCUIT MODEL DOCUMENTATION. 
 C   U1 AND U2 ARE LOG VARIABLES
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -59,7 +60,7 @@ C
       C5 = P(27)
       RP = P(28)
       CP = P(29)
-      L = P(30)
+       L = P(30)
 C
 C   SET VARIABLES FOR ZERO CHECKING
 C

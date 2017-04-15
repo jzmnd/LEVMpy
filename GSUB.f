@@ -1,7 +1,8 @@
       SUBROUTINE GSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
+      INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(*),F(*),FREQ(*)
+      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M)
       CHARACTER*1 DATTYP
       EXTERNAL GDAETN
       COMMON /CM79/ OMEGAT,PSI,GAM,DELI
@@ -15,10 +16,10 @@ C           FITTING FUNCTION POSSIBILITIES DESCRIBED IN DOCUMENTATION
 C           %%%%%%%%%%%%%% RUN ONLY WITH DATTYP=R OR I CHOICE. FITTING
 C                   USES WHICHEVER DATA IS THUS DESIGNATED &&&&&&&&&&&
 C
-C     M: number of data points (IN)
-C     FREQ: array of frequency values (IN)
-C     P: array of model parameters (IN)
-C     F: model function values (OUT)
+C         M : number of data points (IN)
+C      FREQ : array of frequency values (IN)
+C         P : array of model parameters (IN)
+C         F : model function values (OUT)
 C
 C   SET PARAMETER VALUES
 C
@@ -162,7 +163,8 @@ C
 C
       YT = YT1 + YT2 + YT3 + YT4 + YT5 + YT6 + YT7 + YT8
 C
-CC  POLYNOMIAL FIT AND OTHER FIT FUNCTIONS
+C     POLYNOMIAL FIT AND OTHER FIT FUNCTIONS
+C
       IF(P(40).EQ.-4.D0) THEN
           YT = P(41) + OMEGA*(P(42) + OMEGA*(P(43) + OMEGA*P(44))) + YT
       ELSEIF(P(40).EQ.-8.D0) THEN
@@ -170,8 +172,6 @@ CC  POLYNOMIAL FIT AND OTHER FIT FUNCTIONS
       YT = P(41) + OMEGI*(P(42) + OMEGI*(P(43) + OMEGI*P(44))) + YT
 C
       ELSEIF(P(40).EQ.-1.6D1) THEN
-CCC WRITE(*,*) OMEGA,P(40),P(41),P(42)
-CCC READ(*,*)
         YT = P(41)*DSIN(P(42)*OMEGA**P(43)) + YT
       ELSEIF(P(40).EQ.-3.2D1) THEN
         YT = P(41)*DATAN(P(42)*OMEGA**P(43)) + YT

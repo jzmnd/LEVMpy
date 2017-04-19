@@ -2,7 +2,7 @@
 ! Note: the context of this file is case sensitive.
 
 python module LEVMpyFortran ! in 
-    interface  ! in :LEVMpy
+    interface  ! in :LEVMpyFortran
         real*8 :: p8
         real*8 :: p18
         real*8 :: gam
@@ -125,11 +125,11 @@ python module LEVMpyFortran ! in
         common /cm34/ mda,iwt,ixw,infp,ipl
         common /cm36/ shw,isw
         common /cm55/ px1,px41,px45
-        function aifu(yy) ! in :LEVMpy:AIFU.f
+        function aifu(yy) ! in :LEVMpyFortran:AIFU.f
             real*8 intent(in) :: yy
             double precision intent(out) :: aifu
         end function aifu
-        function distel(r,t,u,phi,nelem,omega) ! in :LEVMpy:DISTEL.f
+        function distel(r,t,u,phi,nelem,omega) ! in :LEVMpyFortran:DISTEL.f
             real*8 intent(in) :: r
             real*8 intent(in) :: t
             real*8 intent(in) :: u
@@ -138,11 +138,11 @@ python module LEVMpyFortran ! in
             real*8 intent(in) :: omega
             complex*16 intent(out) :: distel
         end function distel
-        function gammln(xx) ! in :LEVMpy:GAMMLN.f
+        function gammln(xx) ! in :LEVMpyFortran:GAMMLN.f
             real*8 intent(in) :: xx
             real*8 intent(out) :: gammln
         end function gammln
-        subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpy:GEDAE.f
+        subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpyFortran:GEDAE.f
             integer intent(in) :: ii
             integer intent(in) :: m
             real*8 dimension(m),depend(m),intent(in) :: freq
@@ -152,7 +152,7 @@ python module LEVMpyFortran ! in
             integer intent(in) :: nch
             integer intent(in) :: inh
         end subroutine gedae
-        subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy:MAINCLC.f
+        subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran:MAINCLC.f
             integer intent(in) :: k
             real*8 intent(in) :: ftol
             real*8 intent(in) :: gtol
@@ -165,13 +165,13 @@ python module LEVMpyFortran ! in
             integer intent(in) :: nfrei
             real*8 dimension(k),depend(k),intent(in,out) :: fv1
         end subroutine mainclc
-        subroutine model(n,px,fq) ! in :LEVMpy:MODEL.f
+        subroutine model(n,px,fq) ! in :LEVMpyFortran:MODEL.f
             integer intent(in) :: n
             real*8 dimension(n),depend(n),intent(in) :: px
             real*8 dimension(*),intent(in,out) :: fq
         end subroutine model
     end interface 
-end python module LEVMpy
+end python module LEVMpyFortran
 
 ! This file was auto-generated with f2py (version:2).
 ! See http://cens.ioc.ee/projects/f2py2e/

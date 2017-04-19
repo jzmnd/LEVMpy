@@ -3,7 +3,7 @@
 
 python module lmder__user__routines 
     interface lmder_user_interface 
-        subroutine func(m,n,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpy:lmder:unknown_interface
+        subroutine func(m,n,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpyFortran:lmder:unknown_interface
             integer :: m
             integer, optional,check(shape(fjac,1)==n),depend(fjac) :: n=shape(fjac,1)
             double precision dimension(*) :: x
@@ -16,7 +16,7 @@ python module lmder__user__routines
 end python module lmder__user__routines
 python module midpnt__user__routines 
     interface midpnt_user_interface 
-        function func(xx) result (s) ! in :LEVMpy:midpnt:unknown_interface
+        function func(xx) result (s) ! in :LEVMpyFortran:midpnt:unknown_interface
             real*8 :: xx
             real*8 :: s
         end function func
@@ -24,14 +24,14 @@ python module midpnt__user__routines
 end python module midpnt__user__routines
 python module trapzd__user__routines 
     interface trapzd_user_interface 
-        function func(x) result (sum) ! in :LEVMpy:trapzd:unknown_interface
+        function func(x) result (sum) ! in :LEVMpyFortran:trapzd:unknown_interface
             real*8 :: x
             real*8 :: sum
         end function func
     end interface trapzd_user_interface
 end python module trapzd__user__routines
 python module LEVMpyFortran ! in 
-    interface  ! in :LEVMpy
+    interface  ! in :LEVMpyFortran
         real*8 :: p8
         real*8 :: p18
         real*8 :: gam
@@ -154,7 +154,7 @@ python module LEVMpyFortran ! in
         common /cm34/ mda,iwt,ixw,infp,ipl
         common /cm36/ shw,isw
         common /cm55/ px1,px41,px45
-        function aifu(yy) ! in :LEVMpy:AIFU.f
+        function aifu(yy) ! in :LEVMpyFortran:AIFU.f
             real*8 :: yy
             real*8 :: celcap
             real*8 :: atemp
@@ -170,32 +170,32 @@ python module LEVMpyFortran ! in
             common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
             common /cm5/ tomega,phicom,iv
         end function aifu
-        subroutine airyai(x,eps,ai) ! in :LEVMpy:AIRYAI.f
+        subroutine airyai(x,eps,ai) ! in :LEVMpyFortran:AIRYAI.f
             double precision :: x
             double precision :: eps
             double precision :: ai
         end subroutine airyai
-        subroutine asub(m,freq,p,f) ! in :LEVMpy:ASUB.f
+        subroutine asub(m,freq,p,f) ! in :LEVMpyFortran:ASUB.f
             integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
             double precision dimension(m) :: freq
-            double precision dimension(*) :: p
-            double precision dimension(*) :: f
+            double precision dimension(50) :: p
+            double precision dimension(2 * m),depend(m) :: f
             integer :: icnt
             common /cm47/ icnt
         end subroutine asub
-        subroutine bsub(m,freq,p,f) ! in :LEVMpy:BSUB.f
-            integer :: m
-            double precision dimension(*) :: freq
-            double precision dimension(*) :: p
-            double precision dimension(*) :: f
+        subroutine bsub(m,freq,p,f) ! in :LEVMpyFortran:BSUB.f
+            integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+            double precision dimension(m) :: freq
+            double precision dimension(50) :: p
+            double precision dimension(2 * m),depend(m) :: f
             integer :: icnt
             common /cm47/ icnt
         end subroutine bsub
-        function cdcoth(x) ! in :LEVMpy:CDCOTH.f
+        function cdcoth(x) ! in :LEVMpyFortran:CDCOTH.f
             complex*16 :: x
             complex*16 :: cdcoth
         end function cdcoth
-        function cdfg(yy) ! in :LEVMpy:CDFG.f
+        function cdfg(yy) ! in :LEVMpyFortran:CDFG.f
             real*8 :: yy
             real*8 :: tomega
             real*8 :: phix
@@ -212,20 +212,20 @@ python module LEVMpyFortran ! in
             common /cm9/ tomega,phix,ichg,iwt
             common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
         end function cdfg
-        function cmtanh(x) ! in :LEVMpy:CMTANH.f
+        function cmtanh(x) ! in :LEVMpyFortran:CMTANH.f
             complex*16 :: x
             complex*16 :: cmtanh
         end function cmtanh
     end interface 
-    subroutine csub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine csub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         integer :: icnt
         common /cm47/ icnt
     end subroutine csub
-    subroutine cubint(x,f,n,ia,ib,result,error,zt,ind) ! in :LEVMpy
+    subroutine cubint(x,f,n,ia,ib,result,error,zt,ind) ! in :LEVMpyFortran
         real*8 dimension(n) :: x
         complex*16 dimension(n),depend(n) :: f
         integer, optional,check(len(x)>=n),depend(x) :: n=len(x)
@@ -236,7 +236,7 @@ python module LEVMpyFortran ! in
         complex*16 :: zt
         integer :: ind
     end subroutine cubint
-    function daefn(x) ! in :LEVMpy
+    function daefn(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: tomega
         real*8 :: phicom
@@ -244,7 +244,7 @@ python module LEVMpyFortran ! in
         double precision :: daefn
         common /cm5/ tomega,phicom,iv
     end function daefn
-    function daefn2(x) ! in :LEVMpy
+    function daefn2(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: tomega
         real*8 :: phicom
@@ -252,7 +252,7 @@ python module LEVMpyFortran ! in
         double precision :: daefn2
         common /cm5/ tomega,phicom,iv
     end function daefn2
-    subroutine disshill(r1,ta,am,agn,dhrl,dhim,omega) ! in :LEVMpy
+    subroutine disshill(r1,ta,am,agn,dhrl,dhim,omega) ! in :LEVMpyFortran
         real*8 :: r1
         real*8 :: ta
         real*8 :: am
@@ -261,7 +261,7 @@ python module LEVMpyFortran ! in
         real*8 :: dhim
         real*8 :: omega
     end subroutine disshill
-    function distel(r,t,u,phi,nelem,omega) ! in :LEVMpy
+    function distel(r,t,u,phi,nelem,omega) ! in :LEVMpyFortran
         real*8 :: r
         real*8 :: t
         real*8 :: u
@@ -308,15 +308,15 @@ python module LEVMpyFortran ! in
         common /cm5/ tomega,phicom,iv
         common /cm55/ px1,px41,px45
     end function distel
-    function dpmpar(i) ! in :LEVMpy
+    function dpmpar(i) ! in :LEVMpyFortran
         integer :: i
         double precision :: dpmpar
     end function dpmpar
-    subroutine dsub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine dsub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         real*8 :: tomega
         real*8 :: phicom
         integer :: iv
@@ -328,7 +328,7 @@ python module LEVMpyFortran ! in
         common /cm47/ icnt
         common /cm9/ tomegg,xigdae,chgdae
     end subroutine dsub
-    subroutine dxsps(xa,ycc,arr,wf,nn,ip38a) ! in :LEVMpy
+    subroutine dxsps(xa,ycc,arr,wf,nn,ip38a) ! in :LEVMpyFortran
         double precision dimension(*) :: xa
         complex*16 dimension(*) :: ycc
         complex*16 :: arr
@@ -340,25 +340,25 @@ python module LEVMpyFortran ! in
         common /cm47/ icnt
         common /cm73/ p39
     end subroutine dxsps
-    function enorm(n,x) ! in :LEVMpy
+    function enorm(n,x) ! in :LEVMpyFortran
         integer, optional,check(len(x)>=n),depend(x) :: n=len(x)
         double precision dimension(n) :: x
         double precision :: enorm
     end function enorm
-    subroutine epsalg(nmax,ss,sf) ! in :LEVMpy
+    subroutine epsalg(nmax,ss,sf) ! in :LEVMpyFortran
         integer :: nmax
         real*8 dimension(113) :: ss
         real*8 :: sf
     end subroutine epsalg
-    subroutine esub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine esub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         integer :: icnt
         common /cm47/ icnt
     end subroutine esub
-    subroutine fcn(m,nfrei,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpy
+    subroutine fcn(m,nfrei,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpyFortran
         integer, optional,check(len(fvec)>=m),depend(fvec) :: m=len(fvec)
         integer, optional,check(shape(fjac,1)==nfrei),depend(fjac) :: nfrei=shape(fjac,1)
         real*8 dimension(*) :: x
@@ -417,7 +417,7 @@ python module LEVMpyFortran ! in
         common /cm47/ icount
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,n,icnt,mn,irch,ixi,dattyp
     end subroutine fcn
-    subroutine fcn1(mpn,nfrei,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpy
+    subroutine fcn1(mpn,nfrei,x,fvec,fjac,ldfjac,iflag) ! in :LEVMpyFortran
         integer, optional,check(len(fvec)>=mpn),depend(fvec) :: mpn=len(fvec)
         integer, optional,check(shape(fjac,1)==nfrei),depend(fjac) :: nfrei=shape(fjac,1)
         real*8 dimension(40) :: x
@@ -461,7 +461,7 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,n,icnt,mn,irch,ixi,dattyp
         common /cm16/ iop,iorig,nyc,j,iprint,ldfjyc,mode,ifp,ire,istp,jfp,nph,ine
     end subroutine fcn1
-    subroutine fitcalc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,sdwr,sdwi,iocnt,sgmaf,fv1,jit,sgmsqm) ! in :LEVMpy
+    subroutine fitcalc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,sdwr,sdwi,iocnt,sgmaf,fv1,jit,sgmsqm) ! in :LEVMpyFortran
         integer :: k
         real*8 :: ftol
         real*8 :: gtol
@@ -537,42 +537,42 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,n,icnt,mn,irch,ixi,dattyq
         common /cm1/ freq,m,dattyp
     end subroutine fitcalc
-    subroutine fsub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine fsub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         integer :: icnt
         common /cm47/ icnt
     end subroutine fsub
-    subroutine gamma(zz,g1,hh) ! in :LEVMpy
+    subroutine gamma(zz,g1,hh) ! in :LEVMpyFortran
         real*8 :: zz
         real*8 :: g1
         real*8 :: hh
     end subroutine gamma
-    function gammln(xx) ! in :LEVMpy
+    function gammln(xx) ! in :LEVMpyFortran
         real*8 :: xx
         real*8 :: gammln
     end function gammln
-    function gammq(a,x) ! in :LEVMpy
+    function gammq(a,x) ! in :LEVMpyFortran
         double precision :: a
         double precision :: x
         double precision :: gammq
     end function gammq
-    subroutine gbnm(xc,fw,rinn,nph,zm) ! in :LEVMpy
+    subroutine gbnm(xc,fw,rinn,nph,zm) ! in :LEVMpyFortran
         real*8 :: xc
         real*8 :: fw
         real*8 :: rinn
         integer :: nph
         complex*16 :: zm
     end subroutine gbnm
-    subroutine gcf(gammcf,a,x,gln) ! in :LEVMpy
+    subroutine gcf(gammcf,a,x,gln) ! in :LEVMpyFortran
         real*8 :: gammcf
         real*8 :: a
         real*8 :: x
         real*8 :: gln
     end subroutine gcf
-    function gdaefn(x) ! in :LEVMpy
+    function gdaefn(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: celcap
         real*8 :: atemp
@@ -589,7 +589,7 @@ python module LEVMpyFortran ! in
         common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
         common /cm9/ tomega,xigdae,ichg,iwt
     end function gdaefn
-    function gdaefn1(x) ! in :LEVMpy
+    function gdaefn1(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: tomega
         real*8 :: phix
@@ -606,7 +606,7 @@ python module LEVMpyFortran ! in
         common /cm9/ tomega,phix,ichg,iwt
         common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
     end function gdaefn1
-    function gdaefn2(x) ! in :LEVMpy
+    function gdaefn2(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: celcap
         real*8 :: atemp
@@ -639,7 +639,7 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
         common /cm9/ tomega,xigdae,ichg,iwt
     end function gdaefn2
-    function gdaetn(x) ! in :LEVMpy
+    function gdaetn(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: tt
         real*8 :: psi
@@ -648,7 +648,7 @@ python module LEVMpyFortran ! in
         double precision :: gdaetn
         common /cm79/ tt,psi,gam,deli
     end function gdaetn
-    function gdrt(yy) ! in :LEVMpy
+    function gdrt(yy) ! in :LEVMpyFortran
         real*8 :: yy
         real*8 :: celcap
         real*8 :: atemp
@@ -669,7 +669,7 @@ python module LEVMpyFortran ! in
         common /cm5/ tomega,phicom,iv
         common /cm9/ tcmega,xigdae,ichg,iwt
     end function gdrt
-    subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpy
+    subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpyFortran
         integer :: ii
         integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
         real*8 dimension(m) :: freq
@@ -718,23 +718,23 @@ python module LEVMpyFortran ! in
         common /cm9/ tomega,phix,ichg,iwt
         common /cm29/ gamx,sn1,cs1,pii,cdn,qpi,mdex
     end subroutine gedae
-    subroutine ginco(a,x,fincgm,sincgm) ! in :LEVMpy
+    subroutine ginco(a,x,fincgm,sincgm) ! in :LEVMpyFortran
         real*8 :: a
         real*8 :: x
         real*8 :: fincgm
         real*8 :: sincgm
     end subroutine ginco
-    subroutine gser(gamser,a,x,gln) ! in :LEVMpy
+    subroutine gser(gamser,a,x,gln) ! in :LEVMpyFortran
         real*8 :: gamser
         real*8 :: a
         real*8 :: x
         real*8 :: gln
     end subroutine gser
-    subroutine gsub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine gsub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         real*8 :: omegat
         real*8 :: psi
         real*8 :: gam
@@ -743,7 +743,7 @@ python module LEVMpyFortran ! in
         common /cm79/ omegat,psi,gam,deli
         common /cm78/ dattyp
     end subroutine gsub
-    function hnfg(yy) ! in :LEVMpy
+    function hnfg(yy) ! in :LEVMpyFortran
         real*8 :: yy
         real*8 :: tomega
         real*8 :: phix
@@ -760,11 +760,11 @@ python module LEVMpyFortran ! in
         common /cm9/ tomega,phix,ichg,iwt
         common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
     end function hnfg
-    subroutine hsub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine hsub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         real*8 :: clcap
         real*8 :: atemp
         real*8 :: wf
@@ -776,7 +776,7 @@ python module LEVMpyFortran ! in
         common /cm12/ clcap,atemp,wf,maxfev,icf,mde,jcdx
         common /cm47/ icnt
     end subroutine hsub
-    subroutine hyper(xw,ll,s4,s5,aa,bb,cc,dd,d6,ic) ! in :LEVMpy
+    subroutine hyper(xw,ll,s4,s5,aa,bb,cc,dd,d6,ic) ! in :LEVMpyFortran
         real*8 :: xw
         integer :: ll
         real*8 :: s4
@@ -788,26 +788,26 @@ python module LEVMpyFortran ! in
         real*8 :: d6
         integer :: ic
     end subroutine hyper
-    subroutine isub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine isub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
     end subroutine isub
-    subroutine jsub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine jsub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         integer :: icnt
         common /cm47/ icnt
     end subroutine jsub
-    subroutine ksub(m,freq,p,f,nfree) ! in :LEVMpy
-        integer :: m
-        real*8 dimension(*) :: freq
-        real*8 dimension(*) :: p
-        real*8 dimension(*) :: f
-        integer dimension(*) :: nfree
+    subroutine ksub(m,freq,p,f,nfree) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
+        integer dimension(50) :: nfree
         real*8 :: celcap
         real*8 :: atemp
         real*8 :: wf
@@ -821,18 +821,18 @@ python module LEVMpyFortran ! in
         common /cm47/ icnt
         common /cm73/ p39
     end subroutine ksub
-    subroutine kwwdp5(tomega,uu,sum) ! in :LEVMpy
+    subroutine kwwdp5(tomega,uu,sum) ! in :LEVMpyFortran
         real*8 :: tomega
         real*8 :: uu
         real*8 :: sum
     end subroutine kwwdp5
-    subroutine kwwdrt(tau,phi,sum,atemp) ! in :LEVMpy
+    subroutine kwwdrt(tau,phi,sum,atemp) ! in :LEVMpyFortran
         real*8 :: tau
         real*8 :: phi
         real*8 :: sum
         real*8 :: atemp
     end subroutine kwwdrt
-    subroutine lmder(func,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,maxfev,diag,mode,factor,nprint,info,nfev,njev,ipvt,qtf,wa1,wa2,wa3,wa4) ! in :LEVMpy
+    subroutine lmder(func,m,n,x,fvec,fjac,ldfjac,ftol,xtol,gtol,maxfev,diag,mode,factor,nprint,info,nfev,njev,ipvt,qtf,wa1,wa2,wa3,wa4) ! in :LEVMpyFortran
         use lmder__user__routines
         external func
         integer, optional,check(len(wa4)>=m),depend(wa4) :: m=len(wa4)
@@ -861,7 +861,7 @@ python module LEVMpyFortran ! in
         double precision :: fnorm
         common /cm4/ fnorm
     end subroutine lmder
-    subroutine lmpar(n,r,ldr,ipvt,diag,qtb,delta,par,x,sigma,wa1,wa2) ! in :LEVMpy
+    subroutine lmpar(n,r,ldr,ipvt,diag,qtb,delta,par,x,sigma,wa1,wa2) ! in :LEVMpyFortran
         integer, optional,check(shape(r,1)==n),depend(r) :: n=shape(r,1)
         double precision dimension(ldr,n) :: r
         integer, optional,check(shape(r,0)==ldr),depend(r) :: ldr=shape(r,0)
@@ -875,18 +875,18 @@ python module LEVMpyFortran ! in
         double precision dimension(n),depend(n) :: wa1
         double precision dimension(n),depend(n) :: wa2
     end subroutine lmpar
-    subroutine logac(al,acl) ! in :LEVMpy
+    subroutine logac(al,acl) ! in :LEVMpyFortran
         real*8 :: al
         real*8 :: acl
     end subroutine logac
-    subroutine lubksb(a,n,np,indx,b) ! in :LEVMpy
+    subroutine lubksb(a,n,np,indx,b) ! in :LEVMpyFortran
         real*8 dimension(np,np) :: a
         integer :: n
         integer, optional,check(shape(a,0)==np),depend(a) :: np=shape(a,0)
         integer dimension(*) :: indx
         real*8 dimension(np),depend(np) :: b
     end subroutine lubksb
-    subroutine ludcmp(a,n,np,indx,d,isd) ! in :LEVMpy
+    subroutine ludcmp(a,n,np,indx,d,isd) ! in :LEVMpyFortran
         real*8 dimension(np,np) :: a
         integer, optional,check(len(indx)>=n),depend(indx) :: n=len(indx)
         integer, optional,check(shape(a,0)==np),depend(a) :: np=shape(a,0)
@@ -894,7 +894,7 @@ python module LEVMpyFortran ! in
         real*8 :: d
         integer :: isd
     end subroutine ludcmp
-    subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy
+    subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran
         integer, optional,check(len(x)>=k),depend(x) :: k=len(x)
         real*8 :: ftol
         real*8 :: gtol
@@ -958,7 +958,7 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
         common /cm1/ freq,m,dattyp
     end subroutine mainclc
-    subroutine midpnt(func,a,b,s,n) ! in :LEVMpy
+    subroutine midpnt(func,a,b,s,n) ! in :LEVMpyFortran
         use midpnt__user__routines
         external func
         real*8 :: a
@@ -966,7 +966,7 @@ python module LEVMpyFortran ! in
         real*8 :: s
         integer :: n
     end subroutine midpnt
-    subroutine model(n,px,fq) ! in :LEVMpy
+    subroutine model(n,px,fq) ! in :LEVMpyFortran
         integer, optional,check(len(px)>=n),depend(px) :: n=len(px)
         real*8 dimension(n) :: px
         real*8 dimension(*) :: fq
@@ -1001,11 +1001,11 @@ python module LEVMpyFortran ! in
         common /cm2/ yv,r,fj,pr,drss,roe,rke,ns,nfree,ndum,icnt,mn,irch,ixi,dattyq
         common /cm1/ freq,mw,dattyp
     end subroutine model
-    subroutine osub(m,freq,p,f) ! in :LEVMpy
-        integer :: m
-        real*8 dimension(*) :: freq
-        real*8 dimension(*) :: p
-        real*8 dimension(*) :: f
+    subroutine osub(m,freq,p,f) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         real*8 :: rx
         real*8 :: tx
         real*8 :: ux
@@ -1037,7 +1037,7 @@ python module LEVMpyFortran ! in
         common /cm47/ icnt
         common /cm79/ ytt
     end subroutine osub
-    subroutine polint(xa,ya,n,x,y,dy) ! in :LEVMpy
+    subroutine polint(xa,ya,n,x,y,dy) ! in :LEVMpyFortran
         real*8 dimension(n) :: xa
         real*8 dimension(n),depend(n) :: ya
         integer, optional,check(len(xa)>=n),depend(xa) :: n=len(xa)
@@ -1045,7 +1045,7 @@ python module LEVMpyFortran ! in
         real*8 :: y
         real*8 :: dy
     end subroutine polint
-    subroutine qrfac(m,n,a,lda,pivot,ipvt,lipvt,sigma,acnorm,wa) ! in :LEVMpy
+    subroutine qrfac(m,n,a,lda,pivot,ipvt,lipvt,sigma,acnorm,wa) ! in :LEVMpyFortran
         integer :: m
         integer, optional,check(shape(a,1)==n),depend(a) :: n=shape(a,1)
         double precision dimension(lda,n) :: a
@@ -1057,7 +1057,7 @@ python module LEVMpyFortran ! in
         double precision dimension(n),depend(n) :: acnorm
         double precision dimension(n),depend(n) :: wa
     end subroutine qrfac
-    subroutine qromb(func,a,b,vint) ! in :LEVMpy
+    subroutine qromb(func,a,b,vint) ! in :LEVMpyFortran
         external func
         real*8 :: a
         real*8 :: b
@@ -1066,7 +1066,7 @@ python module LEVMpyFortran ! in
         integer :: izr
         common /cm10/ epsg,izr
     end subroutine qromb
-    subroutine qromo(func,a,b,ss) ! in :LEVMpy
+    subroutine qromo(func,a,b,ss) ! in :LEVMpyFortran
         external func
         real*8 :: a
         real*8 :: b
@@ -1075,7 +1075,7 @@ python module LEVMpyFortran ! in
         integer :: izr
         common /cm10/ epsg,izr
     end subroutine qromo
-    subroutine qrsolv(n,r,ldr,ipvt,diag,qtb,x,sigma,wa) ! in :LEVMpy
+    subroutine qrsolv(n,r,ldr,ipvt,diag,qtb,x,sigma,wa) ! in :LEVMpyFortran
         integer, optional,check(shape(r,1)==n),depend(r) :: n=shape(r,1)
         double precision dimension(ldr,n) :: r
         integer, optional,check(shape(r,0)==ldr),depend(r) :: ldr=shape(r,0)
@@ -1086,7 +1086,7 @@ python module LEVMpyFortran ! in
         double precision dimension(n),depend(n) :: sigma
         double precision dimension(n),depend(n) :: wa
     end subroutine qrsolv
-    subroutine regmax(mp,ior,ing,iflag,nfrei,mpn,mk,xr,fvec,fjac,p33a) ! in :LEVMpy
+    subroutine regmax(mp,ior,ing,iflag,nfrei,mpn,mk,xr,fvec,fjac,p33a) ! in :LEVMpyFortran
         integer :: mp
         integer :: ior
         integer :: ing
@@ -1129,12 +1129,12 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,n,icnt,mn,irch,ixi,dattyp
         common /cm16/ iop,iorig,nyc,j,iprint,ldfjyc,mode,ifp,ire,istp,jfp,nph,ine
     end subroutine regmax
-    subroutine rsub(m,freq,p,f,nfree) ! in :LEVMpy
-        integer :: m
-        real*8 dimension(*) :: freq
-        real*8 dimension(*) :: p
-        real*8 dimension(*) :: f
-        integer dimension(*) :: nfree
+    subroutine rsub(m,freq,p,f,nfree) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
+        integer dimension(50) :: nfree
         real*8 :: celcap
         real*8 :: atemp
         real*8 :: wf
@@ -1148,7 +1148,7 @@ python module LEVMpyFortran ! in
         common /cm47/ icnt
         common /cm73/ p39
     end subroutine rsub
-    subroutine rwts(ky,dattyp,yq,ft) ! in :LEVMpy
+    subroutine rwts(ky,dattyp,yq,ft) ! in :LEVMpyFortran
         integer :: ky
         character*1 :: dattyp
         real*8 dimension(4002) :: yq
@@ -1183,7 +1183,7 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fjt,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
         common /cm34/ md,iwt,ixw,infp,ipl
     end subroutine rwts
-    subroutine sdea(omega,iomega,ra,ca,rde,tde,ude,pde,nde,zx) ! in :LEVMpy
+    subroutine sdea(omega,iomega,ra,ca,rde,tde,ude,pde,nde,zx) ! in :LEVMpyFortran
         real*8 :: omega
         complex*16 :: iomega
         real*8 :: ra
@@ -1195,7 +1195,7 @@ python module LEVMpyFortran ! in
         integer :: nde
         complex*16 :: zx
     end subroutine sdea
-    subroutine set(s1,s2,s3,s4,s5,d6,dd,ll,aa,bb,cc,ic) ! in :LEVMpy
+    subroutine set(s1,s2,s3,s4,s5,d6,dd,ll,aa,bb,cc,ic) ! in :LEVMpyFortran
         real*8 :: s1
         real*8 :: s2
         real*8 :: s3
@@ -1209,12 +1209,12 @@ python module LEVMpyFortran ! in
         real*8 :: cc
         integer :: ic
     end subroutine set
-    subroutine sort(tau,isp,nn) ! in :LEVMpy
+    subroutine sort(tau,isp,nn) ! in :LEVMpyFortran
         real*8 dimension(20) :: tau
         integer dimension(20) :: isp
         integer :: nn
     end subroutine sort
-    subroutine spfit(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpy
+    subroutine spfit(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran
         integer :: k
         real*8 :: ftol
         real*8 :: gtol
@@ -1282,14 +1282,14 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
         common /cm1/ freq,m,dattyp
     end subroutine spfit
-    subroutine ssub(m,freq,p,f,nfree) ! in :LEVMpy
-        integer :: m
-        double precision dimension(*) :: freq
-        double precision dimension(*) :: p
-        double precision dimension(*) :: f
+    subroutine ssub(m,freq,p,f,nfree) ! in :LEVMpyFortran
+        integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
+        double precision dimension(m) :: freq
+        double precision dimension(50) :: p
+        double precision dimension(2 * m),depend(m) :: f
         integer :: nfree
     end subroutine ssub
-    subroutine svdm(nd,mp,sgmasq,x,pex,ns,iorig,istp) ! in :LEVMpy
+    subroutine svdm(nd,mp,sgmasq,x,pex,ns,iorig,istp) ! in :LEVMpyFortran
         integer :: nd
         integer :: mp
         real*8 :: sgmasq
@@ -1309,7 +1309,7 @@ python module LEVMpyFortran ! in
         common /cm20/ rxsd
         common /cm14/ v
     end subroutine svdm
-    subroutine traga(aa,yy,pp,qq,il,trsy) ! in :LEVMpy
+    subroutine traga(aa,yy,pp,qq,il,trsy) ! in :LEVMpyFortran
         real*8 dimension(2,2) :: aa
         real*8 :: yy
         real*8 dimension(2) :: pp
@@ -1317,7 +1317,7 @@ python module LEVMpyFortran ! in
         integer :: il
         real*8 dimension(2) :: trsy
     end subroutine traga
-    subroutine trapzd(func,a,b,s,n) ! in :LEVMpy
+    subroutine trapzd(func,a,b,s,n) ! in :LEVMpyFortran
         use trapzd__user__routines
         external func
         real*8 :: a
@@ -1325,7 +1325,7 @@ python module LEVMpyFortran ! in
         real*8 :: s
         integer :: n
     end subroutine trapzd
-    function ww5(x) ! in :LEVMpy
+    function ww5(x) ! in :LEVMpyFortran
         real*8 :: x
         real*8 :: celcap
         real*8 :: atemp
@@ -1341,7 +1341,7 @@ python module LEVMpyFortran ! in
         common /cm12/ celcap,atemp,wf,maxfev,icf,mde,jcdx
         common /cm5/ tomega,phicom,iv
     end function ww5
-end python module LEVMpy
+end python module LEVMpyFortran
 
 ! This file was auto-generated with f2py (version:2).
 ! See http://cens.ioc.ee/projects/f2py2e/

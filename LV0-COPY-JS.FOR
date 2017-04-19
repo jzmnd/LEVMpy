@@ -261,7 +261,7 @@ C
         IF(NFREE(29).GT.0) INE = 1
         IF(NFREE(30).GT.0) ING = 1
         INE = INE + ING
-        ENDIF
+      ENDIF
         NFREI = LLL
 C
         NFIX=NP-NFREI
@@ -313,7 +313,7 @@ C
 C
 C       SET CHOICE TO PRINT CONDUCTIVITY (IN LINOTCON.DAT) AS WELL
 C       AS ADMITTANCE
-                ICOND = 0
+          ICOND = 0
           IPATM = INT(DABS(ATEMP) + 0.01D0)
           IPATA = SIGN(1.D0,ATEMP)
           IPTI = IPATA*IPATM

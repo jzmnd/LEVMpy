@@ -31,7 +31,7 @@ class Experiment():
         self.path = path
         self.infile = infile
 
-        _readinfile()
+        self._readinfile()
 
     def _readinfile(self):
         """Reads LEVM input file"""
@@ -55,7 +55,7 @@ class Experiment():
             self.pfit = line2[9]
             self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
 
-            self.freeq = line2[10]
+            self.freqtyp = line2[10]
             self.neg = line2[11]
             self.fun = line2[12]
             self.celcap = dfloat(line2[14:23])
@@ -120,7 +120,7 @@ class Experiment():
 
             # Lines 4 and 5 - Set model parameters, and nfree/x/ns arrays
             plist = []
-            for i in range(int(self.np / 5) + 1):
+            for i in range(int(self.np / 5)):
                 line = f.readline().strip().split()
                 for p in line:
                     plist.append(dfloat(p))
@@ -132,7 +132,8 @@ class Experiment():
                 self.irg = int(round(abs(self.parameters[30])))
                 self.parameters[30] = 0
 
-            self.nfree = np.array(list(f.readline()), dtype=int)
+            nflist = list(f.readline().strip())
+            self.nfree = np.array(nflist, dtype=int)
 
             self.ixi = 0
             if (self.nfree[31] > 0) and (self.irch > 1):
@@ -141,7 +142,7 @@ class Experiment():
             self.ns = np.where(self.nfree > 0)[0]   # note 0-start index
             self.x = self.parameters[self.ns]
             self.nfrei = len(self.x)
-            self.nfix = self.np - self.nfrei
+            self.nfixi = self.np - self.nfrei
 
             # Read input data
             flist = []
@@ -176,7 +177,7 @@ class Experiment():
                 self.roe = 0
 
             # Perform data transformations if required
-            if self.freeq == 'F':
+            if self.freqtyp == 'F':
                 self.freq = 2 * np.pi * self.freq
 
 

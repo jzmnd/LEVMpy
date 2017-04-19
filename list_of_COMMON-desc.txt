@@ -4,33 +4,33 @@
             DATTYP       : data type (C, I or R)
 
       COMMON /CM2/
-            Y(NPT2)      :
-            R(NPT2)      :
-            FJ(NPT2)     :
+            Y(NPT2)      : data to be fit
+            R(NPT2)      : uncertainty associated with data point Y(I)
+            FJ(NPT2)     : 
             P(NTOT)      : parameter array list
-            DRSS         :
-            ROE          :
-            RKE          :
-            NS(NPAFR)    :
-            NFREE(NTOT)  : array of free parameters (0=fixed, 1=free)
-            N            :
+            DRSS         : numerical derivative step size: default = 1.0D-8
+            ROE          : when > 0, turns on robust regression, when < 0, negative of the A/L cell constant with a dimension of cm
+            RKE          : RKE = ROE*SIGMAF
+            NS(NPAFR)    : array of indices of free parameters
+            NFREE(NTOT)  : array of free parameters (0=fixed, 1=free positive, 2=free, 3=parameter will be subtracted from the data)
+            N            : 
             ICNT         :
-            MN           :
-            IRCH         :
+            MN           : number of data points (out of M) which involve least squares minimization (the rest involve absolute value minimization)
+            IRCH         : selects form of data weighting (-6 to 6)
             IXI          :
             DATTYQ       : data type (C, I or R)
 
       COMMON /CM3/
-            CELCAP       : empty cell capacitance
+            CELCAP       : empty cell capacitance in Farads
             FUN          : circuit function (character*1)
-            DFIT         :
-            PFIT         :
+            DFIT         : fitting system (Z, Y, M or E)
+            PFIT         : complex fit formats (P, D L or R)
 
       COMMON /CM4/
             FNORM        :
 
       COMMON /CM5/
-            TOMEGA       :
+            TOMEGA       : TOMEGA = OMEGA*T
             PHICOM       :
             IV           :
 
@@ -47,7 +47,7 @@
 
       COMMON /CM12/
             CLCAP        : empty cell capacitance
-            ATEMP        : temperature parameter
+            ATEMP        : absolute temperature parameter
             WF
             MAXFEV       : termination when the number of calls to FCN is MAXFEV
             ICF
@@ -59,29 +59,29 @@
             TX           : T parameter of DE
             UX           : U parameter of DE
             PHI          : PHI parameter of DE
-            XXM1
-            XX1
-            XX2
-            XX3
+            XXM1         : dimensionless moment
+            XX1          : dimensionless moment
+            XX2          : dimensionless moment
+            XX3          : dimensionless moment
             RN
             AIN
             ICAV
             NELEM        : distributed element model number (1 - 37)
-            NCH
+            NCH          : selects dispersion response function (0 to 6)
 
       COMMON /CM14/
             FJACC(NPT2,NPAFR)  : Jacobian matrix (2 * # of data points, # of free paramter)
 
       COMMON /CM16/
             IOP
-            IORIG
+            IORIG        : the original number of the first of each parameter pair
             NYC
             JY
-            IPRINT
+            IPRINT       : selects level of output (0 - 3)
             LDFJAC
-            MODE
-            IFP
-            IRE
+            MODE         : plays several important roles depending on model
+            IFP          : when > 0, activates direct function weighting, when < 0, turns on iterative function weighting
+            IRE          : when > 0, turns on residual-weighting
             ISTP
             JFP
             NPH
@@ -91,7 +91,7 @@
             SDWC
             SDRC
             DIAG(NPAFR)
-            IPAR
+            IPAR         : 0 = Residuals/Model output columns in AUXPNTL and AUXPNTL1 are calculated, >0 = Residuals/Model in both are changed to Residuals/Uncertainty, <0=an extra line of parameter relative standard deviations occurs in the output, based on the input values of the free parameters of the fit
             IOPR
 
       COMMON /CM20/
@@ -116,7 +116,7 @@
       COMMON /CM35/
             JIT
             IPF
-            NPRINT
+            NPRINT       : causes intermediate fitting results to be printed every NPRINT iterations
 
       COMMON /CM36/
             SHW(NPT2)

@@ -15,7 +15,7 @@ C           XTOL : termination occurs when the relative error between
 C                  two consecutive iterates is at most xtol (IN)
 C
 C              X : array containing an initial estimate of the solution
-C                  vector (IN,OUT)
+C                  vector i.e. free parameters (IN,OUT)
 C
 C         MAXFEV : termination occurs when the number of calls to fcn
 C                  with iflag = 1 has reached maxfev (IN)

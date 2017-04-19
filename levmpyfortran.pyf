@@ -30,7 +30,7 @@ python module trapzd__user__routines
         end function func
     end interface trapzd_user_interface
 end python module trapzd__user__routines
-python module LEVMpy ! in 
+python module LEVMpyFortran ! in 
     interface  ! in :LEVMpy
         real*8 :: p8
         real*8 :: p18

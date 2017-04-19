@@ -162,11 +162,11 @@ class Experiment():
             if self.dattyp == 'C':
                 self.jy = 1
                 self.ky = 2 * self.md
-            else if self.dattyp == 'R':
+            elif self.dattyp == 'R':
                 self.jy = 1
                 self.ky = self.md
                 self.iopt = 0
-            else if self.dattyp == 'I':
+            elif self.dattyp == 'I':
                 self.jy = 1 + self.md
                 self.ky = 2 * self.md
                 self.iopt = 0
@@ -197,3 +197,5 @@ class Experiment():
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
         # Write outputs
+
+        return

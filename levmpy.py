@@ -11,7 +11,7 @@ Created by Jeremy Smith on 2017-04-16
 
 import os
 import sys
-import LEVMpyFortran as lv
+import levmpyfortran.LEVMpyFortran as lv
 import numpy as np
 
 __author__ = "Jeremy Smith"

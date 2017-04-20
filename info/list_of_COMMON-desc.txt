@@ -107,7 +107,7 @@
             MDEX
 
       COMMON /CM34/
-            MDA
+            MDA          : number of data points
             IWT
             IXW
             INFP

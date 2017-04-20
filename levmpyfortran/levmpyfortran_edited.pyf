@@ -157,7 +157,7 @@ python module LEVMpyFortran ! in
             real*8 intent(in) :: ftol
             real*8 intent(in) :: gtol
             real*8 intent(in) :: xtol
-            real*8 dimension(k),depend(k),intent(in,out) :: x
+            real*8 dimension(nfrei),depend(nfrei),intent(in,out) :: x
             integer intent(in) :: maxfev
             integer intent(in) :: nprint
             integer intent(in,out) :: nfev

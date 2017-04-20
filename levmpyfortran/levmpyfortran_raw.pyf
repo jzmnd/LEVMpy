@@ -895,17 +895,17 @@ python module LEVMpyFortran ! in
         integer :: isd
     end subroutine ludcmp
     subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran
-        integer, optional,check(len(x)>=k),depend(x) :: k=len(x)
+        integer, optional,check(len(fv1)>=k),depend(fv1) :: k=len(fv1)
         real*8 :: ftol
         real*8 :: gtol
         real*8 :: xtol
-        real*8 dimension(k) :: x
+        real*8 dimension(nfrei) :: x
         integer :: maxfev
         integer :: nprint
         integer :: nfev
         real*8 dimension(50) :: pex
-        integer :: nfrei
-        real*8 dimension(k),depend(k) :: fv1
+        integer, optional,check(len(x)>=nfrei),depend(x) :: nfrei=len(x)
+        real*8 dimension(k) :: fv1
         integer :: mqy
         integer :: ispr
         integer :: icx

@@ -82,6 +82,165 @@ class Experiment():
 
         self._readinfile()
 
+        # Set flags
+        self.iacy = 0
+        if self.iopt < 0:
+            self.iacy = abs(self.iopt)
+            self.iopt = 0
+        if self.iacy == 0:
+            self.ftol = 1e-30
+            self.xtol = 1e-48
+        else:
+            self.ftol = 10**(self.iacy)
+            self.xtol = self.ftol
+
+        self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
+        self.iorig = 0
+        if self.ipar < 0:
+            self.iorig = 1
+        self.jfp = 1
+        if self.ifp < 0:
+            self.ifp = abs(self.ifp)
+            self.jfp = 0
+        self.iopr = 0
+        if self.ire < -10:
+            self.iopr = 1
+        self.imd = 1
+        if self.md < 0:
+            self.md = abs(self.md)
+            self.imd = -1
+        self.inp = 0
+        self.izr = 0
+        if self.n < 0:
+            self.n = abs(self.n)
+            self.inp = 1
+            if (self.dattyp == 'C') and (self.dinp == 'Z') and (self.pinp == 'R') and (self.dfit == 'Z') and (self.pfit == 'R'):
+                self.izr = 1
+        if self.irch < 0:
+            self.irch = abs(self.irch)
+            self.iwt = 1
+            self.qq = 'FUNC'
+        else:
+            self.iwt = 0
+            if self.irch == 1:
+                self.qq = 'UNIT'
+            else:
+                self.qq = 'DATA'
+        self.ipl = 0
+        if self.iprint < 0:
+            self.iprint = abs(self.iprint)
+            self.ipl = self.iprint
+
+        # Set default CELCAP
+        if self.celcap == 0:
+            self.celcap = 1.0
+        if self.imd == -1:
+            self.celcap = EPV
+
+        # Set parameter flags
+        self.irg = 0
+        if self.parameters[30] < 0:
+            self.irg = int(round(abs(self.parameters[30])))
+            self.parameters[30] = 0
+
+        # Set NS and X parameter arrays
+        self.ns = np.where(self.nfree > 0)[0]   # 0-start index
+        self.ns1 = self.ns + 1                  # 1-start index
+        self.x = self.parameters[self.ns]
+        self.nfrei = len(self.x)
+        self.nfixi = self.n - self.nfrei
+
+        # Set free parameter flags
+        self.ixi = 0
+        if (self.nfree[31] > 0) and (self.irch > 1):
+            self.ixi = 1
+
+        self.ine = 0
+        if (self.fun == 'R') or (self.fun == 'K'):
+            if self.nfree[28] > 0:
+                self.ine += 1
+            if self.nfree[29] > 0:
+                self.ine += 1
+
+        self.ins = 0
+        if (self.nfree[30] == 0) and (self.nfree[31] != 0):
+            self.ins = 1
+        if (self.nfree[30] != 0) and (self.nfree[31] != 0):
+            self.ins = 2
+
+        # Set start and end indices for data
+        if self.dattyp == 'C':
+            self.jy = 1
+            self.ky = 2 * self.md
+        elif self.dattyp == 'R':
+            self.jy = 1
+            self.ky = self.md
+            self.iopt = 0
+        elif self.dattyp == 'I':
+            self.jy = 1 + self.md
+            self.ky = 2 * self.md
+            self.iopt = 0
+
+        # Scale by A/L if ROE<0
+        if self.roe < 0:
+            self.y1 = abs(self.roe) * self.y1
+            self.y2 = abs(self.roe) * self.y2
+            self.roe = 0
+
+        # Perform data transformations if required
+        if self.freqtyp == 'F':
+            self.omega = 2 * np.pi * self.freq
+        else:
+            self.omega = self.freq
+
+        if not ((self.dinp == self.dfit) and (self.pinp == self.pfit)):
+            if self.pinp != 'R':
+                self.y1, self.y2 = convert_to_rect(self.y1, self.y2, t=self.pinp)
+            if (self.dinp == 'Y') or (self.dinp == 'E'):
+                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
+            if (self.dinp == 'E') or (self.dinp == 'M'):
+                self.y1, self.y2 = convert_m_to_z(self.y1, self.y2, self.omega, clcp=self.celcap)
+
+            if (self.dfit == 'E') or (self.dfit == 'M'):
+                self.y1, self.y2 = convert_z_to_m(self.y1, self.y2, self.omega, clcp=self.celcap)
+            if (self.dfit == 'Y') or (self.dfit == 'E'):
+                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
+            if self.pfit != 'R':
+                self.y1, self.y2 = convert_to_polar(self.y1, self.y2, t=self.pfit)
+
+        # Set NELEM for O-circuit
+        self.nelem = 0
+        if self.fun == 'O':
+            if (self.parameters[34] != 4) and (self.parameters[40] == 4):
+                self.nelem = self.parameters[19]
+            else:
+                self.nelem = self.parameters[9]
+        self.inde = 2
+        if (self.fun == 'O') and (self.nelem in [7, 10, 32, 36]):
+            self.inde = 0
+        elif self.ire < 0:
+            self.inde = 1
+        else:
+            self.inde = 2
+        if (self.nelem == 7) and (self.parameters[6] != 1):
+            self.parameters[9] = 6
+            self.nelem = 6
+            self.inde = 1
+
+        # Combine y and r into single array
+        self.y = np.hstack((self.y1, self.y2))
+        self.r = np.hstack((self.r1, self.r2))
+
+        # Set pex values as "exact" inputs
+        if self.iorig == 1:
+            self.pex = self.parameters
+        else:
+            self.pex = np.zeros(self.n)
+
+        # Define empty arrays for data output
+        self.outputvals = np.zeros(self.ky)
+
+
     def _readinfile(self):
         """Reads LEVM input file"""
         with open(os.path.join(self.path, self.infile), 'r') as f:
@@ -93,91 +252,31 @@ class Experiment():
 
             # Line 2 - data and fit types
             self.iopt = int(line2[:4])
-            self.iacy = 0
-            if self.iopt < 0:
-                self.iacy = abs(self.iopt)
-                self.iopt = 0
-            if self.iacy == 0:
-                self.ftol = 1e-30
-                self.xtol = 1e-48
-            else:
-                self.ftol = 10**(self.iacy)
-                self.xtol = self.ftol
-
             self.dinp = line2[6]
             self.dfit = line2[7]
             self.pinp = line2[8]
             self.pfit = line2[9]
-            self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
-
             self.freqtyp = line2[10]
             self.neg = line2[11]
             self.fun = line2[12]
             self.celcap = dfloat(line2[14:23])
             self.dattyp = line2[23]
             self.ipar = int(line2[25:34])
-            self.iorig = 0
-            if self.ipar < 0:
-                self.iorig = 1
-
             self.roe = dfloat(line2[35:44])
             self.ifp = int(line2[45:50])
-            self.jfp = 1
-            if self.ifp < 0:
-                self.ifp = abs(self.ifp)
-                self.jfp = 0
-                
             self.ire = int(line2[51:56])
-            self.iopr = 0
-            if self.ire < -10:
-                self.iopr = 1
 
             # Line 3 - data, weighting, and fitting specifications
             self.md = int(line3[:5])
-            self.imd = 1
-            if self.md < 0:
-                self.md = abs(self.md)
-                self.imd = -1
-
             self.n = int(line3[6:10])
-            self.inp = 0
-            self.izr = 0
-            if self.n < 0:
-                self.n = abs(self.n)
-                self.inp = 1
-                if (self.dattyp == 'C') and (self.dinp == 'Z') and (self.pinp == 'R') and (self.dfit == 'Z') and (self.pfit == 'R'):
-                    self.izr = 1
-
             self.maxfev = int(line3[11:15])
             self.nprint = int(line3[16:20])
             self.irch = int(line3[21:25])
-            if self.irch < 0:
-                self.irch = abs(self.irch)
-                self.iwt = 1
-                self.qq = 'FUNC'
-            else:
-                self.iwt = 0
-                if self.irch == 1:
-                    self.qq = 'UNIT'
-                else:
-                    self.qq = 'DATA'
-
             self.mode = int(line3[26:30])
             self.icp = int(line3[31:35])
             self.iprint = int(line3[36:40])
-            self.ipl = 0
-            if self.iprint < 0:
-                self.iprint = abs(self.iprint)
-                self.ipl = self.iprint                
-
             self.igacc = int(line3[41:45])
             self.atemp = dfloat(line3[46:55])
-
-            # Set default CELCAP
-            if self.celcap == 0:
-                self.celcap = 1.0
-            if self.imd == -1:
-                self.celcap = EPV
 
             # Line 4 - set model parameters
             plist = []
@@ -188,39 +287,11 @@ class Experiment():
 
             self.parameters = np.array(plist, dtype=float)
 
-            self.irg = 0
-            if self.parameters[30] < 0:
-                self.irg = int(round(abs(self.parameters[30])))
-                self.parameters[30] = 0
-
-            # Line 5 - set nfree/x/ns arrays
+            # Line 5 - set nfree
             nflist = list(f.readline().strip())
             self.nfree = np.array(nflist, dtype=int)
 
-            self.ixi = 0
-            if (self.nfree[31] > 0) and (self.irch > 1):
-                self.ixi = 1
-
-            self.ns = np.where(self.nfree > 0)[0]   # 0-start index
-            self.ns1 = self.ns + 1                  # 1-start index
-            self.x = self.parameters[self.ns]
-            self.nfrei = len(self.x)
-            self.nfixi = self.n - self.nfrei
-
-            self.ine = 0
-            if (self.fun == 'R') or (self.fun == 'K'):
-                if self.nfree[28] > 0:
-                    self.ine += 1
-                if self.nfree[29] > 0:
-                    self.ine += 1
-
-            self.ins = 0
-            if (self.nfree[30] == 0) and (self.nfree[31] != 0):
-                self.ins = 1
-            if (self.nfree[30] != 0) and (self.nfree[31] != 0):
-                self.ins = 2
-
-            # Read input data
+            # Line 6 - read input data
             flist = []
             y1list = []
             y2list = []
@@ -237,61 +308,73 @@ class Experiment():
             self.y1 = np.array(y1list, dtype=float)
             self.y2 = np.array(y2list, dtype=float)
 
-            # Set start and end index
-            if self.dattyp == 'C':
-                self.jy = 1
-                self.ky = 2 * self.md
-            elif self.dattyp == 'R':
-                self.jy = 1
-                self.ky = self.md
-                self.iopt = 0
-            elif self.dattyp == 'I':
-                self.jy = 1 + self.md
-                self.ky = 2 * self.md
-                self.iopt = 0
-
-            # Scale by A/L if ROE<0
-            if self.roe < 0:
-                self.y1 = abs(self.roe) * self.y1
-                self.y2 = abs(self.roe) * self.y2
-                self.roe = 0
-
-            # Perform data transformations if required
-            if self.freqtyp == 'F':
-                self.omega = 2 * np.pi * self.freq
+            # Line 7 - read fixed weighting parameters if they exist (IRCH=0)
+            if self.irch == 0:
+                r1list = []
+                r2list = []
+                for i in range(self.md):
+                    line = f.readline().strip().split()
+                    r1list.append(dfloat(line[1]))
+                    r2list.append(dfloat(line[2]))
+                self.r1 = np.array(r1list, dtype=float)
+                self.r2 = np.array(r2list, dtype=float)
             else:
-                self.omega = self.freq
-
-            if not ((self.dinp == self.dfit) and (self.pinp == self.pfit)):
-                if self.pinp != 'R':
-                    self.y1, self.y2 = convert_to_rect(self.y1, self.y2, t=self.pinp)
-                if (self.dinp == 'Y') or (self.dinp == 'E'):
-                    self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
-                if (self.dinp == 'E') or (self.dinp == 'M'):
-                    self.y1, self.y2 = convert_m_to_z(self.y1, self.y2, self.omega, clcp=self.celcap)
-
-                if (self.dfit == 'E') or (self.dfit == 'M'):
-                    self.y1, self.y2 = convert_z_to_m(self.y1, self.y2, self.omega, clcp=self.celcap)
-                if (self.dfit == 'Y') or (self.dfit == 'E'):
-                    self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
-                if self.pfit != 'R':
-                    self.y1, self.y2 = convert_to_polar(self.y1, self.y2, t=self.pfit)
-
-            self.y = np.hstack((self.y1, self.y2))
-
-            # Read fixed weighting parameters if they exist (IRCH=0)
-
+                self.r1 = np.zeros(self.md) 
+                self.r2 = np.zeros(self.md)
 
         return
 
-
     def fit(self):
         """Performs the CNLS fit"""
-        # Set all COMMON block variables
+        print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
+        print "       VERSION 8.06 - 2/05\n"
+        print "  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT".format(self.dinp, self.pinp, self.dfit, self.pfit,)
+        print "  CIRCUIT MODEL : {:s}\n".format(self.fun)
+        print "  *****  FIT OF {:s} DATA  *****\n".format(self.dattyp)
+
+        print "  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}".format(self.md, self.irch, self.nfrei)
+        print "  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}".format(self.nprint, self.maxfev, self.qq)
+
+        if self.ixi == 0:
+            if self.irch == 0:
+                print "  WEIGHTS (STANDARD DEVIATIONS) ARE READ IN"
+            if self.irch == 1:
+                print "  UNIT WEIGHTING ASSIGNED TO EACH POINT"
+            if self.irch == 2:
+                print "  WEIGHTS INVOLVE THE MAGNITUDES OF DATA OR FUNCTION VALUES RAISED TO THE POWER {:e}".format(self.parameters[31])
+            if self.irch == 3:
+                print "  MODULUS WEIGHTING: RESULTS RAISED TO THE POWER {:e}".format(self.parameters[31])
+            if self.irch == 4:
+                print "  #1174 SPINOLO FRA WEIGHTING"
+            if self.irch == 5:
+                print "  #1250 & 1286 ORAZEM-AGARWAL FRA WEIGHTING"
+            if self.irch == 6:
+                print "  #1250 & PAR 273 ORAZEM-AGARWAL FRA WEIGHTING"
+        else:
+            print "  WEIGHTS USE XI OR U**2 AND XI: BOTH MAY BE FREE PARAMETERS"
+
+        self._setcommon()
+
+        # Run MAINCLC if MAXFEV > 3
+        if self.maxfev > 3:
+            lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.pex, self.nfrei, self.outputvals)
+
+        # If MAXFEV = 0 no fit calc new data
+        # If MAXFEV = 1 no fit convert
+        # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
+
+        # Write outputs
+
+        return
+
+    def _setcommon(self):
+        """Set all COMMON block variables"""
         # Resize arrays
         self.omega.resize(NPTS)
         self.y.resize(NPT2)
+        self.r.resize(NPT2)
         self.parameters.resize(NTOT)
+        self.pex.resize(NTOT)
         self.ns1.resize(NPAFR)
         self.nfree.resize(NPAFR)
         # CM1
@@ -300,7 +383,7 @@ class Experiment():
         lv.cm1.dattyp = self.dattyp
         # CM2
         lv.cm2.y = self.y
-        #lv.cm2.r = 0
+        lv.cm2.r = self.r
         lv.cm2.p = self.parameters
         lv.cm2.drss = 1.0e-8
         lv.cm2.roe = self.roe
@@ -323,11 +406,17 @@ class Experiment():
         # CM12
         lv.cm12.clcap = self.celcap
         lv.cm12.atemp = self.atemp
+        #####lv.cm12.wf = 
+        #####lv.cm12.icf = 
         lv.cm12.maxfev = self.maxfev
         lv.cm12.mde = self.mode
+        lv.cm12.jcdx = 0
+        # CM13
+        lv.cm13.nelem = self.nelem
         # CM16
         lv.cm16.iop = self.iopt
         lv.cm16.iorig = self.iorig
+        lv.cm16.nyc = 0
         lv.cm16.jy = self.jy
         lv.cm16.iprint = self.iprint
         lv.cm16.ldfjac = self.ky
@@ -335,7 +424,7 @@ class Experiment():
         lv.cm16.ifp = self.ifp
         lv.cm16.ire = self.ire
         lv.cm16.jfp = self.jfp
-        #lv.cm16.nph = self.icf / 2
+        #####lv.cm16.nph = self.icf / 2
         lv.cm16.ine = self.ine
         # CM18
         lv.cm18.ipar = self.ipar
@@ -348,6 +437,9 @@ class Experiment():
         # CM35
         lv.cm35.ipf = self.ipf
         lv.cm35.nprint = self.nprint
+        # CM36
+        #####lv.cm36.shw = 
+        lv.cm36.isw = 0
         # CM39
         lv.cm39.p8 = self.parameters[7]
         lv.cm39.p18 = self.parameters[17]
@@ -355,16 +447,4 @@ class Experiment():
         lv.cm78.dattyc = self.dattyp
         # CM79
         lv.cm79.ytt = self.y
-
-        # Run MAINCLC if MAXFEV > 3
-        if self.maxfev > 3:
-            self.outputvals = np.zeros(self.ky)
-            lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.parameters, self.nfrei, self.outputvals)
-
-        # If MAXFEV = 0 no fit calc new data
-        # If MAXFEV = 1 no fit convert
-        # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
-
-        # Write outputs
-
         return

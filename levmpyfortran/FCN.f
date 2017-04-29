@@ -21,7 +21,7 @@ C
 C
 C     M IS KY HERE (TWICE # OF FREQS); MD IS ORIG. NO. OF FREQS.
       ICNT = ICNT + 1
-      WRITE(*,*) ICNT,JIT
+C      WRITE(*,*) ICNT,JIT
       ICOUNT = ICNT
       IMTX = 0
 C
@@ -73,7 +73,7 @@ C
 110   CONTINUE
         MN = 0
         IF(RKE.EQ.0) MN = M
-        CALL MODEL(NPAFR,P,FN)
+        CALL MODEL(NPAFR,M,P,FN)
 C
 C    If IFP >= 0, JFP = 1; otherwise 0.  If IRCH >= 0, IWT = 0;
 C   otherwise 1.  IXI = 1 if XI is free; otherwise 0.
@@ -131,12 +131,12 @@ C
         ENDIF   
         DXJ2 = DXJ*2.D0
         P(NS(JJ))=X(JJ)+DXJ
-        CALL MODEL(NPAFR,P,FNP)
+        CALL MODEL(NPAFR,M,P,FNP)
 C
         IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNP,FJP)
 C
         P(NS(JJ))=X(JJ)-DXJ
-        CALL MODEL(NPAFR,P,FNN)
+        CALL MODEL(NPAFR,M,P,FNN)
         IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNN,FJN)
 C
         P(NS(JJ))=X(JJ)

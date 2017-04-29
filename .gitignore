@@ -37,6 +37,9 @@ LEVMWL/
 # DS Store
 .DS_Store
 
+# iPython noetbook tests
+*.ipynb
+
 # Other
 *.xlsx
 log.txt

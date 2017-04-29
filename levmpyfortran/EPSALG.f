@@ -46,5 +46,5 @@ C              STOP
         ENDDO
       ENDDO
       SF = EX(1,NMAX+1)
-558   RETURN
+      RETURN
       END

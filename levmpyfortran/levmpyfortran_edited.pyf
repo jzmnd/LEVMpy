@@ -165,10 +165,11 @@ python module LEVMpyFortran ! in
             integer intent(in) :: nfrei
             real*8 dimension(k),depend(k),intent(in,out) :: fv1
         end subroutine mainclc
-        subroutine model(n,px,fq) ! in :LEVMpyFortran:MODEL.f
+        subroutine model(n,m,px,fq) ! in :LEVMpyFortran:MODEL.f
             integer intent(in) :: n
+            integer intent(in) :: m
             real*8 dimension(n),depend(n),intent(in) :: px
-            real*8 dimension(*),intent(in,out) :: fq
+            real*8 dimension(2 * m),depend(m),intent(in,out) :: fq
         end subroutine model
     end interface 
 end python module LEVMpyFortran

@@ -25,66 +25,66 @@ C
 C
       DO 983 JIT = 1,4
 C           DO MAIN FIT         
-          IF(JIT.EQ.1) THEN
+        IF(JIT.EQ.1) THEN
             ISTP = 2
 733         CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
-     + PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
+     +           PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
             IF(RKE.EQ.0.D0) THEN
-        SGMSQM = SGMAF*SGMAF
-        IF(ISPR.EQ.1) WRITE(*,745)
-        ENDIF   
+              SGMSQM = SGMAF*SGMAF
+              IF(ISPR.EQ.1) WRITE(*,745)
+            ENDIF   
             IF(ROE.GT.0.D0.AND.RKE.EQ.0.D0) THEN
-                RKE = ROE*SGMAF
-                GOTO 733
+              RKE = ROE*SGMAF
+              GOTO 733
             ENDIF
 C       DO FWT ITERATION
-          ELSE IF(JIT.EQ.2) THEN
-             IF(IFP.NE.0) GOTO 333
-             GOTO 983
+        ELSE IF(JIT.EQ.2) THEN
+            IF(IFP.NE.0) GOTO 333
+            GOTO 983
 C       DO RESIDUAL WEIGHTING ITERATION
-          ELSE IF(JIT.EQ.3.AND.ROE.EQ.0.D0) THEN
-             IF(IRE.GT.0) GOTO 333
-             GOTO 983
+        ELSE IF(JIT.EQ.3.AND.ROE.EQ.0.D0) THEN
+            IF(IRE.GT.0) GOTO 333
+            GOTO 983
 C       DO OPTIMIZATION, COMPLEX FIT ONLY
-          ELSE IF(JIT.EQ.4) THEN
+        ELSE IF(JIT.EQ.4) THEN
             IF(IOP.GT.0) THEN
             RKE = 0.D0
         GOTO 876
         ENDIF
         GOTO 119
-          ENDIF
-          GOTO 983
-745     FORMAT(2X,'**************   END  MAIN  FIT   ***************'/)
+        ENDIF
+        GOTO 983
+745     FORMAT(2X,'==============   END  MAIN  FIT   =============='/)
 C
 C       OPTIMIZATION ITERATION (ONLY FOR DATTYP = C)
-876     CONTINUE   
-      IF(DATTYP.NE.'C') GOTO 119
+876   CONTINUE   
+        IF(DATTYP.NE.'C') GOTO 119
 C     ******  NO OPTIMIZATION WHEN FPWT IS USED  ********
-      IF(IFP.GT.0.OR.IWT.EQ.1) THEN
-        GOTO 119
-      ENDIF
-           SDWRT = SDWR/SDWI
-           SDWRAT = SDWRT*SDWRT
-           TOLTST = DABS(1.D0 - SDWRT)
-           IF(IOCNT.EQ.IOP.OR.TOLTST.LT.1.D-2) THEN
-               ISTP = 2
-           ELSE
-               ISTP = 0 
-           ENDIF
-           SDFI = DSQRT(2.D0/(1.D0 + SDWRAT))
-           SDFR = SDWRT*SDFI
-           DO 880 IL = 1,M
-               R(IL) = SDFR*R(IL)
-               R(IL+M) = SDFI*R(IL+M)
-880        CONTINUE
-           CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
-     +     PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
-           IOCNT = IOCNT + 1
-           IF(ISTP.EQ.2) THEN
+        IF(IFP.GT.0.OR.IWT.EQ.1) THEN
+          GOTO 119
+        ENDIF
+        SDWRT = SDWR/SDWI
+        SDWRAT = SDWRT*SDWRT
+        TOLTST = DABS(1.D0 - SDWRT)
+        IF(IOCNT.EQ.IOP.OR.TOLTST.LT.1.D-2) THEN
+            ISTP = 2
+        ELSE
+            ISTP = 0 
+        ENDIF
+        SDFI = DSQRT(2.D0/(1.D0 + SDWRAT))
+        SDFR = SDWRT*SDFI
+        DO 880 IL = 1,M
+            R(IL) = SDFR*R(IL)
+            R(IL+M) = SDFI*R(IL+M)
+880     CONTINUE
+        CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
+     +       PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
+        IOCNT = IOCNT + 1
+        IF(ISTP.EQ.2) THEN
                IF(ISPR.EQ.1) WRITE(*,748)
                GOTO 119
-           ENDIF
-           GOTO 876
+        ENDIF
+        GOTO 876
 C
 C     PROCEDURE FOR RESIDUAL OR FWT WEIGHTING ITERATION
 333   CONTINUE
@@ -113,7 +113,7 @@ C     PROCEDURE FOR RESIDUAL OR FWT WEIGHTING ITERATION
             IF(JIT.EQ.3.AND.ISPR.EQ.1) WRITE(*,747)            
             GOTO 983
       ENDIF
-      CALL MODEL(NTOT,P,FV1)
+      CALL MODEL(NTOT,M,P,FV1)
       DO 340 I=J,K
         YQQ(I) = DABS(FV1(I) - NRCH*Y(I))   
 340   CONTINUE
@@ -133,8 +133,8 @@ C
           IF(DABS(1.D0-SGMAF).LT.TOLI) GOTO 335
       ENDIF
       IF(NYC.EQ.ITT) GOTO 336
-        SIGOLD=SGMAF
-        NYC=NYC+1
+        SIGOLD = SGMAF
+        NYC = NYC + 1
         GOTO 628
 335   WRITE(*,347)
 347   FORMAT(2X,'*****  CONVERGENCE  *ACHIEVED*  IN WEIGHTING ITERATIO

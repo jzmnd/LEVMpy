@@ -1,4 +1,4 @@
-      SUBROUTINE SSUB(M,FREQ,P,F,NFREE)
+      SUBROUTINE SSUB(M,FREQ,P,F)
       IMPLICIT REAL*8(A-H,O-Z)
       INCLUDE 'SIZE.INC'
       INTEGER M,NFREE
@@ -13,7 +13,6 @@ C         M : number of data points (IN)
 C      FREQ : array of frequency values (IN)
 C         P : array of model parameters (IN)
 C         F : model function values (OUT)
-C     NFREE : free parameter array (IN)
 C
 C   SET PARAMETER VALUES
 C

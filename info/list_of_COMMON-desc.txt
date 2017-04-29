@@ -13,7 +13,7 @@
             RKE          : RKE = ROE*SIGMAF
             NS(NPAFR)    : array of indices of free parameters
             NFREE(NTOT)  : array of free parameters (0=fixed, 1=free positive, 2=free, 3=parameter will be subtracted from the data)
-            N            : 
+            N            : number of model parameters
             ICNT         :
             MN           : number of data points (out of M) which involve least squares minimization (the rest involve absolute value minimization)
             IRCH         : selects form of data weighting (-6 to 6)
@@ -73,10 +73,10 @@
             FJACC(NPT2,NPAFR)  : Jacobian matrix (2 * # of data points, # of free paramter)
 
       COMMON /CM16/
-            IOP
+            IOP          :
             IORIG        : the original number of the first of each parameter pair
             NYC
-            JY
+            JY           :
             IPRINT       : selects level of output (0 - 3)
             LDFJAC
             MODE         : plays several important roles depending on model
@@ -92,7 +92,7 @@
             SDRC
             DIAG(NPAFR)
             IPAR         : 0 = Residuals/Model output columns in AUXPNTL and AUXPNTL1 are calculated, >0 = Residuals/Model in both are changed to Residuals/Uncertainty, <0=an extra line of parameter relative standard deviations occurs in the output, based on the input values of the free parameters of the fit
-            IOPR
+            IOPR         :
 
       COMMON /CM20/
             RXSD(NPAFR)

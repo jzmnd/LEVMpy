@@ -92,5 +92,5 @@ C
       IF(ITW.EQ.200.OR.ITW.EQ.400) THEN
         WRITE(*,*) 33,IX,TAU,SUM
         ENDIF
-931   RETURN
+      RETURN
       END

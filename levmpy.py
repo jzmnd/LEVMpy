@@ -30,6 +30,13 @@ def dfloat(val):
     return float(val.replace('D', 'E'))
 
 
+def resized(arr, s):
+    """Returns resized array padded with zeros"""
+    tmparr = np.copy(arr)
+    tmparr.resize(s)
+    return tmparr
+
+
 def convert_to_rect(mod, theta, t='P'):
     """Converts polar to rectangular data"""
     if t == 'L':
@@ -80,6 +87,7 @@ class Experiment():
         self.path = path
         self.infile = infile
 
+        # Read input file
         self._readinfile()
 
         # Set flags
@@ -233,13 +241,9 @@ class Experiment():
 
         # Set pex values as "exact" inputs
         if self.iorig == 1:
-            self.pex = self.parameters
+            self.pex = resized(self.parameters, NTOT)
         else:
-            self.pex = np.zeros(self.n)
-
-        # Define empty arrays for data output
-        self.outputvals = np.zeros(self.ky)
-
+            self.pex = np.zeros(NTOT)
 
     def _readinfile(self):
         """Reads LEVM input file"""
@@ -321,19 +325,27 @@ class Experiment():
             else:
                 self.r1 = np.zeros(self.md) 
                 self.r2 = np.zeros(self.md)
-
         return
 
     def fit(self):
         """Performs the CNLS fit"""
+        # Reset the levmpy common variables
+        self._reset()
+
+        # Define empty arrays for data output
+        self.outputvals = np.zeros(self.ky)
+
+        # Print fit information
         print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
         print "       VERSION 8.06 - 2/05\n"
+        print "{:s}\n".format(self.alpha)
         print "  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT".format(self.dinp, self.pinp, self.dfit, self.pfit,)
         print "  CIRCUIT MODEL : {:s}\n".format(self.fun)
         print "  *****  FIT OF {:s} DATA  *****\n".format(self.dattyp)
 
         print "  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}".format(self.md, self.irch, self.nfrei)
         print "  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}".format(self.nprint, self.maxfev, self.qq)
+        print "  CELL CAPACITANCE = {:e}".format(self.celcap)
 
         if self.ixi == 0:
             if self.irch == 0:
@@ -353,6 +365,18 @@ class Experiment():
         else:
             print "  WEIGHTS USE XI OR U**2 AND XI: BOTH MAY BE FREE PARAMETERS"
 
+        print "\n  INITIAL PARAMETER GUESSES AND FIXED (0) OR FREE (1 OR 2) STATUS"
+        for i in range(16):
+            j = i + 16
+            print "     P({:2d}) = {:e}   {:d}     P({:2d}) = {:e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
+                                                                                  j + 1, self.parameters[j], self.nfree[j])
+        if self.n > 32:
+            print "\n  THE FOLLOWING PARAMETERS ARE ALWAYS FIXED"
+            for i in range(32, 36):
+                j = i + 4
+                print "     P({:2d}) = {:e}   {:d}     P({:2d}) = {:e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
+                                                                                      j + 1, self.parameters[j], self.nfree[j])
+        # Set the levmpy common variables
         self._setcommon()
 
         # Run MAINCLC if MAXFEV > 3
@@ -364,32 +388,25 @@ class Experiment():
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
         # Write outputs
+        
 
         return
 
     def _setcommon(self):
         """Set all COMMON block variables"""
-        # Resize arrays
-        self.omega.resize(NPTS)
-        self.y.resize(NPT2)
-        self.r.resize(NPT2)
-        self.parameters.resize(NTOT)
-        self.pex.resize(NTOT)
-        self.ns1.resize(NPAFR)
-        self.nfree.resize(NPAFR)
         # CM1
-        lv.cm1.freq = self.omega
+        lv.cm1.freq = resized(self.omega, NPTS)
         lv.cm1.m = self.md
         lv.cm1.dattyp = self.dattyp
         # CM2
-        lv.cm2.y = self.y
-        lv.cm2.r = self.r
-        lv.cm2.p = self.parameters
+        lv.cm2.y = resized(self.y, NPT2)
+        lv.cm2.r = resized(self.r, NPT2)
+        lv.cm2.p = resized(self.parameters, NTOT)
         lv.cm2.drss = 1.0e-8
         lv.cm2.roe = self.roe
-        lv.cm2.ns = self.ns1
-        lv.cm2.nfree = self.nfree
-        lv.cm2.np = self.n
+        lv.cm2.ns = resized(self.ns1, NPAFR)
+        lv.cm2.nfree = resized(self.nfree, NTOT)
+        lv.cm2.n = self.n
         lv.cm2.irch = self.irch
         lv.cm2.ixi = self.ixi
         lv.cm2.dattyq = self.dattyp
@@ -446,5 +463,11 @@ class Experiment():
         # CM78
         lv.cm78.dattyc = self.dattyp
         # CM79
-        lv.cm79.ytt = self.y
+        lv.cm79.ytt = resized(self.y, NPT2)
         return
+
+    def _reset(self):
+        """Reset COMMON block variables if fit() has been previously run"""
+
+        return
+

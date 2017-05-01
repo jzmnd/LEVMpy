@@ -86,6 +86,7 @@ class Experiment():
     def __init__(self, infile, path=os.getcwd()):
         self.path = path
         self.infile = infile
+        self.fitted = False
 
         # Read input file
         self._readinfile()
@@ -328,8 +329,6 @@ class Experiment():
 
     def fit(self):
         """Performs the CNLS fit"""
-        # Reset the levmpy common variables
-        self._reset()
 
         # Define empty arrays for data output
         self.outputvals = np.zeros(NPT2)
@@ -381,6 +380,7 @@ class Experiment():
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
             self.result = lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.pex, self.nfrei, self.outputvals)
+            self.fitted = True
 
         # If MAXFEV = 0 no fit calc new data
         # If MAXFEV = 1 no fit convert
@@ -411,6 +411,7 @@ class Experiment():
         lv.cm2.nfree = resized(self.nfree, NTOT)
         lv.cm2.n = self.n
         lv.cm2.icnt = 0
+        lv.cm2.mn = 0
         lv.cm2.irch = self.irch
         lv.cm2.ixi = self.ixi
         lv.cm2.dattyq = self.dattyp
@@ -455,8 +456,10 @@ class Experiment():
         lv.cm34.mda = self.md
         lv.cm34.iwt = self.iwt
         lv.cm34.ixw = 1 * ((self.ixi == 1) or (self.iwt == 1))
+        lv.cm34.infp = 0
         lv.cm34.ipl = self.ipl
         # CM35
+        lv.cm35.jit = 0
         lv.cm35.ipf = self.ipf
         lv.cm35.nprint = self.nprint
         # CM36
@@ -465,14 +468,10 @@ class Experiment():
         # CM39
         lv.cm39.p8 = self.parameters[7]
         lv.cm39.p18 = self.parameters[17]
+        # CM47
+        lv.cm47.icount = 0
         # CM78
         lv.cm78.dattyc = self.dattyp
         # CM79
         lv.cm79.ytt = resized(self.y, NPT2)
         return
-
-    def _reset(self):
-        """Reset COMMON block variables if fit() has been previously run"""
-
-        return
-

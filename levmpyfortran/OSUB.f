@@ -13,7 +13,7 @@
       COMMON /CM13/ RX,TX,UX,PHIZ,XXM1,XX1,XX2,XX3,RN,AIN,ICAV,
      +  NELEM,NCH
       COMMON /CM55/ PX1,PX41,PX45
-      COMMON /CM79/ YTT(50)
+      COMMON /CM79/ YTT(NPT2)
 C
 C   ****************** O CIRCUIT: Runs as an external subroutine
 C

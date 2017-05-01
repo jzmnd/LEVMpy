@@ -102,6 +102,10 @@ python module LEVMpyFortran ! in
         real*8 :: px1
         real*8 :: px41
         real*8 :: px45
+        real*8 :: omegat
+        real*8 :: psi
+        real*8 :: gama
+        real*8 :: deli
         common /cm39/ p8,p18
         common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
         common /cm20/ rxsd
@@ -125,6 +129,7 @@ python module LEVMpyFortran ! in
         common /cm34/ mda,iwt,ixw,infp,ipl
         common /cm36/ shw,isw
         common /cm55/ px1,px41,px45
+        common /cm80/ omegat,psi,gama,deli
         function aifu(yy) ! in :LEVMpyFortran:AIFU.f
             real*8 intent(in) :: yy
             double precision intent(out) :: aifu

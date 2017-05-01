@@ -156,7 +156,7 @@ C
         RTOT = PX1 + R
           TT = T*CELCAP*RTOT*RTOT/R
       ELSE
-        TT = T
+          TT = T
       ENDIF
 C
 C     EXECUTE APPROPRIATE ROUTINE FOR DISTRIBUTED ELEMENT SELECTED

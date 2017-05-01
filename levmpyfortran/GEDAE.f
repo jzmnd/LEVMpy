@@ -20,8 +20,9 @@ C
       EXTERNAL GDAEFN1,CDFG,HNFG
       INTEGER II,M,JCD,NCH,INH
       REAL*8 FREQ,QX,F
-      DIMENSION QX(8),F(2*M),FREQ(M),VV(5),PHI(2),GAM(2),UU(2)
       COMPLEX*16 ZI0C,TCOMEGA
+      INCLUDE 'SIZE.INC'
+      DIMENSION QX(8),F(*),FREQ(*),VV(5),PHI(2),GAM(2),UU(2)
 C      COMMON TO PASS DATA TO DAEFN FUNCTION
       COMMON /CM9/ TOMEGA,PHIX,ICHG,IWT
       COMMON /CM13/ RX,TX,UX,PHIZ,XXM1,XX1,XX2,XX3,RNX,AIN,ICAV,
@@ -71,45 +72,45 @@ C
         ELSEIF(NCH.EQ.3) THEN
           SN1 = DSIN(GAM(1)*PI)
           CS1 = DCOS(GAM(1)*PI)
-      ENDIF
+        ENDIF
 C
 C      CALCULATE NORMALIZATION COEFFICIENT, RN
-      IF(NCH.EQ.1) THEN
-        IF(UU(1).GT.0) THEN
-            US = UU(1)
-            SYM = 0.5D0
-        ELSE
-            US = 0
-            SYM = 1.D0
-        ENDIF
-      IF(UU(2).EQ.0) THEN
-        MC = 1
-      ELSE
-        MC = 2
-      ENDIF
+        IF(NCH.EQ.1) THEN
+          IF(UU(1).GT.0) THEN
+              US = UU(1)
+              SYM = 0.5D0
+          ELSE
+              US = 0
+              SYM = 1.D0
+          ENDIF
+          IF(UU(2).EQ.0) THEN
+            MC = 1
+          ELSE
+            MC = 2
+          ENDIF
 C
-      RNI = 0.D0
-      DO IJ = 1,MC
-        KK = 3 - 2*IJ
-        PP = 1.D0/GAM(IJ)
-        GAMP = GAMMLN(PP)
-        XGI = DEXP(GAMP)
-        XGP = GAM(IJ)**((1.D0 - GAM(IJ))/GAM(IJ))
-        IF(PHI(IJ).NE.0.D0) THEN
-               RNU = (1.D0 - DEXP(-PHI(IJ)*DABS(UU(IJ))))/PHI(IJ)
-           RNI = RNI + XGI*XGP*RNU
+          RNI = 0.D0
+          DO IJ = 1,MC
+            KK = 3 - 2*IJ
+            PP = 1.D0/GAM(IJ)
+            GAMP = GAMMLN(PP)
+            XGI = DEXP(GAMP)
+            XGP = GAM(IJ)**((1.D0 - GAM(IJ))/GAM(IJ))
+            IF(PHI(IJ).NE.0.D0) THEN
+                   RNU = (1.D0 - DEXP(-PHI(IJ)*DABS(UU(IJ))))/PHI(IJ)
+               RNI = RNI + XGI*XGP*RNU
+            ELSE
+                RNI = RNI + DABS(UU(IJ))*XGI*XGP
+            ENDIF
+          ENDDO
+          RNE = SYM/RNI
         ELSE
-            RNI = RNI + DABS(UU(IJ))*XGI*XGP
+          RNE = 1.D0
         ENDIF
-      ENDDO
-        RNE = SYM/RNI
-      ELSE
-        RNE = 1.D0
-      ENDIF
 C
-      ICHG = 0
-      TOMEGA = 0.D0
-      ISW = 0
+        ICHG = 0
+        TOMEGA = 0.D0
+        ISW = 0
       ENDIF
       IF(ISW.EQ.0) GOTO 199
 189   CONTINUE
@@ -119,55 +120,55 @@ C
 C   CALCULATE FINAL LIMITS FOR CSD QUANTITIES
 C
       IF(ICAV.EQ.1) THEN
-      TOMEGA = 0.D0
-      DO IJ = 1,5
-        IM = IJ - 2
-        ICHG = IM
-        PHIX = PHI(1)
-        GAMX = GAM(1)
+        TOMEGA = 0.D0
+        DO IJ = 1,5
+          IM = IJ - 2
+          ICHG = IM
+          PHIX = PHI(1)
+          GAMX = GAM(1)
 C
-        VINT2 = 0.D0
+          VINT2 = 0.D0
 C
-      IF(NCH.EQ.1) THEN
-        CALL QROMB(GDAEFN1,U1A,US,VINT1)
-      ELSEIF(NCH.EQ.2) THEN
-        UTOP = (DEXP(-U1A) - 1.D0)**(1.D0 - PHI(1))
-        CALL QROMO(CDFG,0.D0,UTOP,VINT1)
-      ELSEIF(NCH.EQ.3) THEN
-        CALL QROMB(HNFG,U1A,-U1A,VINT1)
-      ENDIF
+          IF(NCH.EQ.1) THEN
+            CALL QROMB(GDAEFN1,U1A,US,VINT1)
+          ELSEIF(NCH.EQ.2) THEN
+            UTOP = (DEXP(-U1A) - 1.D0)**(1.D0 - PHI(1))
+            CALL QROMO(CDFG,0.D0,UTOP,VINT1)
+          ELSEIF(NCH.EQ.3) THEN
+            CALL QROMB(HNFG,U1A,-U1A,VINT1)
+          ENDIF
 C
-      IF(UU(2).GT.0) THEN
+          IF(UU(2).GT.0) THEN
 C     REAL:
-      PHIX = PHI(2)
-      GAMX = GAM(2)       
-      CALL QROMB(GDAEFN1,0.D0,UU(2),VINT2)
+            PHIX = PHI(2)
+            GAMX = GAM(2)       
+            CALL QROMB(GDAEFN1,0.D0,UU(2),VINT2)
 C       VINT2 = VINT2*RNE(2)
-      ENDIF
-      ZRE = (VINT1 + VINT2)*RNE
-      VV(IJ) = ZRE
-      ENDDO
+          ENDIF
+          ZRE = (VINT1 + VINT2)*RNE
+          VV(IJ) = ZRE
+        ENDDO
 C
-      AIN = 1.D0/VV(2)
-      XX1 = VV(3)/VV(2)
-      XC0 = 1.D0/XX1
-      XXM1 = AIN*VV(1)
-      XX2 = AIN*VV(4)
-      XX3 = AIN*VV(5)
+        AIN = 1.D0/VV(2)
+        XX1 = VV(3)/VV(2)
+        XC0 = 1.D0/XX1
+        XXM1 = AIN*VV(1)
+        XX2 = AIN*VV(4)
+        XX3 = AIN*VV(5)
 C
-      RNX = RN
-      IF(MDE.LT.0) THEN
-        IF(NCH.EQ.2.OR.NCH.EQ.3) THEN
-            XXM1 = 1.D0/XX1
-            XX1 = VV(4)/VV(3)
-            XX2 = VV(5)/VV(3)
-            XX3 = 0
-        ELSEIF(NCH.EQ.1.AND.JCD.EQ.0) THEN
-            AIN = VV(1)
-            RNX = AIN
+        RNX = RN
+        IF(MDE.LT.0) THEN
+          IF(NCH.EQ.2.OR.NCH.EQ.3) THEN
+              XXM1 = 1.D0/XX1
+              XX1 = VV(4)/VV(3)
+              XX2 = VV(5)/VV(3)
+              XX3 = 0
+          ELSEIF(NCH.EQ.1.AND.JCD.EQ.0) THEN
+              AIN = VV(1)
+              RNX = AIN
+          ENDIF
         ENDIF
-      ENDIF
-653   IF(M.EQ.-1) RETURN
+        IF(M.EQ.-1) RETURN
 C
 191   FORMAT(2X,1P,(5E14.5))
       ENDIF
@@ -187,11 +188,11 @@ C   COMPUTE INTEGRALS
 C
 199   CONTINUE
 C     REAL:
-        PHIX = PHI(1)
-        GAMX = GAM(1)
-        IF(ICAV.EQ.0) ICHG = 0
+      PHIX = PHI(1)
+      GAMX = GAM(1)
+      IF(ICAV.EQ.0) ICHG = 0
 C
-        VINT2 = 0.D0
+      VINT2 = 0.D0
 C
       IF(NCH.EQ.1) THEN
             CALL QROMB(GDAEFN1,U1A,US,VINT1)
@@ -215,17 +216,17 @@ C
       IF(IWT.EQ.0.D0) GOTO 192
 C
 C     IMAGINARY:
-        PHIX = PHI(1)
-        GAMX = GAM(1)
-            ICHG = 1
-        VINT2 = 0.D0
-        IF(NCH.EQ.1) THEN
-                CALL QROMB(GDAEFN1,U1A,US,VINT1)
-        ELSEIF(NCH.EQ.2) THEN
-                CALL QROMO(CDFG,0.D0,UTOP,VINT1)
-        ELSEIF(NCH.EQ.3) THEN
-                CALL QROMB(HNFG,U1A,-U1A,VINT1)
-        ENDIF
+      PHIX = PHI(1)
+      GAMX = GAM(1)
+          ICHG = 1
+      VINT2 = 0.D0
+      IF(NCH.EQ.1) THEN
+              CALL QROMB(GDAEFN1,U1A,US,VINT1)
+      ELSEIF(NCH.EQ.2) THEN
+              CALL QROMO(CDFG,0.D0,UTOP,VINT1)
+      ELSEIF(NCH.EQ.3) THEN
+              CALL QROMB(HNFG,U1A,-U1A,VINT1)
+      ENDIF
       IF(UU(2).GT.0) THEN
 C     IMAGINARY:
         PHIX = PHI(2)

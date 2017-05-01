@@ -466,17 +466,17 @@ python module LEVMpyFortran ! in
         real*8 :: ftol
         real*8 :: gtol
         real*8 :: xtol
-        real*8 dimension(*) :: x
+        real*8 dimension(nfrei) :: x
         integer :: maxfev
         integer :: nprint
         integer :: nfev
         real*8 dimension(50) :: pex
-        integer :: nfrei
+        integer, optional,check(len(x)>=nfrei),depend(x) :: nfrei=len(x)
         real*8 :: sdwr
         real*8 :: sdwi
         integer :: iocnt
         real*8 :: sgmaf
-        real*8 dimension(*) :: fv1
+        real*8 dimension(4002) :: fv1
         integer :: jit
         real*8 :: sgmsqm
         integer :: mqy
@@ -895,7 +895,7 @@ python module LEVMpyFortran ! in
         integer :: isd
     end subroutine ludcmp
     subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran
-        integer, optional,check(len(fv1)>=k),depend(fv1) :: k=len(fv1)
+        integer :: k
         real*8 :: ftol
         real*8 :: gtol
         real*8 :: xtol
@@ -905,7 +905,7 @@ python module LEVMpyFortran ! in
         integer :: nfev
         real*8 dimension(50) :: pex
         integer, optional,check(len(x)>=nfrei),depend(x) :: nfrei=len(x)
-        real*8 dimension(k) :: fv1
+        real*8 dimension(4002) :: fv1
         integer :: mqy
         integer :: ispr
         integer :: icx
@@ -966,10 +966,11 @@ python module LEVMpyFortran ! in
         real*8 :: s
         integer :: n
     end subroutine midpnt
-    subroutine model(n,px,fq) ! in :LEVMpyFortran
+    subroutine model(n,m,px,fq) ! in :LEVMpyFortran
         integer, optional,check(len(px)>=n),depend(px) :: n=len(px)
+        integer :: m
         real*8 dimension(n) :: px
-        real*8 dimension(*) :: fq
+        real*8 dimension(4002) :: fq
         real*8 :: epsg
         integer :: izr
         real*8 :: fnorm
@@ -1219,13 +1220,13 @@ python module LEVMpyFortran ! in
         real*8 :: ftol
         real*8 :: gtol
         real*8 :: xtol
-        real*8 dimension(*) :: x
+        real*8 dimension(nfrei) :: x
         integer :: maxfev
         integer :: nprint
         integer :: nfev
-        real*8 dimension(*) :: pex
-        integer :: nfrei
-        real*8 dimension(*) :: fv1
+        real*8 dimension(50) :: pex
+        integer, optional,check(len(x)>=nfrei),depend(x) :: nfrei=len(x)
+        real*8 dimension(4002) :: fv1
         integer :: mqy
         integer :: ispr
         integer :: icx
@@ -1282,12 +1283,11 @@ python module LEVMpyFortran ! in
         common /cm2/ y,r,fj,p,drss,roe,rke,ns,nfree,np,icnt,mn,irch,ixi,dattyq
         common /cm1/ freq,m,dattyp
     end subroutine spfit
-    subroutine ssub(m,freq,p,f,nfree) ! in :LEVMpyFortran
+    subroutine ssub(m,freq,p,f) ! in :LEVMpyFortran
         integer, optional,check(len(freq)>=m),depend(freq) :: m=len(freq)
         double precision dimension(m) :: freq
         double precision dimension(50) :: p
         double precision dimension(2 * m),depend(m) :: f
-        integer :: nfree
     end subroutine ssub
     subroutine svdm(nd,mp,sgmasq,x,pex,ns,iorig,istp) ! in :LEVMpyFortran
         integer :: nd

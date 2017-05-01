@@ -35,18 +35,18 @@ C     MD IS #  OF FREQ; FOR COMPLEX FIT, M AND LDFJAC = 2*MD
 C     NFREI IS # OF FREE PARAMETERS
 C
       DO 50 I=1,NFREI
-          P(NS(I))=X(I)
-      IF(IXI.EQ.1) THEN
-        DPP = DABS(P(32))
-        IF(P(32).GT.4.D0) THEN
-          IFLAG = -16
-          GOTO 666
+        P(NS(I))=X(I)
+        IF(IXI.EQ.1) THEN
+          DPP = DABS(P(32))
+          IF(P(32).GT.4.D0) THEN
+            IFLAG = -16
+            GOTO 666
+          ENDIF
+          IF(P(32).LT.-4.D0) THEN
+            IFLAG = -15
+            GOTO 666
+          ENDIF
         ENDIF
-        IF(P(32).LT.-4.D0) THEN
-          IFLAG = -15
-          GOTO 666
-        ENDIF
-      ENDIF
 50    CONTINUE
 C
       IF (IFLAG-1) 100, 110, 120
@@ -76,7 +76,7 @@ C
         CALL MODEL(NPAFR,M,P,FN)
 C
 C    If IFP >= 0, JFP = 1; otherwise 0.  If IRCH >= 0, IWT = 0;
-C   otherwise 1.  IXI = 1 if XI is free; otherwise 0.
+C    otherwise 1.  IXI = 1 if XI is free; otherwise 0.
 C
       IF(IRCH.EQ.0.OR.JIT.GT.3) GOTO 116
       IF((IWT+IXI).EQ.0.AND.ICNT.EQ.1.AND.JIT.EQ.1) THEN
@@ -158,13 +158,13 @@ C
       IF(P(34).LT.0.D0) THEN
         SNG = 0.D0
         SNP = 0.D0
-          IF(MOD(NPRIN,-ICNT).EQ.0) THEN
-            IF(JJ.EQ.1) WRITE(*,105) ENORM(M,FVEC)
-          ENDIF
-          DO 342 I = 1,M
-            SNG = SNG + FVEC(I)*FJAC(I,JJ)
-            SNP = SNP + FVEC(I)*FJCW(I,JJ)
-342       CONTINUE
+        IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+          IF(JJ.EQ.1) WRITE(*,105) ENORM(M,FVEC)
+        ENDIF
+        DO 342 I = 1,M
+          SNG = SNG + FVEC(I)*FJAC(I,JJ)
+          SNP = SNP + FVEC(I)*FJCW(I,JJ)
+342     CONTINUE
         PSNG = P(NS(JJ))*SNG
         IF(MOD(NPRIN,-ICNT).EQ.0) THEN
           WRITE(*,341) ICNT,NS(JJ),P(NS(JJ)),SNG,PSNG,SNP

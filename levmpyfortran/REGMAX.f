@@ -100,14 +100,14 @@ C
 C
       IF(IFLAG.EQ.1) THEN
         DO 10 I = 1,MP
-                FVEC(I + MK) = DP3*XREG(I)
-10        CONTINUE
+            FVEC(I+MK) = DP3*XREG(I)
+10      CONTINUE
       ELSE
         DO 30 I = 1,MP
           DO 20 J = 1,MP
             FJAC(I+MK,J) = DP3*MREG(I,J)
-20            CONTINUE
-30          CONTINUE
+20        CONTINUE
+30      CONTINUE
       ENDIF
 C
 876   CONTINUE

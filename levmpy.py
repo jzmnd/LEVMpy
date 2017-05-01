@@ -101,7 +101,6 @@ class Experiment():
         else:
             self.ftol = 10**(self.iacy)
             self.xtol = self.ftol
-
         self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
         self.iorig = 0
         if self.ipar < 0:
@@ -333,7 +332,7 @@ class Experiment():
         self._reset()
 
         # Define empty arrays for data output
-        self.outputvals = np.zeros(self.ky)
+        self.outputvals = np.zeros(NPT2)
 
         # Print fit information
         print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
@@ -381,14 +380,18 @@ class Experiment():
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
-            lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.pex, self.nfrei, self.outputvals)
+            self.result = lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.pex, self.nfrei, self.outputvals)
 
         # If MAXFEV = 0 no fit calc new data
         # If MAXFEV = 1 no fit convert
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
         # Write outputs
-        
+        print "\nFITTED PARAMETERS:"
+        print self.result[0]
+        print "NFEV:", self.result[1]
+        print "OUTPUT VALUES:"
+        print self.result[2]
 
         return
 
@@ -407,6 +410,7 @@ class Experiment():
         lv.cm2.ns = resized(self.ns1, NPAFR)
         lv.cm2.nfree = resized(self.nfree, NTOT)
         lv.cm2.n = self.n
+        lv.cm2.icnt = 0
         lv.cm2.irch = self.irch
         lv.cm2.ixi = self.ixi
         lv.cm2.dattyq = self.dattyp
@@ -429,6 +433,7 @@ class Experiment():
         lv.cm12.mde = self.mode
         lv.cm12.jcdx = 0
         # CM13
+        lv.cm13.icav = 0
         lv.cm13.nelem = self.nelem
         # CM16
         lv.cm16.iop = self.iopt

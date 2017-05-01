@@ -2,7 +2,7 @@
       IMPLICIT REAL*8(A-H,O-Z)
       INCLUDE 'SIZE.INC'
       INTEGER M
-      DOUBLE PRECISION P(NTOT),F(2*M),FREQ(M),L
+      DOUBLE PRECISION P(NTOT),F(NPT2),FREQ(NPT2),L
       COMPLEX*16 ZT,ZD,Z5,YC,IOMEGA
       COMMON /CM47/ ICNT    
       LOGICAL RC10,RC20,RC30,RC40,R40,RP0,RP1
@@ -113,6 +113,7 @@ C
             YC = (C4*R4*IOMEGA + 1.D0)/R4
           ENDIF
         ENDIF
+C
         IF(Z5.EQ.(0,0)) THEN
           IF(YC.NE.(0,0)) ZT = ZT + 1.D0/YC
         ELSE

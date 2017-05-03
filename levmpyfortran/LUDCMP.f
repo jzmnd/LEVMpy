@@ -28,10 +28,10 @@ C
           IF (DABS(A(I,J)).GT.AAMAX) AAMAX=DABS(A(I,J))
 11      CONTINUE
         IF (AAMAX.EQ.0.D0) THEN
-        WRITE(*,*) '*** SINGULAR MATRIX ***'
-        AAMAX = 1.D0
-        ISD = 1
-      ENDIF
+C          WRITE(*,*) '*** SINGULAR MATRIX ***'
+          AAMAX = 1.D0
+          ISD = 1
+        ENDIF
         VV(I)=1.D0/AAMAX
 12    CONTINUE
       DO 19 J=1,N

@@ -59,7 +59,7 @@ C        WRITE(3,102)
         WRITE(*,102)
 102   FORMAT('- PARAMETER ESTIMATES')
 C        WRITE(3,103) ( P(NS(I)), I = 1, NFREI)
-        WRITE(*,103) ( P(NS(I)), I = 1, NFREI)
+        WRITE(*,103) (P(NS(I)), I = 1, NFREI)
 103   FORMAT (2X,6(1PD13.4))
 C        WRITE(3,105) FNORM
         IF(MOD(NPRIN,-ICNT).EQ.0) THEN
@@ -130,9 +130,9 @@ C
           DXJ = DRSS
         ENDIF   
         DXJ2 = DXJ*2.D0
+C
         P(NS(JJ))=X(JJ)+DXJ
         CALL MODEL(NPAFR,M,P,FNP)
-C
         IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNP,FJP)
 C
         P(NS(JJ))=X(JJ)-DXJ

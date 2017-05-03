@@ -91,8 +91,8 @@ class Experiment():
         # Read input file
         self._readinfile()
 
-        # Set flags
-        self.iacy = 0
+        # Set flags for MAINCLC
+        self.iacy = 0 
         if self.iopt < 0:
             self.iacy = abs(self.iopt)
             self.iopt = 0
@@ -102,21 +102,16 @@ class Experiment():
         else:
             self.ftol = 10**(self.iacy)
             self.xtol = self.ftol
+
         self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
-        self.iorig = 0
-        if self.ipar < 0:
-            self.iorig = 1
-        self.jfp = 1
-        if self.ifp < 0:
-            self.ifp = abs(self.ifp)
-            self.jfp = 0
-        self.iopr = 0
-        if self.ire < -10:
-            self.iopr = 1
-        self.imd = 1
-        if self.md < 0:
-            self.md = abs(self.md)
-            self.imd = -1
+
+        self.iorig = 1 if self.ipar < 0 else 0
+        self.jfp = 1 if self.ifp > 0 else 0
+        self.ifp = abs(self.ifp)
+        self.iopr = 1 if self.ire < -10 else 0
+        self.imd = 1 if self.md > 0 else -1
+        self.md = abs(self.md)
+
         self.inp = 0
         self.izr = 0
         if self.n < 0:
@@ -130,26 +125,22 @@ class Experiment():
             self.qq = 'FUNC'
         else:
             self.iwt = 0
-            if self.irch == 1:
-                self.qq = 'UNIT'
-            else:
-                self.qq = 'DATA'
-        self.ipl = 0
-        if self.iprint < 0:
-            self.iprint = abs(self.iprint)
-            self.ipl = self.iprint
+            self.qq = 'UNIT' if self.irch == 1 else 'DATA'
+
+        self.ipl = self.iprint if self.iprint < 0 else 0
+        self.iprint = abs(self.iprint)
+
+        self.irg = 0
+        if self.parameters[30] < 0:
+            self.irg = int(round(abs(self.parameters[30])))
+            self.parameters[30] = 0
 
         # Set default CELCAP
         if self.celcap == 0:
             self.celcap = 1.0
         if self.imd == -1:
             self.celcap = EPV
-
-        # Set parameter flags
-        self.irg = 0
-        if self.parameters[30] < 0:
-            self.irg = int(round(abs(self.parameters[30])))
-            self.parameters[30] = 0
+        self.clcap = 1.0 if self.celcap < 0 else self.celcap
 
         # Set NS and X parameter arrays
         self.ns = np.where(self.nfree > 0)[0]   # 0-start index
@@ -159,17 +150,13 @@ class Experiment():
         self.nfixi = self.n - self.nfrei
 
         # Set free parameter flags
-        self.ixi = 0
-        if (self.nfree[31] > 0) and (self.irch > 1):
-            self.ixi = 1
-
+        self.ixi = 1 if (self.nfree[31] > 0) and (self.irch > 1) else 0
         self.ine = 0
         if (self.fun == 'R') or (self.fun == 'K'):
             if self.nfree[28] > 0:
                 self.ine += 1
             if self.nfree[29] > 0:
                 self.ine += 1
-
         self.ins = 0
         if (self.nfree[30] == 0) and (self.nfree[31] != 0):
             self.ins = 1
@@ -195,6 +182,9 @@ class Experiment():
             self.y2 = abs(self.roe) * self.y2
             self.roe = 0
 
+        # Combine y into single array pre transform
+        self.ytt = np.hstack((self.y1, self.y2))
+
         # Perform data transformations if required
         if self.freqtyp == 'F':
             self.omega = 2 * np.pi * self.freq
@@ -216,21 +206,44 @@ class Experiment():
             if self.pfit != 'R':
                 self.y1, self.y2 = convert_to_polar(self.y1, self.y2, t=self.pfit)
 
-        # Set NELEM for O-circuit
+        # Set K,R,S-circuit flags
+        self.icf = 0
+        if (self.fun == 'K') or (self.fun == 'R') or (self.fun == 'S'):
+            if (self.fun == 'K'):
+                jia = 22
+                jib = 18
+            else:
+                jia = 28
+                jib = 12
+            ip34a = int(round(abs(self.parameters[33])))
+            ip34 = np.sign(self.parameters(33)) * ip34a
+            ip35a = int(round(abs(self.parameters[34])))
+            ip38a = int(round(abs(self.parameters[37])))
+            ip40a = int(round(abs(self.parameters[39])))
+            ip40s = np.sign(self.parameters[39])
+            if self.ire > -10:
+                self.ire = -10
+            if ip35a > 0:
+                self.icf = 2 * ip35a
+            else:
+                self.icf = np.count_nonzero(self.parameters[:jia])
+                if self.n > 40:
+                    self.icf += np.count_nonzero(self.parameters[40:])
+
+        # Set O-circuit NELEM and flags
         self.nelem = 0
         if self.fun == 'O':
-            if (self.parameters[34] != 4) and (self.parameters[40] == 4):
-                self.nelem = self.parameters[19]
+            if (int(self.parameters[34]) != 4) and (int(self.parameters[39]) == 4):
+                self.nelem = int(self.parameters[19])
             else:
-                self.nelem = self.parameters[9]
-        self.inde = 2
+                self.nelem = int(self.parameters[9])
         if (self.fun == 'O') and (self.nelem in [7, 10, 32, 36]):
             self.inde = 0
         elif self.ire < 0:
             self.inde = 1
         else:
             self.inde = 2
-        if (self.nelem == 7) and (self.parameters[6] != 1):
+        if (self.nelem == 7) and (int(self.parameters[6]) != 1):
             self.parameters[9] = 6
             self.nelem = 6
             self.inde = 1
@@ -250,11 +263,9 @@ class Experiment():
         with open(os.path.join(self.path, self.infile), 'r') as f:
             # Line 1 - description of run
             self.alpha = f.readline().strip()
-            
-            line2 = f.readline()
-            line3 = f.readline()
 
             # Line 2 - data and fit types
+            line2 = f.readline()
             self.iopt = int(line2[:4])
             self.dinp = line2[6]
             self.dfit = line2[7]
@@ -271,6 +282,7 @@ class Experiment():
             self.ire = int(line2[51:56])
 
             # Line 3 - data, weighting, and fitting specifications
+            line3 = f.readline()
             self.md = int(line3[:5])
             self.n = int(line3[6:10])
             self.maxfev = int(line3[11:15])
@@ -284,12 +296,13 @@ class Experiment():
 
             # Line 4 - set model parameters
             plist = []
-            for i in range(int(self.n / 5)):
+            for i in range(int(np.ceil(self.n / 5.0))):
                 line = f.readline().strip().split()
                 for p in line:
                     plist.append(dfloat(p))
 
             self.parameters = np.array(plist, dtype=float)
+            self.parameters.resize(NTOT)
 
             # Line 5 - set nfree
             nflist = list(f.readline().strip())
@@ -332,6 +345,7 @@ class Experiment():
 
         # Define empty arrays for data output
         self.outputvals = np.zeros(NPT2)
+        self.nfev = 2
 
         # Print fit information
         print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
@@ -366,32 +380,41 @@ class Experiment():
         print "\n  INITIAL PARAMETER GUESSES AND FIXED (0) OR FREE (1 OR 2) STATUS"
         for i in range(16):
             j = i + 16
-            print "     P({:2d}) = {:e}   {:d}     P({:2d}) = {:e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
-                                                                                  j + 1, self.parameters[j], self.nfree[j])
+            print "     P({:2d}) = {: e}   {:d}     P({:2d}) = {: e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
+                                                                                    j + 1, self.parameters[j], self.nfree[j])
         if self.n > 32:
             print "\n  THE FOLLOWING PARAMETERS ARE ALWAYS FIXED"
             for i in range(32, 36):
                 j = i + 4
-                print "     P({:2d}) = {:e}   {:d}     P({:2d}) = {:e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
-                                                                                      j + 1, self.parameters[j], self.nfree[j])
+                print "     P({:2d}) = {: e}         P({:2d}) = {: e}".format(i + 1, self.parameters[i], j + 1, self.parameters[j])
         # Set the levmpy common variables
         self._setcommon()
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
-            self.result = lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x, self.maxfev, self.nprint, 2, self.pex, self.nfrei, self.outputvals)
+            self.result = lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x,
+                                     self.maxfev, self.nprint, self.nfev, self.pex, self.nfrei, self.outputvals)
             self.fitted = True
 
         # If MAXFEV = 0 no fit calc new data
         # If MAXFEV = 1 no fit convert
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
+        # Resdiduals
+        self.res = self.y - self.outputvals[:self.ky]
+        self.resmod = self.res / self.outputvals[:self.ky]
+
         # Write outputs
-        print "\nFITTED PARAMETERS:"
-        print self.result[0]
-        print "NFEV:", self.result[1]
-        print "OUTPUT VALUES:"
-        print self.result[2]
+        print "\n  PARAMETER ESTIMATES"
+        for i, n in enumerate(self.ns1):
+            print "     P({:2d}) = {: e}".format(n, self.x[i])
+        print "  NFEV =", self.result[1]
+        print "\n  OBSERVED VARIABLES:"
+        print "  M     MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL"
+        for i in range(self.md):
+            j = i + self.md
+            print "{:3d} R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i], lv.cm2.r[i], self.res[i], self.resmod[i])
+            print "{:3d} I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j], lv.cm2.r[j], self.res[j], self.resmod[j])
 
         return
 
@@ -404,7 +427,7 @@ class Experiment():
         # CM2
         lv.cm2.y = resized(self.y, NPT2)
         lv.cm2.r = resized(self.r, NPT2)
-        lv.cm2.p = resized(self.parameters, NTOT)
+        lv.cm2.p = self.parameters
         lv.cm2.drss = 1.0e-8
         lv.cm2.roe = self.roe
         lv.cm2.ns = resized(self.ns1, NPAFR)
@@ -426,10 +449,10 @@ class Experiment():
         # CM11
         lv.cm11.mqy = self.nfrei - self.ins
         # CM12
-        lv.cm12.clcap = self.celcap
+        lv.cm12.clcap = self.clcap
         lv.cm12.atemp = self.atemp
         #####lv.cm12.wf = 
-        #####lv.cm12.icf = 
+        lv.cm12.icf = self.icf
         lv.cm12.maxfev = self.maxfev
         lv.cm12.mde = self.mode
         lv.cm12.jcdx = 0
@@ -447,7 +470,7 @@ class Experiment():
         lv.cm16.ifp = self.ifp
         lv.cm16.ire = self.ire
         lv.cm16.jfp = self.jfp
-        #####lv.cm16.nph = self.icf / 2
+        lv.cm16.nph = self.icf / 2
         lv.cm16.ine = self.ine
         # CM18
         lv.cm18.ipar = self.ipar
@@ -473,5 +496,5 @@ class Experiment():
         # CM78
         lv.cm78.dattyc = self.dattyp
         # CM79
-        lv.cm79.ytt = resized(self.y, NPT2)
+        lv.cm79.ytt = resized(self.ytt, NPT2)
         return

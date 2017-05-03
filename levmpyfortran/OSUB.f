@@ -11,7 +11,7 @@
       COMMON /CM47/ ICNT
       COMMON /CM12/ CELCAP,ATEMP,WF,MAXFEV,ICF,MDE,JCDX
       COMMON /CM13/ RX,TX,UX,PHIZ,XXM1,XX1,XX2,XX3,RN,AIN,ICAV,
-     +  NELEM,NCH
+     + NELEM,NCH
       COMMON /CM55/ PX1,PX41,PX45
       COMMON /CM79/ YTT(NPT2)
 C
@@ -312,6 +312,7 @@ C   NGAI COUPLING MODEL:
             IF(FREQ(I).GE.WT) YT = P(42)/(1.D0 + IOMEGA*P(43))
           ENDIF
         ELSE
+          WRITE(*,*) 'WRONG VALUE OF P(40)'
           RETURN
 C        STOP
         ENDIF
@@ -362,7 +363,7 @@ C
           ELSE
             YEL = ZNL
           ENDIF
-            P11 = 0.D0
+          P11 = 0.D0
 C
         ELSE          ! ORIGINAL SITUATION
            YEL = 0.D0

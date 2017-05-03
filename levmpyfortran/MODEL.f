@@ -4,7 +4,7 @@ C     Runs selected circuit model
 C
 C        N : number of parameters (IN)
 C        M : number of data points (IN)
-C       PX : all parameter list (IN)
+C       PX : parameter list (IN)
 C       FQ : model function values (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017

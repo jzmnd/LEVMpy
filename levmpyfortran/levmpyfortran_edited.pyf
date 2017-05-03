@@ -147,16 +147,6 @@ python module LEVMpyFortran ! in
             real*8 intent(in) :: xx
             real*8 intent(out) :: gammln
         end function gammln
-        subroutine gedae(ii,m,freq,qx,f,jcd,nch,inh) ! in :LEVMpyFortran:GEDAE.f
-            integer intent(in) :: ii
-            integer intent(in) :: m
-            real*8 dimension(m),depend(m),intent(in) :: freq
-            real*8 dimension(8),intent(in) :: qx
-            real*8 dimension(2 * m),depend(m),intent(in,out) :: f
-            integer intent(in) :: jcd
-            integer intent(in) :: nch
-            integer intent(in) :: inh
-        end subroutine gedae
         subroutine mainclc(k,ftol,gtol,xtol,x,maxfev,nprint,nfev,pex,nfrei,fv1) ! in :LEVMpyFortran:MAINCLC.f
             integer intent(in) :: k
             real*8 intent(in) :: ftol

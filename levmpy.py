@@ -14,6 +14,7 @@ import sys
 import levmpyfortran.LEVMpyFortran as _lv
 import numpy as np
 from utils import *
+from outputfunc import *
 
 __author__ = "Jeremy Smith"
 __version__ = "1.1"
@@ -28,9 +29,10 @@ NPT2 = len(_lv.cm2.y)
 
 class Experiment():
     """Class for single LEVM input file"""
-    def __init__(self, infile, path=os.getcwd()):
+    def __init__(self, infile, outfile="OUTFILE.txt", path=os.getcwd()):
         self.path = path
         self.infile = infile
+        self.outfile = outfile
         self.fitted = False
         # Read input file
         self._readinfile()
@@ -345,49 +347,11 @@ class Experiment():
         self.outputvals = np.zeros(NPT2)
         self.nfev = 2
         self.fitted = False
-
-        # Print fit information
-        print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
-        print "       VERSION 8.06 - 2/05\n"
-        print "{:s}\n".format(self.alpha)
-        print "  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT".format(self.dinp, self.pinp, self.dfit, self.pfit)
-        print "  CIRCUIT MODEL : {:s}\n".format(self.fun)
-        print "  *****  FIT OF {:s} DATA  *****\n".format(self.dattyp)
-
-        print "  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}".format(self.md, self.irch, self.nfrei)
-        print "  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}".format(self.nprint, self.maxfev, self.qq)
-        print "  CELL CAPACITANCE = {:e}".format(self.celcap)
-
-        if self.ixi == 0:
-            if self.irch == 0:
-                print "  WEIGHTS (STANDARD DEVIATIONS) ARE READ IN"
-            if self.irch == 1:
-                print "  UNIT WEIGHTING ASSIGNED TO EACH POINT"
-            if self.irch == 2:
-                print "  WEIGHTS INVOLVE THE MAGNITUDES OF DATA OR FUNCTION VALUES RAISED TO THE POWER {:e}".format(self.parameters[31])
-            if self.irch == 3:
-                print "  MODULUS WEIGHTING: RESULTS RAISED TO THE POWER {:e}".format(self.parameters[31])
-            if self.irch == 4:
-                print "  #1174 SPINOLO FRA WEIGHTING"
-            if self.irch == 5:
-                print "  #1250 & 1286 ORAZEM-AGARWAL FRA WEIGHTING"
-            if self.irch == 6:
-                print "  #1250 & PAR 273 ORAZEM-AGARWAL FRA WEIGHTING"
-        else:
-            print "  WEIGHTS USE XI OR U**2 AND XI: BOTH MAY BE FREE PARAMETERS"
-
-        print "\n  INITIAL PARAMETER GUESSES AND FIXED (0) OR FREE (1 OR 2) STATUS"
-        for i in range(16):
-            j = i + 16
-            print "     P({:2d}) = {: e}   {:d}     P({:2d}) = {: e}   {:d}".format(i + 1, self.parameters[i], self.nfree[i],
-                                                                                    j + 1, self.parameters[j], self.nfree[j])
-        if self.n > 32:
-            print "\n  THE FOLLOWING PARAMETERS ARE ALWAYS FIXED"
-            for i in range(32, 36):
-                j = i + 4
-                print "     P({:2d}) = {: e}         P({:2d}) = {: e}".format(i + 1, self.parameters[i], j + 1, self.parameters[j])
         # Set the levmpy common variables
         self._setcommon()
+
+        # Print fit information
+        print_fit_info(self)
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
@@ -399,23 +363,12 @@ class Experiment():
         # If MAXFEV = 1 no fit convert
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
-        # Resdiduals
-        self.res = self.y - self.outputvals[:self.ky]
-        self.resmod = self.res / self.outputvals[:self.ky]
-
+        # Resdiduals and errors
+        self.r = _lv.cm2.r[self.jy - 1:self.ky]
+        self.res = self.y - self.outputvals[self.jy - 1:self.ky]
+        self.resmod = self.res / self.outputvals[self.jy - 1:self.ky]
         # Write outputs
-        print "\n  PARAMETER ESTIMATES"
-        for i, n in enumerate(self.ns1):
-            print "     P({:2d}) = {: e}".format(n, self.x[i])
-        print "  NFEV =", self.result[1]
-        print "\n  OBSERVED VARIABLES:"
-        print "  M  T   MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL"
-        for i in range(self.md):
-            j = i + self.md
-            print "{:3d}  R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i],
-                                                                   _lv.cm2.r[i], self.res[i], self.resmod[i])
-            print "{:3d}  I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j],
-                                                                   _lv.cm2.r[j], self.res[j], self.resmod[j])
+        print_outputs(self)
         return
 
     def _setcommon(self):

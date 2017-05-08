@@ -11,74 +11,19 @@ Created by Jeremy Smith on 2017-04-16
 
 import os
 import sys
-import levmpyfortran.LEVMpyFortran as lv
+import levmpyfortran.LEVMpyFortran as _lv
 import numpy as np
+import utils
 
 __author__ = "Jeremy Smith"
-__version__ = "1.0"
+__version__ = "1.1"
 
 
 EPV = 8.85418782e-14
-NPAFR = len(lv.cm2.ns)
-NTOT = len(lv.cm2.nfree)
-NPTS = len(lv.cm1.freq)
-NPT2 = len(lv.cm2.y)
-
-
-def dfloat(val):
-    """Converts Fortran D string format to float"""
-    return float(val.replace('D', 'E'))
-
-
-def resized(arr, s):
-    """Returns resized array padded with zeros"""
-    tmparr = np.copy(arr)
-    tmparr.resize(s)
-    return tmparr
-
-
-def convert_to_rect(mod, theta, t='P'):
-    """Converts polar to rectangular data"""
-    if t == 'L':
-        mod = np.exp(mod)
-    if t == 'D':
-        theta = np.pi * theta / 180
-    rx = mod * np.cos(theta)
-    ry = mod * np.sin(theta)
-    return rx, ry
-
-
-def convert_to_polar(rx, ry, t='P'):
-    """Converts rectangular to polar data"""
-    mod = np.sqrt(rx**2 + ry**2)
-    theta = np.arctan(ry / rx)
-    if t == 'L':
-        mod = np.log(mod)
-    if t == 'D':
-        theta = 180 * theta / np.pi
-    return mod, theta
-
-
-def convert_to_inverse(y1, y2):
-    """Converts to inverse of input data"""
-    norm = y1**2 + y2**2
-    y1 = y1 / norm
-    y2 = -y2 / norm
-    return y1, y2
-
-
-def convert_m_to_z(y1, y2, fq, clcp=1.0):
-    """Converts modulus to impedance"""
-    r1 = y2 / (fq * clcp)
-    r2 = -y1 / (fq * clcp)
-    return r1, r2
-
-
-def convert_z_to_m(y1, y2, fq, clcp=1.0):
-    """Converts impedance to modulus"""
-    r1 = -y2 * fq * clcp
-    r2 = y1 * fq * clcp
-    return r1, r2
+NPAFR = len(_lv.cm2.ns)
+NTOT = len(_lv.cm2.nfree)
+NPTS = len(_lv.cm1.freq)
+NPT2 = len(_lv.cm2.y)
 
 
 class Experiment():
@@ -87,209 +32,25 @@ class Experiment():
         self.path = path
         self.infile = infile
         self.fitted = False
-
         # Read input file
         self._readinfile()
-
         # Set flags for MAINCLC
-        self.iacy = 0 
-        if self.iopt < 0:
-            self.iacy = abs(self.iopt)
-            self.iopt = 0
-        if self.iacy == 0:
-            self.ftol = 1e-30
-            self.xtol = 1e-48
-        else:
-            self.ftol = 10**(self.iacy)
-            self.xtol = self.ftol
-
-        self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
-
-        self.iorig = 1 if self.ipar < 0 else 0
-        self.jfp = 1 if self.ifp > 0 else 0
-        self.ifp = abs(self.ifp)
-        self.iopr = 1 if self.ire < -10 else 0
-        self.imd = 1 if self.md > 0 else -1
-        self.md = abs(self.md)
-
-        self.inp = 0
-        self.izr = 0
-        if self.n < 0:
-            self.n = abs(self.n)
-            self.inp = 1
-            if (self.dattyp == 'C') and (self.dinp == 'Z') and (self.pinp == 'R') and (self.dfit == 'Z') and (self.pfit == 'R'):
-                self.izr = 1
-        if self.irch < 0:
-            self.irch = abs(self.irch)
-            self.iwt = 1
-            self.qq = 'FUNC'
-        else:
-            self.iwt = 0
-            self.qq = 'UNIT' if self.irch == 1 else 'DATA'
-
-        self.ipl = self.iprint if self.iprint < 0 else 0
-        self.iprint = abs(self.iprint)
-
-        self.irg = 0
-        if self.parameters[30] < 0:
-            self.irg = int(round(abs(self.parameters[30])))
-            self.parameters[30] = 0
-
-        # Set default CELCAP
-        if self.celcap == 0:
-            self.celcap = 1.0
-        if self.imd == -1:
-            self.celcap = EPV
-        self.clcap = 1.0 if self.celcap < 0 else self.celcap
-
-        # Set NS and X parameter arrays
-        self.ns = np.where(self.nfree > 0)[0]   # 0-start index
-        self.ns1 = self.ns + 1                  # 1-start index
-        self.x = self.parameters[self.ns]
-        self.nfrei = len(self.x)
-        self.nfixi = self.n - self.nfrei
-
-        # Set free parameter flags
-        self.ixi = 1 if (self.nfree[31] > 0) and (self.irch > 1) else 0
-        self.ine = 0
-        if (self.fun == 'R') or (self.fun == 'K'):
-            if self.nfree[28] > 0:
-                self.ine += 1
-            if self.nfree[29] > 0:
-                self.ine += 1
-        self.ins = 0
-        if (self.nfree[30] == 0) and (self.nfree[31] != 0):
-            self.ins = 1
-        if (self.nfree[30] != 0) and (self.nfree[31] != 0):
-            self.ins = 2
-
-        # Set start and end indices for data
-        if self.dattyp == 'C':
-            self.jy = 1
-            self.ky = 2 * self.md
-        elif self.dattyp == 'R':
-            self.jy = 1
-            self.ky = self.md
-            self.iopt = 0
-        elif self.dattyp == 'I':
-            self.jy = 1 + self.md
-            self.ky = 2 * self.md
-            self.iopt = 0
-
-        # Scale by A/L if ROE<0
-        if self.roe < 0:
-            self.y1 = abs(self.roe) * self.y1
-            self.y2 = abs(self.roe) * self.y2
-            self.roe = 0
-
-        # Combine y into single array pre transform
+        self._setflags()
+        # Set defaults
+        self._defaults()
+        # Set parameter flags, arrays and indices
+        self._setparams()
+        # Combine y into single array pre-transform
         self.ytt = np.hstack((self.y1, self.y2))
-
         # Perform data transformations if required
-        if self.freqtyp == 'F':
-            self.omega = 2 * np.pi * self.freq
-        else:
-            self.omega = self.freq
-
-        if not ((self.dinp == self.dfit) and (self.pinp == self.pfit)):
-            if self.pinp != 'R':
-                self.y1, self.y2 = convert_to_rect(self.y1, self.y2, t=self.pinp)
-            if (self.dinp == 'Y') or (self.dinp == 'E'):
-                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
-            if (self.dinp == 'E') or (self.dinp == 'M'):
-                self.y1, self.y2 = convert_m_to_z(self.y1, self.y2, self.omega, clcp=self.celcap)
-
-            if (self.dfit == 'E') or (self.dfit == 'M'):
-                self.y1, self.y2 = convert_z_to_m(self.y1, self.y2, self.omega, clcp=self.celcap)
-            if (self.dfit == 'Y') or (self.dfit == 'E'):
-                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
-            if self.pfit != 'R':
-                self.y1, self.y2 = convert_to_polar(self.y1, self.y2, t=self.pfit)
-
-        # Set K,R,S-circuit flags
-        self.icf = 0
-        self.wf = 0.0
-        if (self.fun == 'K') or (self.fun == 'R') or (self.fun == 'S'):
-            if (self.fun == 'K'):
-                jia = 22
-                jib = 18
-            else:
-                jia = 28
-                jib = 12
-            ip34a = int(round(abs(self.parameters[33])))
-            ip34 = np.sign(self.parameters[33]) * ip34a
-            ip35a = int(round(abs(self.parameters[34])))
-            ip38a = 1 if ip34 > 0 else int(round(abs(self.parameters[37])))
-            ip40a = int(round(abs(self.parameters[39])))
-            ip40s = np.sign(self.parameters[39])
-            if self.ire > -10:
-                self.ire = -10
-            if ip35a > 0:
-                self.icf = 2 * ip35a
-            else:
-                self.icf = np.count_nonzero(self.parameters[:jia])
-                if self.n > 40:
-                    self.icf += np.count_nonzero(self.parameters[40:])
-
-            if ip38a == 1:
-                if int(self.parameters[35]) == 0:
-                    if self.freq[self.md - 1] > self.freq[0]:
-                        taumin = 1.0 / self.freq[self.md - 1]
-                        taumax = 1.0 / self.freq[0]
-                    else:
-                        taumin = 1.0 / self.freq[0]
-                        taumax = 1.0 / self.freq[self.md - 1]
-                    frat = taumax / taumin
-                else:
-                    taumin = self.parameters[35]
-                    frat = self.parameters[38] / taumin
-                self.wf = (1.0/(self.icf / 2 - 1)) * np.log(frat)
-
-            if not ((ip38a != 1) and (ip40a <= 1) and (ip34 <= 0)):
-                if 0 < ip34 < 8:
-                    self.maxfev = 1
-                    self.irch = 2
-                    if (ip34 < 3) or (ip34 == 5):
-                        self.parameters[37] = 1
-                        if ip40a != 4: self.parameters[39] = 3 * ip40s
-                    elif (ip34 == 3) or (ip34 == 4):
-                        self.parameters[37] = 2
-                        if ip40a != 4: self.parameters[39] = 2 * ip40s
-                    elif ip34 == 6:
-                        self.parameters[37] = 2
-                    else:
-                        self.parameters[37] = 2
-                        self.parameters[39] = 2 * ip40s
-                #if self.fun != 'S':
-                    # RESORT(P,NFREE,TAUM,WF,X,NTOT,NS,JIA,JIB)
-
-        # Set O-circuit NELEM and flags
-        self.nelem = 0
-        if self.fun == 'O':
-            if (int(self.parameters[34]) != 4) and (int(self.parameters[39]) == 4):
-                self.nelem = int(self.parameters[19])
-            else:
-                self.nelem = int(self.parameters[9])
-        if (self.fun == 'O') and (self.nelem in [7, 10, 32, 36]):
-            self.inde = 0
-        elif self.ire < 0:
-            self.inde = 1
-        else:
-            self.inde = 2
-        if (self.nelem == 7) and (int(self.parameters[6]) != 1):
-            self.parameters[9] = 6
-            self.nelem = 6
-            self.inde = 1
-
+        self._transform()
+        # Set circuit flags
+        self._setcircuitsp()
         # Combine y and r into single array
         self.y = np.hstack((self.y1, self.y2))
         self.r = np.hstack((self.r1, self.r2))
-
-        # Set pex values as "exact" inputs
-        if self.iorig == 1:
-            self.pex = resized(self.parameters, NTOT)
-        else:
-            self.pex = np.zeros(NTOT)
+        # Define empty arrays for data output
+        self.outputvals = np.zeros(NPT2)
 
     def _readinfile(self):
         """Reads LEVM input file"""
@@ -373,18 +134,223 @@ class Experiment():
                 self.r2 = np.zeros(abs(self.md))
         return
 
+    def _setflags(self):
+        """Set flags for MAINCLC"""
+        self.iacy = 0 
+        if self.iopt < 0:
+            self.iacy = abs(self.iopt)
+            self.iopt = 0
+        if self.iacy == 0:
+            self.ftol = 1e-30
+            self.xtol = 1e-48
+        else:
+            self.ftol = 10**(self.iacy)
+            self.xtol = self.ftol
+
+        self.ipf = ['R', 'P', 'D', 'L'].index(self.pfit)
+
+        self.iorig = 1 if self.ipar < 0 else 0
+        self.jfp = 1 if self.ifp > 0 else 0
+        self.ifp = abs(self.ifp)
+        self.iopr = 1 if self.ire < -10 else 0
+        self.imd = 1 if self.md > 0 else -1
+        self.md = abs(self.md)
+
+        self.inp = 0
+        self.izr = 0
+        if self.n < 0:
+            self.n = abs(self.n)
+            self.inp = 1
+            if (self.dattyp == 'C') and (self.dinp == 'Z') and (self.pinp == 'R') and (self.dfit == 'Z') and (self.pfit == 'R'):
+                self.izr = 1
+        if self.irch < 0:
+            self.irch = abs(self.irch)
+            self.iwt = 1
+            self.qq = 'FUNC'
+        else:
+            self.iwt = 0
+            self.qq = 'UNIT' if self.irch == 1 else 'DATA'
+
+        self.ipl = self.iprint if self.iprint < 0 else 0
+        self.iprint = abs(self.iprint)
+
+        self.irg = 0
+        if self.parameters[30] < 0:
+            self.irg = int(round(abs(self.parameters[30])))
+            self.parameters[30] = 0
+        return
+
+    def _defaults():
+        """Set default values"""
+        if self.celcap == 0:
+            self.celcap = 1.0
+        if self.imd == -1:
+            self.celcap = EPV
+        self.clcap = 1.0 if self.celcap < 0 else self.celcap
+        return
+
+    def _setparams(self):
+        """Set parameter flags, arrays and indices"""
+        # Set NS and X parameter arrays
+        self.ns = np.where(self.nfree > 0)[0]   # 0-start index
+        self.ns1 = self.ns + 1                  # 1-start index
+        self.x = self.parameters[self.ns]
+        self.nfrei = len(self.x)
+        self.nfixi = self.n - self.nfrei
+
+        # Set free parameter flags
+        self.ixi = 1 if (self.nfree[31] > 0) and (self.irch > 1) else 0
+        self.ine = 0
+        if (self.fun == 'R') or (self.fun == 'K'):
+            if self.nfree[28] > 0:
+                self.ine += 1
+            if self.nfree[29] > 0:
+                self.ine += 1
+        self.ins = 0
+        if (self.nfree[30] == 0) and (self.nfree[31] != 0):
+            self.ins = 1
+        if (self.nfree[30] != 0) and (self.nfree[31] != 0):
+            self.ins = 2
+
+        # Set start and end indices for data
+        if self.dattyp == 'C':
+            self.jy = 1
+            self.ky = 2 * self.md
+        elif self.dattyp == 'R':
+            self.jy = 1
+            self.ky = self.md
+            self.iopt = 0
+        elif self.dattyp == 'I':
+            self.jy = 1 + self.md
+            self.ky = 2 * self.md
+            self.iopt = 0
+
+        # Scale by A/L if ROE<0
+        if self.roe < 0:
+            self.y1 = abs(self.roe) * self.y1
+            self.y2 = abs(self.roe) * self.y2
+            self.roe = 0
+
+        # Set pex values as "exact" inputs
+        if self.iorig == 1:
+            self.pex = resized(self.parameters, NTOT)
+        else:
+            self.pex = np.zeros(NTOT)
+        return
+
+    def _transform(self):
+        """Perform data transformations"""
+        if self.freqtyp == 'F':
+            self.omega = 2 * np.pi * self.freq
+        else:
+            self.omega = self.freq
+
+        if not ((self.dinp == self.dfit) and (self.pinp == self.pfit)):
+            if self.pinp != 'R':
+                self.y1, self.y2 = convert_to_rect(self.y1, self.y2, t=self.pinp)
+            if (self.dinp == 'Y') or (self.dinp == 'E'):
+                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
+            if (self.dinp == 'E') or (self.dinp == 'M'):
+                self.y1, self.y2 = convert_m_to_z(self.y1, self.y2, self.omega, clcp=self.celcap)
+
+            if (self.dfit == 'E') or (self.dfit == 'M'):
+                self.y1, self.y2 = convert_z_to_m(self.y1, self.y2, self.omega, clcp=self.celcap)
+            if (self.dfit == 'Y') or (self.dfit == 'E'):
+                self.y1, self.y2 = convert_to_inverse(self.y1, self.y2)
+            if self.pfit != 'R':
+                self.y1, self.y2 = convert_to_polar(self.y1, self.y2, t=self.pfit)
+        return
+
+    def _setcircuitsp(self):
+        """Set circuit specific flags"""
+        # K,R,S-circuit flags
+        self.icf = 0
+        self.wf = 0.0
+        if (self.fun == 'K') or (self.fun == 'R') or (self.fun == 'S'):
+            if (self.fun == 'K'):
+                jia = 22
+                jib = 18
+            else:
+                jia = 28
+                jib = 12
+            ip34a = int(round(abs(self.parameters[33])))
+            ip34 = np.sign(self.parameters[33]) * ip34a
+            ip35a = int(round(abs(self.parameters[34])))
+            ip38a = 1 if ip34 > 0 else int(round(abs(self.parameters[37])))
+            ip40a = int(round(abs(self.parameters[39])))
+            ip40s = np.sign(self.parameters[39])
+            if self.ire > -10:
+                self.ire = -10
+            if ip35a > 0:
+                self.icf = 2 * ip35a
+            else:
+                self.icf = np.count_nonzero(self.parameters[:jia])
+                if self.n > 40:
+                    self.icf += np.count_nonzero(self.parameters[40:])
+
+            if ip38a == 1:
+                if int(self.parameters[35]) == 0:
+                    if self.freq[self.md - 1] > self.freq[0]:
+                        taumin = 1.0 / self.freq[self.md - 1]
+                        taumax = 1.0 / self.freq[0]
+                    else:
+                        taumin = 1.0 / self.freq[0]
+                        taumax = 1.0 / self.freq[self.md - 1]
+                    frat = taumax / taumin
+                else:
+                    taumin = self.parameters[35]
+                    frat = self.parameters[38] / taumin
+                self.wf = (1.0/(self.icf / 2 - 1)) * np.log(frat)
+
+            if not ((ip38a != 1) and (ip40a <= 1) and (ip34 <= 0)):
+                if 0 < ip34 < 8:
+                    self.maxfev = 1
+                    self.irch = 2
+                    if (ip34 < 3) or (ip34 == 5):
+                        self.parameters[37] = 1
+                        if ip40a != 4: self.parameters[39] = 3 * ip40s
+                    elif (ip34 == 3) or (ip34 == 4):
+                        self.parameters[37] = 2
+                        if ip40a != 4: self.parameters[39] = 2 * ip40s
+                    elif ip34 == 6:
+                        self.parameters[37] = 2
+                    else:
+                        self.parameters[37] = 2
+                        self.parameters[39] = 2 * ip40s
+                #if self.fun != 'S':
+                    # RESORT(P,NFREE,TAUM,WF,X,NTOT,NS,JIA,JIB)
+
+        # O-circuit NELEM and flags
+        self.nelem = 0
+        if self.fun == 'O':
+            if (int(self.parameters[34]) != 4) and (int(self.parameters[39]) == 4):
+                self.nelem = int(self.parameters[19])
+            else:
+                self.nelem = int(self.parameters[9])
+        if (self.fun == 'O') and (self.nelem in [7, 10, 32, 36]):
+            self.inde = 0
+        elif self.ire < 0:
+            self.inde = 1
+        else:
+            self.inde = 2
+        if (self.nelem == 7) and (int(self.parameters[6]) != 1):
+            self.parameters[9] = 6
+            self.nelem = 6
+            self.inde = 1
+        return
+
     def fit(self):
         """Performs the CNLS fit"""
-
-        # Define empty arrays for data output
+        # Reset outputs
         self.outputvals = np.zeros(NPT2)
         self.nfev = 2
+        self.fitted = False
 
         # Print fit information
         print "\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM"
         print "       VERSION 8.06 - 2/05\n"
         print "{:s}\n".format(self.alpha)
-        print "  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT".format(self.dinp, self.pinp, self.dfit, self.pfit,)
+        print "  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT".format(self.dinp, self.pinp, self.dfit, self.pfit)
         print "  CIRCUIT MODEL : {:s}\n".format(self.fun)
         print "  *****  FIT OF {:s} DATA  *****\n".format(self.dattyp)
 
@@ -425,8 +391,8 @@ class Experiment():
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
-            self.result = lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x,
-                                     self.maxfev, self.nprint, self.nfev, self.pex, self.nfrei, self.outputvals)
+            self.result = _lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x,
+                                      self.maxfev, self.nprint, self.nfev, self.pex, self.nfrei, self.outputvals)
             self.fitted = True
 
         # If MAXFEV = 0 no fit calc new data
@@ -446,143 +412,143 @@ class Experiment():
         print "  M  T   MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL"
         for i in range(self.md):
             j = i + self.md
-            print "{:3d}  R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i], lv.cm2.r[i], self.res[i], self.resmod[i])
-            print "{:3d}  I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j], lv.cm2.r[j], self.res[j], self.resmod[j])
-
+            print "{:3d}  R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i],
+                                                                   _lv.cm2.r[i], self.res[i], self.resmod[i])
+            print "{:3d}  I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j],
+                                                                   _lv.cm2.r[j], self.res[j], self.resmod[j])
         return
 
     def _setcommon(self):
         """Set all COMMON block variables"""
         # CM1
-        lv.cm1.freq = resized(self.omega, NPTS)
-        lv.cm1.m = self.md
-        lv.cm1.dattyp = self.dattyp
+        _lv.cm1.freq = resized(self.omega, NPTS)
+        _lv.cm1.m = self.md
+        _lv.cm1.dattyp = self.dattyp
         # CM2
-        lv.cm2.y = resized(self.y, NPT2)
-        lv.cm2.r = resized(self.r, NPT2)
-        lv.cm2.fj = np.zeros(NPT2)
-        lv.cm2.p = self.parameters
-        lv.cm2.drss = 1.0e-8
-        lv.cm2.roe = self.roe
-        lv.cm2.ns = resized(self.ns1, NPAFR)
-        lv.cm2.nfree = resized(self.nfree, NTOT)
-        lv.cm2.n = self.n
-        lv.cm2.icnt = 0
-        lv.cm2.mn = 0
-        lv.cm2.irch = self.irch
-        lv.cm2.ixi = self.ixi
-        lv.cm2.dattyq = self.dattyp
+        _lv.cm2.y = resized(self.y, NPT2)
+        _lv.cm2.r = resized(self.r, NPT2)
+        _lv.cm2.fj = np.zeros(NPT2)
+        _lv.cm2.p = self.parameters
+        _lv.cm2.drss = 1.0e-8
+        _lv.cm2.roe = self.roe
+        _lv.cm2.ns = resized(self.ns1, NPAFR)
+        _lv.cm2.nfree = resized(self.nfree, NTOT)
+        _lv.cm2.n = self.n
+        _lv.cm2.icnt = 0
+        _lv.cm2.mn = 0
+        _lv.cm2.irch = self.irch
+        _lv.cm2.ixi = self.ixi
+        _lv.cm2.dattyq = self.dattyp
         # CM3
-        lv.cm3.celcap = self.celcap
-        lv.cm3.fun = self.fun
-        lv.cm3.dfit = self.dfit
-        lv.cm3.pfit = self.pfit
+        _lv.cm3.celcap = self.celcap
+        _lv.cm3.fun = self.fun
+        _lv.cm3.dfit = self.dfit
+        _lv.cm3.pfit = self.pfit
         # CM4
-        lv.cm4.fnorm = 0.0
+        _lv.cm4.fnorm = 0.0
         # CM5
-        lv.cm5.tomega = 0.0
-        lv.cm5.phicom = 0.0
-        lv.cm5.iv = 0
+        _lv.cm5.tomega = 0.0
+        _lv.cm5.phicom = 0.0
+        _lv.cm5.iv = 0
         # CM9
-        lv.cm9.tomegax = 0.0
-        lv.cm9.phix = 0.0
-        lv.cm9.ichg = 0
-        lv.cm9.iwtx = 0
+        _lv.cm9.tomegax = 0.0
+        _lv.cm9.phix = 0.0
+        _lv.cm9.ichg = 0
+        _lv.cm9.iwtx = 0
         # CM10
-        lv.cm10.epsg = 10**(-abs(self.igacc))
-        lv.cm10.izr = self.izr
+        _lv.cm10.epsg = 10**(-abs(self.igacc))
+        _lv.cm10.izr = self.izr
         # CM11
-        lv.cm11.mqy = self.nfrei - self.ins
-        lv.cm11.ispr = 0
-        lv.cm11.icx = 0
-        lv.cm11.ndf = 0
-        lv.cm11.fqq = 0.0
+        _lv.cm11.mqy = self.nfrei - self.ins
+        _lv.cm11.ispr = 0
+        _lv.cm11.icx = 0
+        _lv.cm11.ndf = 0
+        _lv.cm11.fqq = 0.0
         # CM12
-        lv.cm12.clcap = self.clcap
-        lv.cm12.atemp = self.atemp
-        lv.cm12.wf = self.wf
-        lv.cm12.maxfev = self.maxfev
-        lv.cm12.icf = self.icf
-        lv.cm12.mde = self.mode
-        lv.cm12.jcdx = 0
+        _lv.cm12.clcap = self.clcap
+        _lv.cm12.atemp = self.atemp
+        _lv.cm12.wf = self.wf
+        _lv.cm12.maxfev = self.maxfev
+        _lv.cm12.icf = self.icf
+        _lv.cm12.mde = self.mode
+        _lv.cm12.jcdx = 0
         # CM13
-        lv.cm13.rx = 0.0
-        lv.cm13.tx = 0.0
-        lv.cm13.ux = 0.0
-        lv.cm13.phi = 0.0
-        lv.cm13.xxm1 = 0.0
-        lv.cm13.xx1 = 0.0
-        lv.cm13.xx2 = 0.0
-        lv.cm13.xx3 = 0.0
-        lv.cm13.rn = 0.0
-        lv.cm13.ain = 0.0
-        lv.cm13.icav = 0
-        lv.cm13.nelem = self.nelem
-        lv.cm13.nch = 0
+        _lv.cm13.rx = 0.0
+        _lv.cm13.tx = 0.0
+        _lv.cm13.ux = 0.0
+        _lv.cm13.phi = 0.0
+        _lv.cm13.xxm1 = 0.0
+        _lv.cm13.xx1 = 0.0
+        _lv.cm13.xx2 = 0.0
+        _lv.cm13.xx3 = 0.0
+        _lv.cm13.rn = 0.0
+        _lv.cm13.ain = 0.0
+        _lv.cm13.icav = 0
+        _lv.cm13.nelem = self.nelem
+        _lv.cm13.nch = 0
         # CM14
-        lv.cm14.fjacc = np.zeros((NPT2, NPAFR))
+        _lv.cm14.fjacc = np.zeros((NPT2, NPAFR))
         # CM16
-        lv.cm16.iop = self.iopt
-        lv.cm16.iorig = self.iorig
-        lv.cm16.nyc = 0
-        lv.cm16.jy = self.jy
-        lv.cm16.iprint = self.iprint
-        lv.cm16.ldfjac = self.ky
-        lv.cm16.mode = self.mode
-        lv.cm16.ifp = self.ifp
-        lv.cm16.ire = self.ire
-        lv.cm16.istp = 0
-        lv.cm16.jfp = self.jfp
-        lv.cm16.nph = self.icf / 2
-        lv.cm16.ine = self.ine
+        _lv.cm16.iop = self.iopt
+        _lv.cm16.iorig = self.iorig
+        _lv.cm16.nyc = 0
+        _lv.cm16.jy = self.jy
+        _lv.cm16.iprint = self.iprint
+        _lv.cm16.ldfjac = self.ky
+        _lv.cm16.mode = self.mode
+        _lv.cm16.ifp = self.ifp
+        _lv.cm16.ire = self.ire
+        _lv.cm16.istp = 0
+        _lv.cm16.jfp = self.jfp
+        _lv.cm16.nph = self.icf / 2
+        _lv.cm16.ine = self.ine
         # CM18
-        lv.cm18.sdwc = 0.0
-        lv.cm18.sdrc = 0.0
-        lv.cm18.diag = np.zeros(NPAFR)
-        lv.cm18.ipar = self.ipar
-        lv.cm18.iopr = self.iopr
+        _lv.cm18.sdwc = 0.0
+        _lv.cm18.sdrc = 0.0
+        _lv.cm18.diag = np.zeros(NPAFR)
+        _lv.cm18.ipar = self.ipar
+        _lv.cm18.iopr = self.iopr
         # CM20
-        lv.cm20.rxsd = np.zeros(NPAFR)
+        _lv.cm20.rxsd = np.zeros(NPAFR)
         # CM29
-        lv.cm29.gam = 0.0
-        lv.cm29.sn1 = 0.0
-        lv.cm29.cs1 = 0.0
-        lv.cm29.pii = 0.0
-        lv.cm29.cdn = 0.0
-        lv.cm29.qpi = 0.0
-        lv.cm29.mdex = 0
+        _lv.cm29.gam = 0.0
+        _lv.cm29.sn1 = 0.0
+        _lv.cm29.cs1 = 0.0
+        _lv.cm29.pii = 0.0
+        _lv.cm29.cdn = 0.0
+        _lv.cm29.qpi = 0.0
+        _lv.cm29.mdex = 0
         # CM34
-        lv.cm34.mda = self.md
-        lv.cm34.iwt = self.iwt
-        lv.cm34.ixw = 1 * ((self.ixi == 1) or (self.iwt == 1))
-        lv.cm34.infp = 0
-        lv.cm34.ipl = self.ipl
+        _lv.cm34.mda = self.md
+        _lv.cm34.iwt = self.iwt
+        _lv.cm34.ixw = 1 * ((self.ixi == 1) or (self.iwt == 1))
+        _lv.cm34.infp = 0
+        _lv.cm34.ipl = self.ipl
         # CM35
-        lv.cm35.jit = 0
-        lv.cm35.ipf = self.ipf
-        lv.cm35.nprint = self.nprint
+        _lv.cm35.jit = 0
+        _lv.cm35.ipf = self.ipf
+        _lv.cm35.nprint = self.nprint
         # CM36
-        lv.cm36.shw = np.zeros(NPT2)
-        lv.cm36.isw = 0
+        _lv.cm36.shw = np.zeros(NPT2)
+        _lv.cm36.isw = 0
         # CM39
-        lv.cm39.p8 = self.parameters[7]
-        lv.cm39.p18 = self.parameters[17]
+        _lv.cm39.p8 = self.parameters[7]
+        _lv.cm39.p18 = self.parameters[17]
         # CM47
-        lv.cm47.icount = 0
+        _lv.cm47.icount = 0
         # CM55
-        lv.cm55.px1 = 0.0
-        lv.cm55.px41 = 0.0
-        lv.cm55.px45 = 0.0
+        _lv.cm55.px1 = 0.0
+        _lv.cm55.px41 = 0.0
+        _lv.cm55.px45 = 0.0
         # CM73
-        lv.cm73.p39 = self.parameters[38]
+        _lv.cm73.p39 = self.parameters[38]
         # CM78
-        lv.cm78.dattyc = self.dattyp
+        _lv.cm78.dattyc = self.dattyp
         # CM79
-        lv.cm79.ytt = resized(self.ytt, NPT2)
+        _lv.cm79.ytt = resized(self.ytt, NPT2)
         # CM80
-        lv.cm80.omegat = 0.0
-        lv.cm80.psi = 0.0
-        lv.cm80.gama = 0.0
-        lv.cm80.deli = 0.0
-
+        _lv.cm80.omegat = 0.0
+        _lv.cm80.psi = 0.0
+        _lv.cm80.gama = 0.0
+        _lv.cm80.deli = 0.0
         return

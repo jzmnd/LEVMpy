@@ -1,18 +1,18 @@
 C
 C     MODEL SUBROUTINE
-C     Runs selected circuit model
+C     Runs selected circuit model depending on FUN
+C     Performs transformation if required
 C
 C        N : number of parameters (IN)
-C        M : number of data points (IN)
 C       PX : parameter list (IN)
 C       FQ : model function values (IN,OUT)
 C
 C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
-      SUBROUTINE MODEL(N,M,PX,FQ)
+      SUBROUTINE MODEL(N,PX,FQ)
       IMPLICIT REAL*8(A-H,O-Z)
       INCLUDE 'SIZE.INC'
-      INTEGER N,M
+      INTEGER N
       REAL*8 PX,FQ
       COMPLEX*16 TRANS,ZRF,FOMEG
       CHARACTER*1 AA,BB,CC,DD,EE,FF,GG,HH,II,JJ,KK,LM,MM,PP,YY,

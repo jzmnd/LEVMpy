@@ -9,11 +9,11 @@ C       MODIFIED FOR LEVMpy JEREMY SMITH 3/31/2017
 C
       SUBROUTINE QROMO(FUNC,A,B,SS)
       IMPLICIT REAL*8 (A-H,O-Z)
+      INTEGER J,JMAX,JMAXP,K,KM
       REAL*8 A,B,SS
       PARAMETER (JMAX=22, JMAXP=JMAX+1, K=7, KM=K-1)
       DIMENSION S(JMAXP),H(JMAXP)
       EXTERNAL FUNC
-      INTEGER J
       COMMON /CM10/ EPSG,IZR
 C 
       H(1)=1.D0
@@ -27,8 +27,8 @@ C
 150   FORMAT(I4,1P,(3D14.5))
           IF (ABS(DSS).LE.SERR) RETURN
         ENDIF
-        S(J+1)=S(J)
-        H(J+1)=H(J)/9.D0
+        S(J+1) = S(J)
+        H(J+1) = H(J)/9.D0
 11    CONTINUE
       WRITE(*,*) 'TOO MANY STEPS IN QROMO'
       END

@@ -14,6 +14,14 @@ python module LEVMpyFortran ! in
         integer :: mdex
         real*8 dimension(50) :: rxsd
         integer :: icount
+        real*8 :: omegat
+        real*8 :: psi
+        real*8 :: gama
+        real*8 :: deli
+        real*8 :: tomegax
+        real*8 :: phix
+        integer :: ichg
+        integer :: iwtx
         character*1 :: dattyc
         real*8 :: tomega
         real*8 :: phicom
@@ -102,14 +110,12 @@ python module LEVMpyFortran ! in
         real*8 :: px1
         real*8 :: px41
         real*8 :: px45
-        real*8 :: omegat
-        real*8 :: psi
-        real*8 :: gama
-        real*8 :: deli
         common /cm39/ p8,p18
         common /cm29/ gam,sn1,cs1,pii,cdn,qpi,mdex
         common /cm20/ rxsd
         common /cm47/ icount
+        common /cm80/ omegat,psi,gama,deli
+        common /cm9/ tomegax,phix,ichg,iwtx
         common /cm78/ dattyc
         common /cm5/ tomega,phicom,iv
         common /cm4/ fnorm
@@ -129,7 +135,6 @@ python module LEVMpyFortran ! in
         common /cm34/ mda,iwt,ixw,infp,ipl
         common /cm36/ shw,isw
         common /cm55/ px1,px41,px45
-        common /cm80/ omegat,psi,gama,deli
         function aifu(yy) ! in :LEVMpyFortran:AIFU.f
             real*8 intent(in) :: yy
             double precision intent(out) :: aifu
@@ -160,13 +165,12 @@ python module LEVMpyFortran ! in
             real*8 dimension(50),intent(in) :: pex
             real*8 dimension(4002),intent(in,out) :: fv1
         end subroutine mainclc
-        subroutine model(n,m,px,fq) ! in :LEVMpyFortran:MODEL.f
+        subroutine model(n,px,fq) ! in :LEVMpyFortran:MODEL.f
             integer intent(in) :: n
-            integer intent(in) :: m
             real*8 dimension(50),intent(in) :: px
             real*8 dimension(4002),intent(in,out) :: fq
         end subroutine model
-    end interface 
+    end interface
 end python module LEVMpyFortran
 
 ! This file was auto-generated with f2py (version:2).

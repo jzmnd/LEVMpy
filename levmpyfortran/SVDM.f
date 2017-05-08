@@ -132,7 +132,7 @@ C        WRITE(3,39) PDAV,PDRMS
 39    FORMAT(6X,'PDAV=',2X,1P,1D12.4,6X,'PDRMS=',2X,1P,1D12.4)
 C
 C        WRITE(*,173) NDF,FQQ 
-173   FORMAT(7X,'NDF=',I4,7X,'FQF=',1P,1D15.6) 
+C 173   FORMAT(7X,'NDF=',I4,7X,'FQF=',1P,1D15.6)
 C     temporarily changed 1.d3 to 1.d40  8/17/94 !!!!!!!!!!!!!
         IF(PDAV.GT.1.D40) THEN
           WRITE(*,749)

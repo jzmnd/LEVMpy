@@ -23,8 +23,11 @@ C
       COMMON /CM34/ MD,IWT,IXW,INFP,IPL
       COMMON /CM35/ JIT,IPF,NPRIN
 C
+C     ITERATIONS (JIT=1 MAIN FIT, JIT=2 FWT WEIGHTING, JIT=3 RESIDUAL
+C                 WEIGHTING, JIT=4 COMPLEX OPTIMIZATON)
+C
       DO 983 JIT = 1,4
-C           DO MAIN FIT         
+C       DO MAIN FIT         
         IF(JIT.EQ.1) THEN
             ISTP = 2
 733         CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
@@ -38,20 +41,20 @@ C           DO MAIN FIT
               GOTO 733
             ENDIF
 C       DO FWT ITERATION
-        ELSE IF(JIT.EQ.2) THEN
+        ELSEIF(JIT.EQ.2) THEN
             IF(IFP.NE.0) GOTO 333
             GOTO 983
 C       DO RESIDUAL WEIGHTING ITERATION
-        ELSE IF(JIT.EQ.3.AND.ROE.EQ.0.D0) THEN
+        ELSEIF(JIT.EQ.3.AND.ROE.EQ.0.D0) THEN
             IF(IRE.GT.0) GOTO 333
             GOTO 983
 C       DO OPTIMIZATION, COMPLEX FIT ONLY
-        ELSE IF(JIT.EQ.4) THEN
+        ELSEIF(JIT.EQ.4) THEN
             IF(IOP.GT.0) THEN
-            RKE = 0.D0
-        GOTO 876
-        ENDIF
-        GOTO 119
+              RKE = 0.D0
+              GOTO 876
+            ENDIF
+            GOTO 119
         ENDIF
         GOTO 983
 745     FORMAT(2X,'==============   END  MAIN  FIT   =============='/)
@@ -88,71 +91,73 @@ C     ******  NO OPTIMIZATION WHEN FPWT IS USED  ********
 C
 C     PROCEDURE FOR RESIDUAL OR FWT WEIGHTING ITERATION
 333   CONTINUE
-        NYC = 0
-       ISTP = 0
-        IXW = 0
-      IF(JIT.EQ.2) THEN
-        IXW = 1
-      IF(JFP.EQ.1) THEN
-        ISTP = 2
-        GOTO 628
-      ENDIF
+          NYC = 0
+         ISTP = 0
+          IXW = 0
+        IF(JIT.EQ.2) THEN
+          IXW = 1
+          IF(JFP.EQ.1) THEN
+            ISTP = 2
+            GOTO 628
+          ENDIF
           SIGOLD = 5.D0
           TOLI = 1.D-3
           ITT = IFP
           NRCH = 0
-      ENDIF
-      IF(JIT.EQ.3) THEN
-          TOLI = 1.D-2
-          ITT = IABS(IRE)
-          NRCH = 1
-      ENDIF
-384   IF(ISTP.EQ.2) THEN
+        ENDIF
+        IF(JIT.EQ.3) THEN
+            TOLI = 1.D-2
+            ITT = IABS(IRE)
+            NRCH = 1
+        ENDIF
+384     IF(ISTP.EQ.2) THEN
             IF(JIT.EQ.2.AND.JFP.EQ.0.AND.ISPR.EQ.1) WRITE(*,746)
             IF(JIT.EQ.2.AND.JFP.EQ.1.AND.ISPR.EQ.1) WRITE(*,846)
             IF(JIT.EQ.3.AND.ISPR.EQ.1) WRITE(*,747)            
             GOTO 983
-      ENDIF
-      CALL MODEL(NTOT,M,P,FV1)
-      DO 340 I=J,K
-        YQQ(I) = DABS(FV1(I) - NRCH*Y(I))   
-340   CONTINUE
+        ENDIF
+        CALL MODEL(NTOT,P,FV1)
+        DO 340 I=J,K
+            YQQ(I) = DABS(FV1(I) - NRCH*Y(I))   
+340     CONTINUE
+C
 846     FORMAT(1X,'*****  END *DIRECT* FWT ITERATION FIT   *****',/)
 746     FORMAT(1X,'*****  END *STAGED* FWT ITERATION  FIT   *****',/)
 747     FORMAT(3X,'*****  END  RWT  ITERATION  FIT   *****',/)
 748     FORMAT(3X,'*****  END  COMPLEX  FIT  OPTIMIZATION  *****',/)
 C
-      CALL RWTS(K,DATTYP,YQQ,FJ)
-      IF(NYC.GT.0) WRITE(*,346) NYC,SGMAF,SIGOLD
+        CALL RWTS(K,DATTYP,YQQ,FJ)
+C
+        IF(NYC.GT.0) WRITE(*,346) NYC,SGMAF,SIGOLD
 346   FORMAT(2X,'*****  AFTER',I5,2X,'WEIGHTING ITERATIONS, SIGMA =',
-     +D20.10,/7X,'SIGMA OLD = ',D20.10,2X,'*****')
-      IF(JIT.EQ.2) THEN
-      IF(SGMAF.EQ.0.D0) GOTO 335
+     + D20.10,/7X,'SIGMA OLD = ',D20.10,2X,'*****')
+        IF(JIT.EQ.2) THEN
+          IF(SGMAF.EQ.0.D0) GOTO 335
           IF(DABS((SGMAF-SIGOLD)/SIGOLD).LT.TOLI) GOTO 335
-      ELSE
+        ELSE
           IF(DABS(1.D0-SGMAF).LT.TOLI) GOTO 335
-      ENDIF
-      IF(NYC.EQ.ITT) GOTO 336
+        ENDIF
+        IF(NYC.EQ.ITT) GOTO 336
         SIGOLD = SGMAF
         NYC = NYC + 1
         GOTO 628
-335   WRITE(*,347)
-347   FORMAT(2X,'*****  CONVERGENCE  *ACHIEVED*  IN WEIGHTING ITERATIO
-     +N  *****'/)
-      ISTP = 2
-      GOTO 628
-336   WRITE(*,348)
-348   FORMAT(1H0,2X,'*****  CONVERGENCE NOT ACHIEVED IN WEIGHTING ITER
-     +ATION  *****'/)
-      ISTP = 2
-      GOTO 628
+335     WRITE(*,347)
+347   FORMAT(2X,'*****  CONVERGENCE  *ACHIEVED*  IN WEIGHTING ITERATION 
+     + *****'/)
+        ISTP = 2
+        GOTO 628
+336     WRITE(*,348)
+348   FORMAT(1H0,2X,'*****  CONVERGENCE NOT ACHIEVED IN WEIGHTING ITERAT
+     +ION  *****'/)
+        ISTP = 2
+        GOTO 628
 C
 628   CONTINUE
       CALL FITCALC(K,FTOL,GTOL,XTOL,X,MAXFEV,NPRINT,NFEV,
      +     PEX,NFREI,SDWR,SDWI,IOCNT,SGMAF,FV1,JIT,SGMSQM)
-        GOTO 384
+      GOTO 384
 C     END OF WEIGHTING ITERATION PROCEDURE
 C
-983    CONTINUE
+983   CONTINUE
 119   RETURN
       END

@@ -177,7 +177,7 @@ C
 487         CONTINUE
             YPXS = YDDS
         ELSEIF(IWT.EQ.1) THEN
-            CALL MODEL(NTOT,M,P,FV1)
+            CALL MODEL(NTOT,P,FV1)
             YDMS = 1.D0
             DO 488 I = J,K
               IF(FV1(I).EQ.0.D0) THEN
@@ -284,9 +284,8 @@ C
       CALL SVDM(K,NFREI,SGMFUN,X,PEX,NS,IORIG,ISTP)
 C
       IF(IPRINT.EQ.0) GOTO 947
-      WRITE(*,*) 'SETTING ICOUNT TO ZERO!!!'
-      ICOUNT = 0
-      CALL MODEL(NTOT,M,P,FV1)
+      ICOUNT = 0              !SET ICOUNT TO ZERO BEFORE FINAL OUTPUT
+      CALL MODEL(NTOT,P,FV1)
       YPX = DSQRT(YPXS)
       IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
         IF(IPAR.LE.0) THEN
@@ -340,7 +339,7 @@ C      OPEN(7,FILE='AUXPNTL1')
           WRITE(*,857) IW,Y(IW),FV1(IW),R(IW),V1,V7  ! file 4
           IF(DATTYP.EQ.'R') THEN
             V7L = DLOG10(DABS(V7)+SML) + MODE
-C            WRITE(*,865)IW,FREQXX,V1,V5,V7,V7L     ! file 7
+C            WRITE(*,865)IW,FREQXX,V1,V5,V7,V7L      ! file 7
           ENDIF
         ENDIF
 900     CONTINUE
@@ -364,11 +363,11 @@ C            WRITE(*,865)IW,FREQXX,V1,V5,V7,V7L     ! file 7
         ENDIF
         IF(IPRINT.GE.1.AND.ISTP.GT.0) THEN
           WRITE(*,857)IW,Y(IW+M),FV1(IW+M),R(IW+M),V3,V8   ! file 4
-C          WRITE(*,865)IW,FREQXX,V1,V3,V7,V8     ! file 7
+C          WRITE(*,865)IW,FREQXX,V1,V3,V7,V8               ! file 7
         ENDIF
 860   CONTINUE
 859   CONTINUE
-865     FORMAT(1X,I5,1PE14.5,4(1PE13.4))
+C 865     FORMAT(1X,I5,1PE14.5,4(1PE13.4))
 C      CLOSE(7)
 C
       IF(DATTYP.EQ.'I') THEN

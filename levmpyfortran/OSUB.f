@@ -7,13 +7,15 @@
       EXTERNAL DISTEL
       COMPLEX*16 ZT,YT,YZ,YE,DISTEL,IOMEGA,ZR,ZNL,ZS,ZT16,EEM,EEF,ZEL,
      + YEL,YS,YES,ZES
-      LOGICAL RD30,C30
       COMMON /CM47/ ICNT
       COMMON /CM12/ CELCAP,ATEMP,WF,MAXFEV,ICF,MDE,JCDX
       COMMON /CM13/ RX,TX,UX,PHIZ,XXM1,XX1,XX2,XX3,RN,AIN,ICAV,
      + NELEM,NCH
       COMMON /CM55/ PX1,PX41,PX45
       COMMON /CM79/ YTT(NPT2)
+      LOGICAL RD30,C30
+C              SAVE LOGICAL CHECKS AND VARIABLES FOR SUBSEQUENT CALLS
+      SAVE RD30,C30,NCH1,NCH2,NDE1,NDE2,NDE3,INH,ZNL,CELC
 C
 C   ****************** O CIRCUIT: Runs as an external subroutine
 C
@@ -169,53 +171,53 @@ C   ADDED BELOW IF ON 4/4/97  CHANGED CM13 NCH1 TO NCH
         ELSE
             NCH = NCH1
         ENDIF
-        NDE1 = IDINT(DABS(P(10))+0.001D0)  
+        NDE1 = IDINT(DABS(P(10))+0.001D0)
         NDE1 = NDE1*NINT(DSIGN(1.D0,P(10)))
         NDE2 = IDINT(DABS(P(20))+0.001D0)
         NDE2 = NDE2*NINT(DSIGN(1.D0,P(20)))
 C
-      IF(NCH1.NE.3) THEN
-        PX1 = P(1)
-        PX41 = P(41)
-        PX45 = P(45)
-        JCDX = 0
-      ELSE
-        PX1 = 0.D0
-        JCDX = 1
-      ENDIF
+        IF(NCH1.NE.3) THEN
+          PX1 = P(1)
+          PX41 = P(41)
+          PX45 = P(45)
+          JCDX = 0
+        ELSE
+          PX1 = 0.D0
+          JCDX = 1
+        ENDIF
 C
 C      THE FOLLOWING DCE APPEARS IN SERIES WITH THE R3 OF THE CIRCUIT
 C
-      NDE3 = IDINT(P(25)+.001D0)
+        NDE3 = IDINT(P(25)+.001D0)
 C
-      RD30 = ((NDE3.EQ.0.D0).AND.(R3.EQ.0.D0))
-      C30 = C3.EQ.0.D0
-      ZNL = DCMPLX(0.D0,0.D0)
+        RD30 = ((NDE3.EQ.0.D0).AND.(R3.EQ.0.D0))
+        C30 = (C3.EQ.0.D0)
+        ZNL = DCMPLX(0.D0,0.D0)
 C
-C           CSD & DSD CASES; SET U2 = 0:
+C       CSD & DSD CASES; SET U2 = 0:
 C
-      IF(NCH1.GT.1.AND.NDE1.NE.9) THEN
-        P(8) = 0
-      ELSE
-        IF(P(3).EQ.0.D0) P(3) = 1.D0
-        IF(P(4).EQ.0.D0) P(4) = 1.D0
-        IF(P(5).EQ.0.D0.AND.P(6).EQ.0.D0) NCH1 = 0
-      ENDIF
-      IF(NCH2.GT.1.AND.NDE2.NE.9) THEN
-        P(18) = 0
-      ELSE
-        IF(P(13).EQ.0.D0) P(13) = 1.D0
-        IF(P(14).EQ.0.D0) P(14) = 1.D0
-        IF(P(15).EQ.0.D0.AND.P(16).EQ.0.D0) NCH2 = 0
-      ENDIF
-      INH = 0
-      IF(NCH1.GT.0.AND.NCH2.GT.0) INH = 1
+        IF(NCH1.GT.1.AND.NDE1.NE.9) THEN
+          P(8) = 0
+        ELSE
+          IF(P(3).EQ.0.D0) P(3) = 1.D0
+          IF(P(4).EQ.0.D0) P(4) = 1.D0
+          IF(P(5).EQ.0.D0.AND.P(6).EQ.0.D0) NCH1 = 0
+        ENDIF
+        IF(NCH2.GT.1.AND.NDE2.NE.9) THEN
+          P(18) = 0
+        ELSE
+          IF(P(13).EQ.0.D0) P(13) = 1.D0
+          IF(P(14).EQ.0.D0) P(14) = 1.D0
+          IF(P(15).EQ.0.D0.AND.P(16).EQ.0.D0) NCH2 = 0
+        ENDIF
+        INH = 0
+        IF(NCH1.GT.0.AND.NCH2.GT.0) INH = 1
 C
-      IF(ATEMP.LT.0.D0.OR.ATEMP.GT.9.99D2) THEN
-        CELC = CELCAP
-      ELSE
-        CELC = 1.D0
-      ENDIF
+        IF(ATEMP.LT.0.D0.OR.ATEMP.GT.9.99D2) THEN
+          CELC = CELCAP
+        ELSE
+          CELC = 1.D0
+        ENDIF
       ENDIF
 C
 C   LOOP OVER ALL FREQUENCIES
@@ -261,11 +263,12 @@ C
 C
 C   NGAI COUPLING MODEL:
           IF((NCH1.EQ.5.OR.NCH1.EQ.6).AND.P(41).GT.0.D0) THEN
-                  WT =1.D0/P(41)
+            WT = 1.D0/P(41)
             IF(FREQ(I).GE.WT) ZT = P(42)/(1.D0 + IOMEGA*P(43))
           ENDIF
 C
         ELSE
+          WRITE(*,*) 'WRONG VALUE OF P(35)'
           WRITE(*,*) 22,NCH1
           RETURN
 C        STOP
@@ -325,7 +328,7 @@ C
           GOTO 197
         ENDIF
 C
-        F(I) = DREAL(YT)
+          F(I) = DREAL(YT)
         F(I+M) = DIMAG(YT)
         IF(F(I).EQ.0.D0) THEN
 C               ! CONVERT EPS TO Y
@@ -341,7 +344,7 @@ C
 969     YT = YZ + YE + P(12) + CELC*IOMEGA*P2
         ABSYT = REAL(YT)*REAL(YT) + IMAG(YT)*IMAG(YT)
         IF(ABSYT.LT.1D-150) ABSYT = 0.D0
-561     IF(ABSYT.EQ.0.D0) THEN   ! FOR PS1
+        IF(ABSYT.EQ.0.D0) THEN   ! FOR PS1
             ZT = ZNL
         ELSE
             ZT = 1.D0/YT

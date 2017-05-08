@@ -19,11 +19,11 @@ C
                   IND = J
                 ENDIF
 15      CONTINUE
-                IF(IND.NE.I) THEN
-                  ITMP = ISP(I)
-                  ISP(I) = ISP(IND)
-                  ISP(IND) = ITMP
-                ENDIF
+        IF(IND.NE.I) THEN
+              ITMP = ISP(I)
+            ISP(I) = ISP(IND)
+          ISP(IND) = ITMP
+        ENDIF
 20    CONTINUE
       RETURN
       END

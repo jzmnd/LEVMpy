@@ -39,9 +39,9 @@ C
             SUM=SUM-A(I,J)*B(J)
 13        CONTINUE
         ENDIF
-      IF(A(I,I).EQ.0.D0) THEN
-        A(I,I) = 1.D-10
-      ENDIF
+        IF(A(I,I).EQ.0.D0) THEN
+          A(I,I) = 1.D-10
+        ENDIF
         B(I)=SUM/A(I,I)
 14    CONTINUE
       RETURN

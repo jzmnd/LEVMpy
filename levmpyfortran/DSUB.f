@@ -11,6 +11,8 @@ C              COMMON TO PASS DATA TO GDAEFN FUNCTION
       COMMON /CM9/ TOMEGG,XIGDAE,CHGDAE
       COMMON /CM47/ ICNT    
       LOGICAL RD40,RD50,C40,C50,RC23,DAE0,RA0,RP0,RP1
+C              SAVE LOGICAL CHECKS FOR SUBSEQUENT CALLS
+      SAVE RD40,RD50,C40,C50,RC23,DAE0,RA0,RP0,RP1
 C
 C   *********************   D CIRCUIT:
 C
@@ -48,13 +50,13 @@ C
       TDE4 = P(17)
       UDE4 = P(18)
       PDE4 = P(19)
-      NDE4 = IDINT(P(20))
+      NDE4 = IDINT(P(20)+0.001D0)
 C
       RDE5 = P(21)
       TDE5 = P(22)
       UDE5 = P(23)
       PDE5 = P(24)
-      NDE5 = IDINT(P(25))
+      NDE5 = IDINT(P(25)+0.001D0)
 C
       R5 = P(26)
       C5 = P(27)
@@ -84,39 +86,39 @@ C       EDAE PRELIMINARY CALCULATIONS
 C
 C         WHEN PHI1>800 (FIXED), EDAE1 CASE if also U2=U1
 C
-      IF(PHI1.GT.8.D2) PHI1 = PHI2
+        IF(PHI1.GT.8.D2) PHI1 = PHI2
 C
 C         WHEN XU=U2 > 800(FIXED), U2=U1
 C
-      IF(U2.GT.8.D2) U2=U1
+        IF(U2.GT.8.D2) U2=U1
 C
 C         WHEN PHI2>800(FIXED), PHI2=-PHI1
 C
-      IF(PHI2.GT.8.D2) PHI2=-PHI1
+        IF(PHI2.GT.8.D2) PHI2=-PHI1
 C
-      IF(TDAE.LT.0.D0) THEN
-        TDAE = -TDAE
-        TMLT = DEXP(-U1)
-      ELSE
-        TMLT = 1.D0
-      ENDIF
+        IF(TDAE.LT.0.D0) THEN
+          TDAE = -TDAE
+          TMLT = DEXP(-U1)
+        ELSE
+          TMLT = 1.D0
+        ENDIF
 C
 C   CALCULATE EDAE NORMALIZATION COEFFICIENT
 C
-      IF (PHI1.EQ.0.D0) THEN
-        RNORM = U1
-      ELSE
-        PHU1 = PHI1*U1
-        IF(DABS(PHU1).GT.1.D2) PHU1 = DSIGN(1.D2,PHU1)
-        RNORM = (1.D0 - DEXP(-PHU1))/PHI1
-      ENDIF
-      IF(PHI2.EQ.0.D0) THEN
-        RNORM = RNORM + U2
-      ELSE
-        PHU2 = PHI2*U2
-        IF(DABS(PHU2).GT.1.D2) PHU2 = DSIGN(1.D2,PHU2)
-        RNORM = RNORM + (DEXP(PHU2) - 1.D0)/PHI2
-      ENDIF
+        IF (PHI1.EQ.0.D0) THEN
+          RNORM = U1
+        ELSE
+          PHU1 = PHI1*U1
+          IF(DABS(PHU1).GT.1.D2) PHU1 = DSIGN(1.D2,PHU1)
+          RNORM = (1.D0 - DEXP(-PHU1))/PHI1
+        ENDIF
+        IF(PHI2.EQ.0.D0) THEN
+          RNORM = RNORM + U2
+        ELSE
+          PHU2 = PHI2*U2
+          IF(DABS(PHU2).GT.1.D2) PHU2 = DSIGN(1.D2,PHU2)
+          RNORM = RNORM + (DEXP(PHU2) - 1.D0)/PHI2
+        ENDIF
 C
         RNORM = 1.D0/RNORM
       ELSE  
@@ -131,19 +133,19 @@ C   GAUSSIAN DISTRIBUTION OF ACTIVATION ENERGIES, FULL EXPRESSION
 C
 C         CALCULATE LOWER, UPPER GDAE FINAL LIMITS
 C         WHEN XL > 800, IT IS FIXED. MAKES UPPER, LOWER LIMITS SAME
-          IF(XLGDAE.GT.8.D2) XLGDAE = XUGDAE
+        IF(XLGDAE.GT.8.D2) XLGDAE = XUGDAE
 C
-            SARG = 0.5D0*THGDAE*(XIGDAE**2)
-            IF(DABS(SARG).GT.1.D2) SARG = DSIGN(1.D2,SARG)
-                UPPER1 = XUGDAE - SARG
-                BOTTM = -XLGDAE - SARG
+        SARG = 0.5D0*THGDAE*(XIGDAE**2)
+        IF(DABS(SARG).GT.1.D2) SARG = DSIGN(1.D2,SARG)
+        UPPER1 = XUGDAE - SARG
+        BOTTM = -XLGDAE - SARG
 C
-C            CALCULATE GDAE NORMALIZATION COEFFICIENT
+C         CALCULATE GDAE NORMALIZATION COEFFICIENT
 C
-                CHGDAE = 0.D0
-                TOMEGG = 0.D0
-                    CALL QROMB(GDAEFN,BOTTM,UPPER1,VINT)
-                        RNORM = 1.D0/VINT
+        CHGDAE = 0.D0
+        TOMEGG = 0.D0
+          CALL QROMB(GDAEFN,BOTTM,UPPER1,VINT)
+        RNORM = 1.D0/VINT
       ENDIF 
 62    CONTINUE
 C
@@ -280,7 +282,7 @@ C
         IF(ZT.EQ.(0,0).AND.YC.NE.(0,0)) THEN
           ZT = 1.0/YC
         ELSE
-            ZT = (ZT/(1.D0 + ZT*YC))
+          ZT = (ZT/(1.D0 + ZT*YC))
         ENDIF
         ZT = ZT + L*IOMEGA
 C   RETURN IMPEDANCE VALUES

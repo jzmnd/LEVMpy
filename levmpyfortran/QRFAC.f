@@ -88,43 +88,43 @@ C
           K = IPVT(J)
           IPVT(J) = IPVT(KMAX)
           IPVT(KMAX) = K
-40    CONTINUE
+40      CONTINUE
 C
 C     COMPUTE THE HOUSEHOLDER TRANSFORMATION TO REDUCE THE
 C     J-TH COLUMN OF A TO A MULTIPLE OF THE J-TH UNIT VECTOR.
 C
-      AJNORM = ENORM(M-J+1,A(J,J))
-      IF (AJNORM .EQ. ZERO) GO TO 100
-      IF (A(J,J) .LT. ZERO) AJNORM = -AJNORM
-      DO 50 I = J, M
-        A(I,J) = A(I,J)/AJNORM
-50    CONTINUE
-      A(J,J) = A(J,J) + ONE
+        AJNORM = ENORM(M-J+1,A(J,J))
+        IF (AJNORM .EQ. ZERO) GO TO 100
+        IF (A(J,J) .LT. ZERO) AJNORM = -AJNORM
+        DO 50 I = J, M
+          A(I,J) = A(I,J)/AJNORM
+50      CONTINUE
+        A(J,J) = A(J,J) + ONE
 C
 C     APPLY THE TRANSFORMATION TO THE REMAINING COLUMNS
 C     AND UPDATE THE NORMS.
 C
-      JP1 = J + 1
-      IF (N .LT. JP1) GO TO 100
-      DO 90 K = JP1, N
-        SUM = ZERO
-        DO 60 I = J, M
-          SUM = SUM + A(I,J)*A(I,K)
-60      CONTINUE
-        TEMP = SUM/A(J,J)
-        DO 70 I = J, M
-          A(I,K) = A(I,K) - TEMP*A(I,J)
-70      CONTINUE
-        IF (.NOT.PIVOT .OR. SIGMA(K) .EQ. ZERO) GO TO 80
-        TEMP = A(J,K)/SIGMA(K)
-        SIGMA(K) = SIGMA(K)*DSQRT(DMAX1(ZERO,ONE-TEMP**2))
-        IF (P05*(SIGMA(K)/WA(K))**2 .GT. EPSMCH) GO TO 80
-        SIGMA(K) = ENORM(M-J,A(JP1,K))
-        WA(K) = SIGMA(K)
-80    CONTINUE
-90    CONTINUE
-100   CONTINUE
-      SIGMA(J) = -AJNORM
+        JP1 = J + 1
+        IF (N .LT. JP1) GO TO 100
+        DO 90 K = JP1, N
+          SUM = ZERO
+          DO 60 I = J, M
+            SUM = SUM + A(I,J)*A(I,K)
+60        CONTINUE
+          TEMP = SUM/A(J,J)
+          DO 70 I = J, M
+            A(I,K) = A(I,K) - TEMP*A(I,J)
+70        CONTINUE
+          IF (.NOT.PIVOT .OR. SIGMA(K) .EQ. ZERO) GO TO 80
+          TEMP = A(J,K)/SIGMA(K)
+          SIGMA(K) = SIGMA(K)*DSQRT(DMAX1(ZERO,ONE-TEMP**2))
+          IF (P05*(SIGMA(K)/WA(K))**2 .GT. EPSMCH) GO TO 80
+          SIGMA(K) = ENORM(M-J,A(JP1,K))
+          WA(K) = SIGMA(K)
+80      CONTINUE
+90      CONTINUE
+100     CONTINUE
+        SIGMA(J) = -AJNORM
 110   CONTINUE
       RETURN
       END

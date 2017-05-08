@@ -32,6 +32,8 @@ C      COMMON TO PASS DATA TO DAEFN FUNCTION
       COMMON /CM55/ PX1,PX41,PX45
       DATA PI/3.1415926535898D0/,PII/0.3183098861838D0/
 C
+      SAVE RDAE,TDAE,UU,U1A,PHI,GAM,US,RNE
+C
       ISW = 1
       IF(II.EQ.1.OR.INH.EQ.1) THEN 
         MDEXA = IABS(MDE)
@@ -97,8 +99,8 @@ C
             XGI = DEXP(GAMP)
             XGP = GAM(IJ)**((1.D0 - GAM(IJ))/GAM(IJ))
             IF(PHI(IJ).NE.0.D0) THEN
-                   RNU = (1.D0 - DEXP(-PHI(IJ)*DABS(UU(IJ))))/PHI(IJ)
-               RNI = RNI + XGI*XGP*RNU
+                RNU = (1.D0 - DEXP(-PHI(IJ)*DABS(UU(IJ))))/PHI(IJ)
+                RNI = RNI + XGI*XGP*RNU
             ELSE
                 RNI = RNI + DABS(UU(IJ))*XGI*XGP
             ENDIF
@@ -170,7 +172,6 @@ C
         ENDIF
         IF(M.EQ.-1) RETURN
 C
-191   FORMAT(2X,1P,(5E14.5))
       ENDIF
       ICAV = 0
 C

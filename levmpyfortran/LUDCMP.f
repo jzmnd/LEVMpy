@@ -18,7 +18,7 @@ C
       REAL*8 A,D,TINY
       PARAMETER (TINY=1.0D-20)
       INCLUDE 'SIZE.INC'
-      DIMENSION A(NP,NP),INDX(N),VV(NPAFR)
+      DIMENSION A(NP,NP),INDX(*),VV(NPAFR)
 C
       D = 1.D0
       ISD = 0

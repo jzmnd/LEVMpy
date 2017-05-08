@@ -316,16 +316,17 @@ C     4-9 AND 4-10 IN THE LEVM MANUAL FOR A DISCUSSION OF THE OTHER
 C   P8-SELECTED CHOICES.
 C  
 900   XTX = DCMPLX(0.D0,OMEGA)  ! XTX =I*OMEGA
-      A18 = DABS(P18) 
+      A18 = DABS(P18)
       IF(P18.GT.0.D0) THEN
         JM = 0
         IF(P18.EQ.4.D0.OR.P18.EQ.8.D0) PX = 4
         IF(P18.EQ.2.D0) PX = 8
       ELSEIF(P18.LT.0.D0) THEN
-        JM=1
+        JM = 1
         IF(P18.EQ.-4.D0.OR.P18.EQ.-8.D0) PX = 3
         IF(P18.EQ.-2.D0) PX = 8
       ELSE
+        JM = 0
         PX = P8                ! P18=0
       ENDIF
 C

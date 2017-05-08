@@ -20,16 +20,19 @@ C
      + NPH,INE
 C
 C     M IS KY HERE (TWICE # OF FREQS); MD IS ORIG. NO. OF FREQS.
+C
+C      COUNTS NUMBER OF CALLS TO FCN
       ICNT = ICNT + 1
-C      WRITE(*,*) ICNT,JIT
+      WRITE(*,10) ICNT,JIT
+10    FORMAT(6X,I3,"  FIT STAGE:",I2)
       ICOUNT = ICNT
       IMTX = 0
 C
-      IF(ICNT.EQ.1) THEN
-        AKY = 1.D0/FLOAT(M)
-        AKF = 1.D0/FLOAT(M-NFREI)
-        RKK = RKE
-      ENDIF
+C      IF(ICNT.EQ.1) THEN
+C        AKY = 1.D0/FLOAT(M)
+C        AKF = 1.D0/FLOAT(M-NFREI)
+C        RKK = RKE
+C      ENDIF
 C
 C     MD IS #  OF FREQ; FOR COMPLEX FIT, M AND LDFJAC = 2*MD
 C     NFREI IS # OF FREE PARAMETERS
@@ -73,7 +76,7 @@ C
 110   CONTINUE
         MN = 0
         IF(RKE.EQ.0) MN = M
-        CALL MODEL(NPAFR,M,P,FN)
+        CALL MODEL(NPAFR,P,FN)
 C
 C    If IFP >= 0, JFP = 1; otherwise 0.  If IRCH >= 0, IWT = 0;
 C    otherwise 1.  IXI = 1 if XI is free; otherwise 0.
@@ -132,11 +135,11 @@ C
         DXJ2 = DXJ*2.D0
 C
         P(NS(JJ))=X(JJ)+DXJ
-        CALL MODEL(NPAFR,M,P,FNP)
+        CALL MODEL(NPAFR,P,FNP)
         IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNP,FJP)
 C
         P(NS(JJ))=X(JJ)-DXJ
-        CALL MODEL(NPAFR,M,P,FNN)
+        CALL MODEL(NPAFR,P,FNN)
         IF(IXW.EQ.1) CALL RWTS(M,DATTYP,FNN,FJN)
 C
         P(NS(JJ))=X(JJ)
@@ -148,28 +151,27 @@ C
             FJCW(I,JJ) = 0.D0   
           ENDIF
 C
-        FJAC(I,JJ) = FJCW(I,JJ) + (FNN(I) - FNP(I))/(FJ(I)*DXJ2)
-        FJACC(I,JJ) = FJAC(I,JJ)
-C
-145   CONTINUE
+          FJAC(I,JJ) = FJCW(I,JJ) + (FNN(I) - FNP(I))/(FJ(I)*DXJ2)
+          FJACC(I,JJ) = FJAC(I,JJ)
+145     CONTINUE
 C
 C     CALCULATE GRADIENT
 C
-      IF(P(34).LT.0.D0) THEN
-        SNG = 0.D0
-        SNP = 0.D0
-        IF(MOD(NPRIN,-ICNT).EQ.0) THEN
-          IF(JJ.EQ.1) WRITE(*,105) ENORM(M,FVEC)
+        IF(P(34).LT.0.D0) THEN
+          SNG = 0.D0
+          SNP = 0.D0
+          IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+            IF(JJ.EQ.1) WRITE(*,105) ENORM(M,FVEC)
+          ENDIF
+          DO 342 I = 1,M
+            SNG = SNG + FVEC(I)*FJAC(I,JJ)
+            SNP = SNP + FVEC(I)*FJCW(I,JJ)
+342       CONTINUE
+          PSNG = P(NS(JJ))*SNG
+          IF(MOD(NPRIN,-ICNT).EQ.0) THEN
+            WRITE(*,341) ICNT,NS(JJ),P(NS(JJ)),SNG,PSNG,SNP
+          ENDIF
         ENDIF
-        DO 342 I = 1,M
-          SNG = SNG + FVEC(I)*FJAC(I,JJ)
-          SNP = SNP + FVEC(I)*FJCW(I,JJ)
-342     CONTINUE
-        PSNG = P(NS(JJ))*SNG
-        IF(MOD(NPRIN,-ICNT).EQ.0) THEN
-          WRITE(*,341) ICNT,NS(JJ),P(NS(JJ)),SNG,PSNG,SNP
-        ENDIF
-      ENDIF
 341   FORMAT(2X,I7,3X,I3,5(1PD14.3))
 C
 150   CONTINUE

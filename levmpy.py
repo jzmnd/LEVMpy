@@ -208,6 +208,7 @@ class Experiment():
 
         # Set K,R,S-circuit flags
         self.icf = 0
+        self.wf = 0.0
         if (self.fun == 'K') or (self.fun == 'R') or (self.fun == 'S'):
             if (self.fun == 'K'):
                 jia = 22
@@ -216,9 +217,9 @@ class Experiment():
                 jia = 28
                 jib = 12
             ip34a = int(round(abs(self.parameters[33])))
-            ip34 = np.sign(self.parameters(33)) * ip34a
+            ip34 = np.sign(self.parameters[33]) * ip34a
             ip35a = int(round(abs(self.parameters[34])))
-            ip38a = int(round(abs(self.parameters[37])))
+            ip38a = 1 if ip34 > 0 else int(round(abs(self.parameters[37])))
             ip40a = int(round(abs(self.parameters[39])))
             ip40s = np.sign(self.parameters[39])
             if self.ire > -10:
@@ -229,6 +230,38 @@ class Experiment():
                 self.icf = np.count_nonzero(self.parameters[:jia])
                 if self.n > 40:
                     self.icf += np.count_nonzero(self.parameters[40:])
+
+            if ip38a == 1:
+                if int(self.parameters[35]) == 0:
+                    if self.freq[self.md - 1] > self.freq[0]:
+                        taumin = 1.0 / self.freq[self.md - 1]
+                        taumax = 1.0 / self.freq[0]
+                    else:
+                        taumin = 1.0 / self.freq[0]
+                        taumax = 1.0 / self.freq[self.md - 1]
+                    frat = taumax / taumin
+                else:
+                    taumin = self.parameters[35]
+                    frat = self.parameters[38] / taumin
+                self.wf = (1.0/(self.icf / 2 - 1)) * np.log(frat)
+
+            if not ((ip38a != 1) and (ip40a <= 1) and (ip34 <= 0)):
+                if 0 < ip34 < 8:
+                    self.maxfev = 1
+                    self.irch = 2
+                    if (ip34 < 3) or (ip34 == 5):
+                        self.parameters[37] = 1
+                        if ip40a != 4: self.parameters[39] = 3 * ip40s
+                    elif (ip34 == 3) or (ip34 == 4):
+                        self.parameters[37] = 2
+                        if ip40a != 4: self.parameters[39] = 2 * ip40s
+                    elif ip34 == 6:
+                        self.parameters[37] = 2
+                    else:
+                        self.parameters[37] = 2
+                        self.parameters[39] = 2 * ip40s
+                #if self.fun != 'S':
+                    # RESORT(P,NFREE,TAUM,WF,X,NTOT,NS,JIA,JIB)
 
         # Set O-circuit NELEM and flags
         self.nelem = 0
@@ -292,7 +325,7 @@ class Experiment():
             self.icp = int(line3[31:35])
             self.iprint = int(line3[36:40])
             self.igacc = int(line3[41:45])
-            self.atemp = dfloat(line3[46:55])
+            self.atemp = dfloat(line3[45:55])
 
             # Line 4 - set model parameters
             plist = []
@@ -312,7 +345,7 @@ class Experiment():
             flist = []
             y1list = []
             y2list = []
-            for i in range(self.md):
+            for i in range(abs(self.md)):
                 line = f.readline().strip().split()
                 flist.append(dfloat(line[1]))
                 y1list.append(dfloat(line[2]))
@@ -329,15 +362,15 @@ class Experiment():
             if self.irch == 0:
                 r1list = []
                 r2list = []
-                for i in range(self.md):
+                for i in range(abs(self.md)):
                     line = f.readline().strip().split()
                     r1list.append(dfloat(line[1]))
                     r2list.append(dfloat(line[2]))
                 self.r1 = np.array(r1list, dtype=float)
                 self.r2 = np.array(r2list, dtype=float)
             else:
-                self.r1 = np.zeros(self.md) 
-                self.r2 = np.zeros(self.md)
+                self.r1 = np.zeros(abs(self.md)) 
+                self.r2 = np.zeros(abs(self.md))
         return
 
     def fit(self):
@@ -410,11 +443,11 @@ class Experiment():
             print "     P({:2d}) = {: e}".format(n, self.x[i])
         print "  NFEV =", self.result[1]
         print "\n  OBSERVED VARIABLES:"
-        print "  M     MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL"
+        print "  M  T   MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL"
         for i in range(self.md):
             j = i + self.md
-            print "{:3d} R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i], lv.cm2.r[i], self.res[i], self.resmod[i])
-            print "{:3d} I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j], lv.cm2.r[j], self.res[j], self.resmod[j])
+            print "{:3d}  R  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[i], self.outputvals[i], lv.cm2.r[i], self.res[i], self.resmod[i])
+            print "{:3d}  I  {: e} {: e} {: e} {: e} {: e}".format(i + 1, self.y[j], self.outputvals[j], lv.cm2.r[j], self.res[j], self.resmod[j])
 
         return
 
@@ -427,6 +460,7 @@ class Experiment():
         # CM2
         lv.cm2.y = resized(self.y, NPT2)
         lv.cm2.r = resized(self.r, NPT2)
+        lv.cm2.fj = np.zeros(NPT2)
         lv.cm2.p = self.parameters
         lv.cm2.drss = 1.0e-8
         lv.cm2.roe = self.roe
@@ -443,22 +477,50 @@ class Experiment():
         lv.cm3.fun = self.fun
         lv.cm3.dfit = self.dfit
         lv.cm3.pfit = self.pfit
+        # CM4
+        lv.cm4.fnorm = 0.0
+        # CM5
+        lv.cm5.tomega = 0.0
+        lv.cm5.phicom = 0.0
+        lv.cm5.iv = 0
+        # CM9
+        lv.cm9.tomegax = 0.0
+        lv.cm9.phix = 0.0
+        lv.cm9.ichg = 0
+        lv.cm9.iwtx = 0
         # CM10
         lv.cm10.epsg = 10**(-abs(self.igacc))
         lv.cm10.izr = self.izr
         # CM11
         lv.cm11.mqy = self.nfrei - self.ins
+        lv.cm11.ispr = 0
+        lv.cm11.icx = 0
+        lv.cm11.ndf = 0
+        lv.cm11.fqq = 0.0
         # CM12
         lv.cm12.clcap = self.clcap
         lv.cm12.atemp = self.atemp
-        #####lv.cm12.wf = 
-        lv.cm12.icf = self.icf
+        lv.cm12.wf = self.wf
         lv.cm12.maxfev = self.maxfev
+        lv.cm12.icf = self.icf
         lv.cm12.mde = self.mode
         lv.cm12.jcdx = 0
         # CM13
+        lv.cm13.rx = 0.0
+        lv.cm13.tx = 0.0
+        lv.cm13.ux = 0.0
+        lv.cm13.phi = 0.0
+        lv.cm13.xxm1 = 0.0
+        lv.cm13.xx1 = 0.0
+        lv.cm13.xx2 = 0.0
+        lv.cm13.xx3 = 0.0
+        lv.cm13.rn = 0.0
+        lv.cm13.ain = 0.0
         lv.cm13.icav = 0
         lv.cm13.nelem = self.nelem
+        lv.cm13.nch = 0
+        # CM14
+        lv.cm14.fjacc = np.zeros((NPT2, NPAFR))
         # CM16
         lv.cm16.iop = self.iopt
         lv.cm16.iorig = self.iorig
@@ -469,12 +531,26 @@ class Experiment():
         lv.cm16.mode = self.mode
         lv.cm16.ifp = self.ifp
         lv.cm16.ire = self.ire
+        lv.cm16.istp = 0
         lv.cm16.jfp = self.jfp
         lv.cm16.nph = self.icf / 2
         lv.cm16.ine = self.ine
         # CM18
+        lv.cm18.sdwc = 0.0
+        lv.cm18.sdrc = 0.0
+        lv.cm18.diag = np.zeros(NPAFR)
         lv.cm18.ipar = self.ipar
         lv.cm18.iopr = self.iopr
+        # CM20
+        lv.cm20.rxsd = np.zeros(NPAFR)
+        # CM29
+        lv.cm29.gam = 0.0
+        lv.cm29.sn1 = 0.0
+        lv.cm29.cs1 = 0.0
+        lv.cm29.pii = 0.0
+        lv.cm29.cdn = 0.0
+        lv.cm29.qpi = 0.0
+        lv.cm29.mdex = 0
         # CM34
         lv.cm34.mda = self.md
         lv.cm34.iwt = self.iwt
@@ -486,15 +562,27 @@ class Experiment():
         lv.cm35.ipf = self.ipf
         lv.cm35.nprint = self.nprint
         # CM36
-        #####lv.cm36.shw = 
+        lv.cm36.shw = np.zeros(NPT2)
         lv.cm36.isw = 0
         # CM39
         lv.cm39.p8 = self.parameters[7]
         lv.cm39.p18 = self.parameters[17]
         # CM47
         lv.cm47.icount = 0
+        # CM55
+        lv.cm55.px1 = 0.0
+        lv.cm55.px41 = 0.0
+        lv.cm55.px45 = 0.0
+        # CM73
+        lv.cm73.p39 = self.parameters[38]
         # CM78
         lv.cm78.dattyc = self.dattyp
         # CM79
         lv.cm79.ytt = resized(self.ytt, NPT2)
+        # CM80
+        lv.cm80.omegat = 0.0
+        lv.cm80.psi = 0.0
+        lv.cm80.gama = 0.0
+        lv.cm80.deli = 0.0
+
         return

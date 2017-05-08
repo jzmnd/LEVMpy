@@ -13,7 +13,7 @@ import os
 import sys
 import levmpyfortran.LEVMpyFortran as _lv
 import numpy as np
-import utils
+from utils import *
 
 __author__ = "Jeremy Smith"
 __version__ = "1.1"
@@ -141,8 +141,8 @@ class Experiment():
             self.iacy = abs(self.iopt)
             self.iopt = 0
         if self.iacy == 0:
-            self.ftol = 1e-30
-            self.xtol = 1e-48
+            self.ftol = 1e-15
+            self.xtol = 1e-28
         else:
             self.ftol = 10**(self.iacy)
             self.xtol = self.ftol
@@ -180,7 +180,7 @@ class Experiment():
             self.parameters[30] = 0
         return
 
-    def _defaults():
+    def _defaults(self):
         """Set default values"""
         if self.celcap == 0:
             self.celcap = 1.0

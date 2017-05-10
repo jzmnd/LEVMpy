@@ -1,8 +1,10 @@
 # LEVMpy
 
-Python module and wrapper for the LEVM complex nonlinear least squares program.
+Python module and wrapper for the LEVM complex nonlinear least squares (CNLS) program.
 
 [LEVM](http://jrossmacdonald.com/levmlevmw/) was written by J. Ross Macdonald.
+The LEVM Maunual can be downloaded [here](http://jrossmacdonald.com/jrm/wp-content/uploads/LEVMMANUAL-5-12-14.pdf)
+and provides a complete description of the LEVM program and how to set up a CNLS fit.
 
 Example of use:
 

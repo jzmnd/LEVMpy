@@ -42,7 +42,7 @@ LEVMWL/
 
 # Other
 *.xlsx
-log.txt
+*.log
 NEED_TO_WRAP.txt
 list_of_files.txt
 list_of_COMMON-all.txt

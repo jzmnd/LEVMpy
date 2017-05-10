@@ -398,18 +398,18 @@ C
       ELSE
         ANPEF = 1.D0/FLOAT(M - NFREI)
       ENDIF
-         ANK = 1.D0/FLOAT(KX)
-       SUMRR = -(V2R - V4R)
-        AVRR = SUMRR*ANK
-        AVFR = SUMFR*ANK*YPX
-        SDRR = DSQRT(V2S*ANPEF)
-        SDRI = DSQRT(V4S*ANPEF)
-        SDRC = DSQRT((V2S + V4S)*ANEFF)
-        SDWR = DSQRT(V5W*ANPEF)
-        SDWI = DSQRT(V6W*ANPEF)
-        SDWC = DSQRT(SUMSQW*ANEFF)
-       AVARR = V2RA/M
-       AVARI = V4RA/M
+      ANK = 1.D0/FLOAT(KX)
+      SUMRR = -(V2R - V4R)
+      AVRR = SUMRR*ANK
+      AVFR = SUMFR*ANK*YPX
+      SDRR = DSQRT(V2S*ANPEF)
+      SDRI = DSQRT(V4S*ANPEF)
+      SDRC = DSQRT((V2S + V4S)*ANEFF)
+      SDWR = DSQRT(V5W*ANPEF)
+      SDWI = DSQRT(V6W*ANPEF)
+      SDWC = DSQRT(SUMSQW*ANEFF)
+      AVARR = V2RA/M
+      AVARI = V4RA/M
 C
       IF(ISTP.GT.0) THEN
         WRITE(*,107)

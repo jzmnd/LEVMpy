@@ -4,7 +4,7 @@
             DATTYP       : data type (C, I or R)
 
       COMMON /CM2/
-            Y(NPT2)      : data to be fit
+            Y(NPT2)      : y data to be fit
             R(NPT2)      : uncertainty associated with data point Y(I)
             FJ(NPT2)     : 
             P(NTOT)      : parameter array list
@@ -14,7 +14,7 @@
             NS(NPAFR)    : array of indices of free parameters
             NFREE(NTOT)  : array of free parameters (0=fixed, 1=free positive, 2=free, 3=parameter will be subtracted from the data)
             N            : number of model parameters
-            ICNT         :
+            ICNT         : counter for calls to FCN
             MN           : number of data points (out of M) which involve least squares minimization (the rest involve absolute value minimization)
             IRCH         : selects form of data weighting (-6 to 6)
             IXI          :
@@ -34,8 +34,14 @@
             PHICOM       :
             IV           :
 
+      COMMON /CM9/
+            TOMEGAX      : TOMEGA = OMEGA*T
+            PHIX
+            ICHG
+            IWTX
+
       COMMON /CM10/
-            EPSG
+            EPSG         :
             IZR
 
       COMMON /CM11/
@@ -51,7 +57,7 @@
             WF
             MAXFEV       : termination when the number of calls to FCN is MAXFEV
             ICF
-            MDE
+            MDE          : mode, plays several important roles depending on model
             JCDX
 
       COMMON /CM13/
@@ -76,10 +82,10 @@
             IOP          :
             IORIG        : the original number of the first of each parameter pair
             NYC
-            JY           :
+            JY           : index of 1st data point
             IPRINT       : selects level of output (0 - 3)
             LDFJAC
-            MODE         : plays several important roles depending on model
+            MODE         : mode, plays several important roles depending on model
             IFP          : when > 0, activates direct function weighting, when < 0, turns on iterative function weighting
             IRE          : when > 0, turns on residual-weighting
             ISTP
@@ -110,7 +116,7 @@
             MDA          : number of data points
             IWT
             IXW
-            INFP
+            INFP         : INFO output of LMDER routine
             IPL
 
       COMMON /CM35/
@@ -120,14 +126,14 @@
 
       COMMON /CM36/
             SHW(NPT2)
-            ISW
+            ISW          : 0 = no shaped weigthing, 1 = shaped weigthing
 
       COMMON /CM39/
             P8           : parameter 8
             P18          : parameter 18
 
       COMMON /CM47/
-            ICOUNT
+            ICOUNT       : copy of counter for calls to FCN passed to circuit models
 
       COMMON /CM55/
             PX1          : parameter 1
@@ -141,4 +147,10 @@
             DATTYC       : data type (C, I or R)
 
       COMMON /CM79/
-            YTT(NPT2)
+            YTT(NPT2)    : copy of y data
+
+      COMMON /CM80/
+            OMEGAT
+            PSI
+            GAMA
+            DELI

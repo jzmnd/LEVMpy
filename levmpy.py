@@ -14,7 +14,6 @@ import sys
 import levmpyfortran.LEVMpyFortran as _lv
 import numpy as np
 from utils import *
-from outputfunc import *
 
 __author__ = "Jeremy Smith"
 __version__ = "1.1"
@@ -29,10 +28,10 @@ NPT2 = len(_lv.cm2.y)
 
 class Experiment():
     """Class for single LEVM input file"""
-    def __init__(self, infile, outfile="OUTFILE.txt", path=os.getcwd()):
+    def __init__(self, infile, outsuffix="OUTFILE", path=os.getcwd()):
         self.path = path
         self.infile = infile
-        self.outfile = outfile
+        self.outfile = infile + '_' + outsuffix
         self.fitted = False
         # Read input file
         self._readinfile()
@@ -349,9 +348,8 @@ class Experiment():
         self.fitted = False
         # Set the levmpy common variables
         self._setcommon()
-
         # Print fit information
-        print_fit_info(self)
+        self._print_fit_info(sys.stdout.write)
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
@@ -367,8 +365,15 @@ class Experiment():
         self.r = _lv.cm2.r[self.jy - 1:self.ky]
         self.res = self.y - self.outputvals[self.jy - 1:self.ky]
         self.resmod = self.res / self.outputvals[self.jy - 1:self.ky]
+        # Relative standard deviation of parameters
+        self.rxsd = _lv.cm20.rxsd[:self.nfrei]
+        # Fit information
+        self.info = int(_lv.cm34.infp)
+        self.fnorm = float(_lv.cm4.fnorm)
+        self.fqq = float(_lv.cm11.fqq)
+        self.ndf = int(_lv.cm11.ndf)
         # Write outputs
-        print_outputs(self)
+        self._print_outputs(sys.stdout.write)
         return
 
     def _setcommon(self):
@@ -504,4 +509,105 @@ class Experiment():
         _lv.cm80.psi = 0.0
         _lv.cm80.gama = 0.0
         _lv.cm80.deli = 0.0
+        return
+
+    def _print_fit_info(self, fp):
+        """Prints fit information"""
+        fp("\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM\n")
+        fp("       VERSION 8.06 - 2/05\n\n")
+        fp("{:s}\n".format(self.alpha))
+        fp("  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT\n".format(self.dinp, self.pinp, self.dfit, self.pfit))
+        fp("  CIRCUIT MODEL : {:s}\n\n".format(self.fun))
+        fp("  *****  FIT OF {:s} DATA  *****\n\n".format(self.dattyp))
+
+        fp("  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}\n".format(self.md, self.irch, self.nfrei))
+        fp("  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}\n".format(self.nprint, self.maxfev, self.qq))
+        fp("  CELL CAPACITANCE = {:e}\n".format(self.celcap))
+
+        if self.ixi == 0:
+            if self.irch == 0:
+                fp("  WEIGHTS (STANDARD DEVIATIONS) ARE READ IN\n")
+            if self.irch == 1:
+                fp("  UNIT WEIGHTING ASSIGNED TO EACH POINT\n")
+            if self.irch == 2:
+                fp("  WEIGHTS INVOLVE THE MAGNITUDES OF DATA OR FUNCTION VALUES RAISED TO THE POWER {:e}\n".format(self.parameters[31]))
+            if self.irch == 3:
+                fp("  MODULUS WEIGHTING: RESULTS RAISED TO THE POWER {:e}\n".format(self.parameters[31]))
+            if self.irch == 4:
+                fp("  #1174 SPINOLO FRA WEIGHTING\n")
+            if self.irch == 5:
+                fp("  #1250 & 1286 ORAZEM-AGARWAL FRA WEIGHTING\n")
+            if self.irch == 6:
+                fp("  #1250 & PAR 273 ORAZEM-AGARWAL FRA WEIGHTING\n")
+        else:
+            fp("  WEIGHTS USE XI OR U**2 AND XI: BOTH MAY BE FREE PARAMETERS\n")
+
+        fp("\n  INITIAL PARAMETER GUESSES AND FIXED (0) OR FREE (1 OR 2) STATUS\n")
+        for i in range(16):
+            j = i + 16
+            fp("     P({:2d}) = {: e}   {:d}     P({:2d}) = {: e}   {:d}\n".format(i + 1, self.parameters[i], self.nfree[i],
+                                                                                       j + 1, self.parameters[j], self.nfree[j]))
+        if self.n > 32:
+            fp("\n  THE FOLLOWING PARAMETERS ARE ALWAYS FIXED\n")
+            for i in range(32, 36):
+                j = i + 4
+                fp("     P({:2d}) = {: e}         P({:2d}) = {: e}\n".format(i + 1, self.parameters[i], j + 1, self.parameters[j]))
+        fp("\n")
+        return
+
+    def _print_outputs(self, fp):
+        """Prints output data"""
+        if self.info < 0:
+            fp("  U & XI OR XI CONVERGENCE PROBLEM\n\n")
+        if self.info == 0:
+            fp("  IMPROPER INPUT PARAMETERS\n\n")
+        if self.info == 1:
+            fp("  ALGORITHM TERMINATES HAVING ESTIMATED THAT THE RELATIVE ERROR\n")
+            fp("  IN THE SUM OF SQUARES IS AT MOST FTOL\n\n")
+        if self.info == 2:
+            fp("  ALGORITHM TERMINATES HAVING ESTIMATED THAT THE RELATIVE ERROR\n")
+            fp("  BETWEEN THE VECTOR OF FREE PARAMETERS AND THE DESIRED SOLUTION IS AT MOST XTOL\n\n")
+        if self.info == 3:
+            fp("  ALGORITHM TERMINATES HAVING ESTIMATED THAT THE RELATIVE ERROR\n")
+            fp("  IN THE SUM OF SQUARES IS LESS THAN FTOL AND THE L2 NORM OF\n")
+            fp("  THE VECTOR OF FREE PARAMETERS AND THE DESIRED SOLUTION IS LESS THAN XTOL\n\n")
+        if self.info == 4:
+            fp("  ALGORITHM TERMINATES HAVING ESTIMATED THAT FVEC IS ORTHOGONAL\n")
+            fp("  TO THE COLUMNS OF THE JACOBIAN TO PRECISION GTOL\n\n")
+        if self.info == 5:
+            fp("  TERMINATION: NUMBER OF CALLS TO FCN WITH IFLAG=1 EXCEEDS MAXFEV\n\n")
+        if self.info == 6:
+            fp("  TERMINATION: FTOL IS TOO SMALL\n")
+            fp("  NO FURTHER REDUCTION IN THE SUM OF SQUARES IS POSSIBLE\n\n")
+        if self.info == 7:
+            fp("  TERMINATION: XTOL IS TOO SMALL\n")
+            fp("  NO FURTHER IMPROVEMENT IN THE FREE PARAMETERS IS POSSIBLE\n\n")
+
+        fp("  FINAL L2 NORM OF THE RESIDUALS = {: e}\n".format(self.fnorm))
+        fp("  NUMBER OF FUNCTION EVALUATIONS = {: d}\n".format(self.result[1]))
+        fp("  FIT QUALITY FACTOR             = {: e}\n".format(self.fqq))
+        fp("  NO. DEGREES OF FREEDOM         = {: d}\n".format(self.ndf))
+
+        fp("\n  PARAMETER ESTIMATES         STD DEV         REL STD DEV\n")
+        for i, n in enumerate(self.ns1):
+            fp("     P({:2d}) = {: e}    {:e}    {:e}\n".format(n, self.x[i], self.rxsd[i] * self.x[i], self.rxsd[i]))
+        fp("\n  PDAV = {:e}\n".format(np.sum(self.rxsd) / (self.nfrei - self.ins)))
+        fp("  PDRMS = {:e}\n".format(np.sqrt(np.sum(self.rxsd**2) / (self.nfrei - self.ins))))
+
+        fp("\n  OBSERVED VARIABLES\n")
+        fp("  M  T   MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL\n")
+        for i in range(self.md):
+            j = i + self.md
+            fp("{:3d}  R  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[i], self.outputvals[i],
+                                                                      self.r[i], self.res[i], self.resmod[i]))
+            fp("{:3d}  I  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[j], self.outputvals[j],
+                                                                      self.r[j], self.res[j], self.resmod[j]))
+        return
+
+    def writetofile(self):
+        """Writes current data to output file"""
+        if self.fitted:
+            with open(os.path.join(self.path, self.outfile), 'w') as f:
+                self._print_fit_info(f.write)
+                self._print_outputs(f.write)
         return

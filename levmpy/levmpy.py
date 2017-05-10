@@ -361,10 +361,13 @@ class Experiment():
         # If MAXFEV = 1 no fit convert
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
+        self.outputvals = self.outputvals[self.jy - 1:self.ky]
         # Resdiduals and errors
         self.r = _lv.cm2.r[self.jy - 1:self.ky]
-        self.res = self.y - self.outputvals[self.jy - 1:self.ky]
-        self.resmod = self.res / self.outputvals[self.jy - 1:self.ky]
+        self.res = self.y - self.outputvals
+        self.resmod = self.res / self.outputvals
+        # Jacobian matrix
+        self.jac = _lv.cm14.fjacc[self.jy - 1:self.ky, :self.nfrei]
         # Relative standard deviation of parameters
         self.rxsd = _lv.cm20.rxsd[:self.nfrei]
         # Fit information

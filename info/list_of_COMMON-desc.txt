@@ -27,7 +27,7 @@
             PFIT         : complex fit formats (P, D L or R)
 
       COMMON /CM4/
-            FNORM        :
+            FNORM        : L2 norm of the residuals
 
       COMMON /CM5/
             TOMEGA       : TOMEGA = OMEGA*T
@@ -41,7 +41,7 @@
             IWTX
 
       COMMON /CM10/
-            EPSG         :
+            EPSG         : relative accuracy of EDAE, GDAE, and other response functions
             IZR
 
       COMMON /CM11/
@@ -53,7 +53,7 @@
 
       COMMON /CM12/
             CLCAP        : empty cell capacitance
-            ATEMP        : absolute temperature parameter
+            ATEMP        : absolute temperature parameter or choice variable
             WF
             MAXFEV       : termination when the number of calls to FCN is MAXFEV
             ICF
@@ -79,7 +79,7 @@
             FJACC(NPT2,NPAFR)  : Jacobian matrix (2 * # of data points, # of free paramter)
 
       COMMON /CM16/
-            IOP          :
+            IOP          : turns on CNLS optimization iteration (only for complex fit)
             IORIG        : the original number of the first of each parameter pair
             NYC
             JY           : index of 1st data point
@@ -94,11 +94,11 @@
             INE
 
       COMMON /CM18/
-            SDWC
-            SDRC
+            SDWC         : the prior fit values of the SD’s
+            SDRC         : the prior fit values of the SD’s
             DIAG(NPAFR)
             IPAR         : 0 = Residuals/Model output columns in AUXPNTL and AUXPNTL1 are calculated, >0 = Residuals/Model in both are changed to Residuals/Uncertainty, <0=an extra line of parameter relative standard deviations occurs in the output, based on the input values of the free parameters of the fit
-            IOPR         :
+            IOPR         : 
 
       COMMON /CM20/
             RXSD(NPAFR)

@@ -34,7 +34,7 @@ The following class variables of the Experiment class may be useful:
 
 `expt.x` : fitted parameter estimates
 
-`expt.rxsd` : residual on x
+`expt.rxsd` : relative standard deviation on x
 
 `expt.nfrei` : number of free parameters
 

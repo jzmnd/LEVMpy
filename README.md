@@ -6,18 +6,22 @@ Python module and wrapper for the LEVM complex nonlinear least squares program.
 
 Example of use:
 
-`import levmpy as lv`
-
-`expt = lv.Experiment("name-of-input-file", outsuffix="OUTFILE", path="path-name")`
-
+```python
+import levmpy as lv
+expt = lv.Experiment("name-of-input-file", outsuffix="OUTFILE", path="path-name")
+```
 
 To fit the data use the command:
 
-`expt.fit()`
+```python
+expt.fit()
+```
 
 To write the output to a file use:
 
-`expt.writetofile()`
+```python
+expt.writetofile()
+```
 
 
 The following class variables of the Experiment class may be useful:

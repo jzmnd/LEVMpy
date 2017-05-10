@@ -361,7 +361,9 @@ class Experiment():
         # If MAXFEV = 1 no fit convert
         # If MAXFEV = 2 no fit calc new data without parameters with NFREE = 3
 
+        self.nfev = self.result[1]
         self.outputvals = self.outputvals[self.jy - 1:self.ky]
+        self.y = self.y[self.jy - 1:self.ky]
         # Resdiduals and errors
         self.r = _lv.cm2.r[self.jy - 1:self.ky]
         self.res = self.y - self.outputvals
@@ -587,7 +589,7 @@ class Experiment():
             fp("  NO FURTHER IMPROVEMENT IN THE FREE PARAMETERS IS POSSIBLE\n\n")
 
         fp("  FINAL L2 NORM OF THE RESIDUALS = {: e}\n".format(self.fnorm))
-        fp("  NUMBER OF FUNCTION EVALUATIONS = {: d}\n".format(self.result[1]))
+        fp("  NUMBER OF FUNCTION EVALUATIONS = {: d}\n".format(self.nfev))
         fp("  FIT QUALITY FACTOR             = {: e}\n".format(self.fqq))
         fp("  NO. DEGREES OF FREEDOM         = {: d}\n".format(self.ndf))
 
@@ -599,11 +601,13 @@ class Experiment():
 
         fp("\n  OBSERVED VARIABLES\n")
         fp("  M  T   MEASURED      ESTIMATED     UNCERTANTY    RESIDUALS     RESID/MODEL\n")
+        t = 'I' if self.dattyp == 'I' else 'R'
         for i in range(self.md):
             j = i + self.md
-            fp("{:3d}  R  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[i], self.outputvals[i],
-                                                                      self.r[i], self.res[i], self.resmod[i]))
-            fp("{:3d}  I  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[j], self.outputvals[j],
+            fp("{:3d}  {:s}  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, t, self.y[i], self.outputvals[i],
+                                                                     self.r[i], self.res[i], self.resmod[i]))
+            if self.dattyp == 'C':
+                fp("{:3d}  I  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[j], self.outputvals[j],
                                                                       self.r[j], self.res[j], self.resmod[j]))
         return
 

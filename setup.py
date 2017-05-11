@@ -2,7 +2,7 @@
 
 from numpy.distutils.core import setup, Extension
 
-fortranlib = Extension(name = 'fortranlib',
+fortranlib = Extension(name = 'LEVMpyFortran',
     extra_compile_args = ['-Wall -Wno-tabs -O3 -ffast-math'],
     sources = ['levmpy/fortranlib/levmpyfortran_edited.pyf',
                'levmpy/fortranlib/*.f']

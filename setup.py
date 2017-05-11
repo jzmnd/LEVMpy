@@ -9,7 +9,7 @@ fortranlib = Extension(name = 'fortranlib',
     )
 
 setup(name = 'levmpy',
-    description = 'Python module and wrapper for the LEVM complex nonlinear least squares program'
+    description = 'Python module and wrapper for the LEVM complex nonlinear least squares program',
     version = '1.1',
     author = 'Jeremy Smith',
     author_email = 'j.smith.03@cantab.net',

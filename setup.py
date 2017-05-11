@@ -14,6 +14,6 @@ setup(name = 'levmpy',
     author = 'Jeremy Smith',
     author_email = 'j.smith.03@cantab.net',
     url = 'http://jeremysmithscientist.com',
-    py_modules = ['levmpy'],
+    packages = ['levmpy'],
     ext_modules = [fortranlib]
     )

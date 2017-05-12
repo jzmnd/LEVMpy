@@ -18,10 +18,11 @@ C
       REAL*8 A,D,TINY
       PARAMETER (TINY=1.0D-20)
       INCLUDE 'SIZE.INC'
-      DIMENSION A(NP,NP),INDX(*),VV(NPAFR)
+      DIMENSION A(NP,NP),INDX(N),VV(NPAFR)
 C
       D = 1.D0
       ISD = 0
+      IMAX = 1
       DO 12 I=1,N
         AAMAX=0.D0
         DO 11 J=1,N

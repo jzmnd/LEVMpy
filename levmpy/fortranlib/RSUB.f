@@ -77,7 +77,7 @@ C        CALCULATE ICFH=ICF/2 SUBCIRCUITS IN SERIES
 C       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 C
         JJ = 0
-765     DO 161 KK = 1,ICF-1
+        DO 161 KK = 1,ICF-1
           IF(KK.GT.28) THEN
               KQ = KK + 12
           ELSE
@@ -107,7 +107,7 @@ C       OMEGA IS HERE TIME
             ENDIF
           IF(XTAU(JJ).EQ.0.D0) GOTO 732
           ENDIF
-173     FORMAT(2X,I4,1P,(5E15.6))
+C 173     FORMAT(2X,I4,1P,(5E15.6))
 C
 161     CONTINUE
 C

@@ -96,7 +96,7 @@ C
         ENDDO
       ENDDO
 C
-47    FORMAT(1X,19I4)
+C 47    FORMAT(1X,19I4)
 C
       IF(IFLAG.EQ.1) THEN
         DO 10 I = 1,MP
@@ -110,6 +110,6 @@ C
 30      CONTINUE
       ENDIF
 C
-876   CONTINUE
+      CONTINUE
       RETURN
       END

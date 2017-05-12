@@ -111,14 +111,14 @@ C
               ZC = 1.D0/(C3*IOMEGA)
           ENDIF
         ELSE
-           CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE3,TDE3,UDE3,PDE3,NDE3,ZD)
-              ZC = R3 + ZD
-                  ZC = ZC/(1.D0 + IOMEGA*C3*ZC)
+          CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE3,TDE3,UDE3,PDE3,NDE3,ZD)
+          ZC = R3 + ZD
+          ZC = ZC/(1.D0 + IOMEGA*C3*ZC)
         ENDIF
-           CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE2,TDE2,UDE2,PDE2,NDE2,ZD)
-          ZC = ZC + R2 + ZD
+        CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE2,TDE2,UDE2,PDE2,NDE2,ZD)
+        ZC = ZC + R2 + ZD
         IF(.NOT.RD40) THEN
-           CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE4,TDE4,UDE4,PDE4,NDE4,ZD)
+          CALL SDEA(OMEGA,IOMEGA,0.D0,0.D0,RDE4,TDE4,UDE4,PDE4,NDE4,ZD)
           IF(C20) THEN
               ZB = ZD
           ELSE

@@ -20,7 +20,7 @@ C
         PHIM = 1.D0/PHI
         ONEMP = 1.D0 - PHI
         ONEMI = 1.D0/ONEMP
-        PHPRI = PHIM*ONEMI      
+        PHPRI = PHIM*ONEMI
         PHP5 = DSQRT(PHPRI)
 C        PHPI2 = PHPRI*PHPRI
         TWMP = 2.D0 - PHI

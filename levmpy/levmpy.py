@@ -11,7 +11,7 @@ Created by Jeremy Smith on 2017-04-16
 
 import os
 import sys
-import fortranlib.LEVMpyFortran as _lv
+import fortranlib as _lv
 import numpy as np
 from utils import *
 

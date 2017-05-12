@@ -15,7 +15,7 @@
       COMMON /CM79/ YTT(NPT2)
       LOGICAL RD30,C30
 C              SAVE LOGICAL CHECKS AND VARIABLES FOR SUBSEQUENT CALLS
-      SAVE RD30,C30,NCH1,NCH2,NDE1,NDE2,NDE3,INH,ZNL,CELC
+      SAVE RD30,C30,ZNL,NCH1,NCH2,INH,CELC
 C
 C   ****************** O CIRCUIT: Runs as an external subroutine
 C
@@ -159,6 +159,14 @@ C
       R3 = P(28)
       C3 = P(29)
 C
+      NDE1 = IDINT(DABS(P(10))+0.001D0)
+      NDE1 = NDE1*NINT(DSIGN(1.D0,P(10)))
+      NDE2 = IDINT(DABS(P(20))+0.001D0)
+      NDE2 = NDE2*NINT(DSIGN(1.D0,P(20)))
+C
+C     THE FOLLOWING DCE APPEARS IN SERIES WITH THE R3 OF THE CIRCUIT
+      NDE3 = IDINT(P(25)+.001D0)
+C
       MDEO = MDE
       IF(MDE.EQ.-16) MDES = MDE
       IF(ICNT.LE.1) THEN
@@ -171,10 +179,6 @@ C   ADDED BELOW IF ON 4/4/97  CHANGED CM13 NCH1 TO NCH
         ELSE
             NCH = NCH1
         ENDIF
-        NDE1 = IDINT(DABS(P(10))+0.001D0)
-        NDE1 = NDE1*NINT(DSIGN(1.D0,P(10)))
-        NDE2 = IDINT(DABS(P(20))+0.001D0)
-        NDE2 = NDE2*NINT(DSIGN(1.D0,P(20)))
 C
         IF(NCH1.NE.3) THEN
           PX1 = P(1)
@@ -186,9 +190,8 @@ C
           JCDX = 1
         ENDIF
 C
-C      THE FOLLOWING DCE APPEARS IN SERIES WITH THE R3 OF THE CIRCUIT
-C
-        NDE3 = IDINT(P(25)+.001D0)
+        INH = 0
+        IF(NCH1.GT.0.AND.NCH2.GT.0) INH = 1
 C
         RD30 = ((NDE3.EQ.0.D0).AND.(R3.EQ.0.D0))
         C30 = (C3.EQ.0.D0)
@@ -210,8 +213,6 @@ C
           IF(P(14).EQ.0.D0) P(14) = 1.D0
           IF(P(15).EQ.0.D0.AND.P(16).EQ.0.D0) NCH2 = 0
         ENDIF
-        INH = 0
-        IF(NCH1.GT.0.AND.NCH2.GT.0) INH = 1
 C
         IF(ATEMP.LT.0.D0.OR.ATEMP.GT.9.99D2) THEN
           CELC = CELCAP
@@ -373,6 +374,7 @@ C
            P11 = P(11)  ! HERE, P(11) IS A PARALLEL RESISTANCE
         ENDIF
 C
+        YS = ZNL
         IF(RD30) THEN
           IF(C30) THEN
               ZS = ZNL
@@ -389,7 +391,7 @@ C
           ZS = DISTEL(P(21),P(22),P(23),P(24),NDE3,FREQ(I))
           ZS = R3 + ZS
           IF(ZS.NE.ZNL) THEN
-              YS =1.D0/ZS
+              YS = 1.D0/ZS
           ELSE
               YS = ZNL
           ENDIF

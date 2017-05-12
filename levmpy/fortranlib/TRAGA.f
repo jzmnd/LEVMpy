@@ -7,6 +7,7 @@ C
       REAL*8 AA,YY,PP,QQ,TRSY
       DIMENSION XX(2,2),AA(2,2),PG(2),GC(2),PP(2),QQ(2),
      +  TRSY(2),SC(2)
+      SAVE DNORMI
 C
 C   Index IA: Make both PGs, phis; IY: two parts of PG, x args.
       DO 111 IA = 1,2

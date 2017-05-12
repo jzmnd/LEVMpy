@@ -103,7 +103,7 @@ C       TAU IS A PARAMETER VARIABLE
                YCC(JJ) = XTAU(JJ)*P(KQ)/(1.D0 + IOMEGA*XTAU(JJ)) 
             ENDIF
           ENDIF
-173     FORMAT(2X,I4,1P,(5E15.6))
+C 173     FORMAT(2X,I4,1P,(5E15.6))
 C
 161     CONTINUE
 C

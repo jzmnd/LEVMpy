@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
+from os import listdir
 from numpy.distutils.core import setup, Extension
 
-fortranlib = Extension(name = 'LEVMpyFortran',
-    extra_compile_args = ['-Wall -Wno-tabs -O3 -ffast-math'],
-    sources = ['levmpy/fortranlib/levmpyfortran_edited.pyf'],
-    depends = ['levmpy/fortranlib/']
+sourcefiles = ['levmpy/fortranlib/levmpyfortran_edited.pyf']
+sourcefiles += ['levmpy/fortranlib/' + f for f in listdir('levmpy/fortranlib/') if f.endswith('.f')]
+
+fortranlib = Extension(name = 'levmpy.fortranlib.LEVMpyFortran',
+    extra_f77_compile_args = ['-Wall', '-Wno-tabs', '-O3', '-ffast-math'],
+    sources = sourcefiles
     )
 
 setup(name = 'levmpy',
@@ -14,6 +17,7 @@ setup(name = 'levmpy',
     author = 'Jeremy Smith',
     author_email = 'j.smith.03@cantab.net',
     url = 'http://jeremysmithscientist.com',
-    packages = ['levmpy'],
+    download_url = 'https://github.com/jzmnd/LEVMpy',
+    packages = ['levmpy', 'levmpy.fortranlib'],
     ext_modules = [fortranlib]
     )

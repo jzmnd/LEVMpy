@@ -477,7 +477,7 @@ class Experiment():
         _lv.cm29.gam = 0.0
         _lv.cm29.sn1 = 0.0
         _lv.cm29.cs1 = 0.0
-        _lv.cm29.pii = 0.0
+        _lv.cm29.pii = 0.3183098861838
         _lv.cm29.cdn = 0.0
         _lv.cm29.qpi = 0.0
         _lv.cm29.mdex = 0

@@ -15,7 +15,7 @@ C
       XCU = CDN*YEE*XEE
 C
       IF(IWT.EQ.1) THEN
-            CDFG = XCU/(1.D0 + (TOMEGA*XEE)**2)
+        CDFG = XCU/(1.D0 + (TOMEGA*XEE)**2)
 C
         IF(MDEX.EQ.-6) CDFG = CDFG*XEE
       ELSEIF(IWT.EQ.0.AND.ABS(MDEX).EQ.8) THEN

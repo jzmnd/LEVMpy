@@ -35,7 +35,7 @@ C
       SAVE RDAE,TDAE,UU,U1A,PHI,GAM,US,RNE
 C
       ISW = 1
-      IF(II.EQ.1.OR.INH.EQ.1) THEN 
+      IF(II.EQ.1.OR.INH.EQ.1) THEN
         MDEXA = IABS(MDE)
         IF(JCD.EQ.0) THEN           ! CSD ONLY
             MDEX = MDE

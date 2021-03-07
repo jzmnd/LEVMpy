@@ -9,12 +9,7 @@ Based on LEVM version 8.06
 Created by Jeremy Smith on 2017-04-16
 """
 
-import os
-import sys
 import numpy as np
-
-__author__ = "Jeremy Smith"
-__version__ = "1.1"
 
 
 def dfloat(val):

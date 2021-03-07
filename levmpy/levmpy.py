@@ -11,13 +11,17 @@ Created by Jeremy Smith on 2017-04-16
 
 import os
 import sys
-import fortranlib as _lv
+import levmpy.fortranlib as _lv
 import numpy as np
-from utils import *
-
-__author__ = "Jeremy Smith"
-__version__ = "1.1"
-
+from levmpy.utils import (
+    dfloat,
+    resized,
+    convert_to_rect,
+    convert_to_polar,
+    convert_to_inverse,
+    convert_m_to_z,
+    convert_z_to_m
+)
 
 EPV = 8.85418782e-14
 NPAFR = len(_lv.cm2.ns)
@@ -131,13 +135,13 @@ class Experiment():
                 self.r1 = np.array(r1list, dtype=float)
                 self.r2 = np.array(r2list, dtype=float)
             else:
-                self.r1 = np.zeros(abs(self.md)) 
+                self.r1 = np.zeros(abs(self.md))
                 self.r2 = np.zeros(abs(self.md))
         return
 
     def _setflags(self):
         """Set flags for MAINCLC"""
-        self.iacy = 0 
+        self.iacy = 0
         if self.iopt < 0:
             self.iacy = abs(self.iopt)
             self.iopt = 0
@@ -301,7 +305,7 @@ class Experiment():
                 else:
                     taumin = self.parameters[35]
                     frat = self.parameters[38] / taumin
-                self.wf = (1.0/(self.icf / 2 - 1)) * np.log(frat)
+                self.wf = (1.0 / (self.icf / 2 - 1)) * np.log(frat)
 
             if not ((ip38a != 1) and (ip40a <= 1) and (ip34 <= 0)):
                 if 0 < ip34 < 8:
@@ -309,10 +313,12 @@ class Experiment():
                     self.irch = 2
                     if (ip34 < 3) or (ip34 == 5):
                         self.parameters[37] = 1
-                        if ip40a != 4: self.parameters[39] = 3 * ip40s
+                        if ip40a != 4:
+                            self.parameters[39] = 3 * ip40s
                     elif (ip34 == 3) or (ip34 == 4):
                         self.parameters[37] = 2
-                        if ip40a != 4: self.parameters[39] = 2 * ip40s
+                        if ip40a != 4:
+                            self.parameters[39] = 2 * ip40s
                     elif ip34 == 6:
                         self.parameters[37] = 2
                     else:
@@ -353,8 +359,19 @@ class Experiment():
 
         # Run MAINCLC if MAXFEV > 3
         if self.maxfev > 3:
-            self.result = _lv.mainclc(self.ky, self.ftol, 0.0, self.xtol, self.x,
-                                      self.maxfev, self.nprint, self.nfev, self.pex, self.nfrei, self.outputvals)
+            self.result = _lv.mainclc(
+                self.ky,
+                self.ftol,
+                0.0,
+                self.xtol,
+                self.x,
+                self.maxfev,
+                self.nprint,
+                self.nfev,
+                self.pex,
+                self.nfrei,
+                self.outputvals
+            )
             self.fitted = True
 
         # If MAXFEV = 0 no fit calc new data
@@ -521,12 +538,15 @@ class Experiment():
         fp("\nLEVM : COMPLEX NONLINEAR LEAST SQUARES IMMITTANCE DATA FITTING PROGRAM\n")
         fp("       VERSION 8.06 - 2/05\n\n")
         fp("{:s}\n".format(self.alpha))
-        fp("  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT\n".format(self.dinp, self.pinp, self.dfit, self.pfit))
+        fp("  DATA ENTERED IN {:s}{:s} FORMAT TO BE USED IN {:s}{:s} FIT\n".format(
+            self.dinp, self.pinp, self.dfit, self.pfit))
         fp("  CIRCUIT MODEL : {:s}\n\n".format(self.fun))
         fp("  *****  FIT OF {:s} DATA  *****\n\n".format(self.dattyp))
 
-        fp("  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}\n".format(self.md, self.irch, self.nfrei))
-        fp("  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}\n".format(self.nprint, self.maxfev, self.qq))
+        fp("  # OF DATA POINTS = {:d}   WEIGHT: IRCH = {:d}   # OF FREE PARAMETERS = {:d}\n".format(
+            self.md, self.irch, self.nfrei))
+        fp("  PRINTS EVERY {:d} ITERATIONS   MAX # ITERATIONS = {:d}   MAIN WT USES: {:s}\n".format(
+            self.nprint, self.maxfev, self.qq))
         fp("  CELL CAPACITANCE = {:e}\n".format(self.celcap))
 
         if self.ixi == 0:
@@ -550,13 +570,14 @@ class Experiment():
         fp("\n  INITIAL PARAMETER GUESSES AND FIXED (0) OR FREE (1 OR 2) STATUS\n")
         for i in range(16):
             j = i + 16
-            fp("     P({:2d}) = {: e}   {:d}     P({:2d}) = {: e}   {:d}\n".format(i + 1, self.parameters[i], self.nfree[i],
-                                                                                       j + 1, self.parameters[j], self.nfree[j]))
+            fp("     P({:2d}) = {: e}   {:d}     P({:2d}) = {: e}   {:d}\n".format(
+                i + 1, self.parameters[i], self.nfree[i], j + 1, self.parameters[j], self.nfree[j]))
         if self.n > 32:
             fp("\n  THE FOLLOWING PARAMETERS ARE ALWAYS FIXED\n")
             for i in range(32, 36):
                 j = i + 4
-                fp("     P({:2d}) = {: e}         P({:2d}) = {: e}\n".format(i + 1, self.parameters[i], j + 1, self.parameters[j]))
+                fp("     P({:2d}) = {: e}         P({:2d}) = {: e}\n".format(
+                    i + 1, self.parameters[i], j + 1, self.parameters[j]))
         fp("\n")
         return
 
@@ -595,7 +616,8 @@ class Experiment():
 
         fp("\n  PARAMETER ESTIMATES         STD DEV         REL STD DEV\n")
         for i, n in enumerate(self.ns1):
-            fp("     P({:2d}) = {: e}    {:e}    {:e}\n".format(n, self.x[i], self.rxsd[i] * self.x[i], self.rxsd[i]))
+            fp("     P({:2d}) = {: e}    {:e}    {:e}\n".format(
+                n, self.x[i], self.rxsd[i] * self.x[i], self.rxsd[i]))
         fp("\n  PDAV = {:e}\n".format(np.sum(self.rxsd) / (self.nfrei - self.ins)))
         fp("  PDRMS = {:e}\n".format(np.sqrt(np.sum(self.rxsd**2) / (self.nfrei - self.ins))))
 
@@ -604,11 +626,11 @@ class Experiment():
         t = 'I' if self.dattyp == 'I' else 'R'
         for i in range(self.md):
             j = i + self.md
-            fp("{:3d}  {:s}  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, t, self.y[i], self.outputvals[i],
-                                                                     self.r[i], self.res[i], self.resmod[i]))
+            fp("{:3d}  {:s}  {: e} {: e} {: e} {: e} {: e}\n".format(
+                i + 1, t, self.y[i], self.outputvals[i], self.r[i], self.res[i], self.resmod[i]))
             if self.dattyp == 'C':
-                fp("{:3d}  I  {: e} {: e} {: e} {: e} {: e}\n".format(i + 1, self.y[j], self.outputvals[j],
-                                                                      self.r[j], self.res[j], self.resmod[j]))
+                fp("{:3d}  I  {: e} {: e} {: e} {: e} {: e}\n".format(
+                    i + 1, self.y[j], self.outputvals[j], self.r[j], self.res[j], self.resmod[j]))
         return
 
     def writetofile(self):
